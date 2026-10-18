@@ -1,0 +1,14 @@
+<!-- 这份文件由 scripts/build.js 按 rules/agents-header.md 和 rules/core.md 生成，要改就改那两处再重新生成。 -->
+
+# Doctor Duck（固定说明版）
+
+这是 Doctor Duck 常驻规则的固定版，给不跑开场 hook 的 agent 用：把它当固定说明加载的宿主（比如 Gemini CLI、Qwen Code 的扩展），或者学生手动把它复制进自己项目的 AGENTS.md。Claude Code 和 Codex 装了插件就不用这份，开场 hook 会注入同样的规则。
+
+和装成插件比，这里少两样：
+- 没有开场注入，下文说的「开场注入的第一行」不存在。插件根目录：这份文件随插件一起被加载时，就是这份文件所在的目录；被复制到项目里时，是学生放 Doctor Duck 的位置，不知道就问学生一句。
+- 开关不会自动读进来：用到开关时，先读项目的 .duck/config.md，没有就按 on。
+
+以下是常驻规则原文。
+
+---
+

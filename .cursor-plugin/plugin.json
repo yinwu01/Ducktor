@@ -1,0 +1,20 @@
+{
+  "name": "duck",
+  "displayName": "Doctor Duck",
+  "description": "Doctor Duck: a research mentor built on Supervisor-Skills. Runs the research skills as /duck-* commands and explains the why behind each step. Trust me, I'm a Ducktor.",
+  "version": "0.1.0",
+  "author": {
+    "name": "JoeyWu-tech"
+  },
+  "homepage": "https://github.com/JoeyWu-tech/Doctor-Duck",
+  "repository": "https://github.com/JoeyWu-tech/Doctor-Duck",
+  "license": "CC-BY-NC-SA-4.0 AND CC-BY-4.0 AND MIT",
+  "keywords": [
+    "research",
+    "mentor",
+    "paper-writing",
+    "supervisor-skills"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks-cursor.json"
+}

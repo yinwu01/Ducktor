@@ -47,4 +47,4 @@ off：只交原技能的结果，不附报告，也不写 .duck/ 里的文件。
 
 .duck/ 和里面的文件不存在时，用到才建。
 
-<!-- 插件开发者看：这份文件由 scripts/build-wrappers.js 按 rules/wrapper-template.md 和 rules/commands.json 生成，要改就改那两处再重新生成。 -->
+<!-- 插件开发者看：这份文件由 scripts/build.js 按 rules/wrapper-template.md 和 rules/commands.json 生成，要改就改那两处再重新生成。 -->

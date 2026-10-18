@@ -90,8 +90,11 @@ function buildContext(project) {
 
 function sessionStart() {
   const input = readInput();
-  const cwd = typeof input.cwd === 'string' && input.cwd ? input.cwd : null;
-  return buildContext(cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  // Claude Code and Codex send cwd; Cursor sends workspace_roots.
+  const roots = Array.isArray(input.workspace_roots) ? input.workspace_roots : [];
+  const project = [input.cwd, roots[0], process.env.CLAUDE_PROJECT_DIR]
+    .find((p) => typeof p === 'string' && p);
+  return buildContext(project || process.cwd());
 }
 
 // True when target (a file or folder) sits inside the plugin root, symlinks resolved.
@@ -134,11 +137,13 @@ function main(command) {
     context = `Doctor Duck 插件根目录：${ROOT}\n\n（开场脚本出错，常驻规则这次没加载：${err.message}）`;
   }
   if (!context) return;
-  // Claude Code and Codex both read this shape at SessionStart. writeSync, because an
-  // async pipe write can be lost when the process exits right after it.
-  fs.writeSync(1, JSON.stringify({
-    hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: context },
-  }));
+  // Claude Code and Codex read hookSpecificOutput; Cursor reads additional_context.
+  // Print only the one the host reads: Claude Code would inject both, twice.
+  // writeSync, because an async pipe write can be lost when the process exits right after it.
+  const output = process.env.CURSOR_PLUGIN_ROOT
+    ? { additional_context: context }
+    : { hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: context } };
+  fs.writeSync(1, JSON.stringify(output));
 }
 
 module.exports = { main, modeOf, buildContext, insideRoot, ROOT };
