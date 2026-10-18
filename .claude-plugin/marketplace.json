@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "doctor-duck",
+  "description": "Doctor Duck: a research mentor built on Supervisor-Skills.",
+  "owner": {
+    "name": "JoeyWu-tech"
+  },
+  "plugins": [
+    {
+      "name": "duck",
+      "description": "Runs the Supervisor-Skills research skills as /duck-* commands and explains the why behind each step.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
