@@ -1,7 +1,7 @@
-# Block-skip attention (made-up test project)
+# BlockSkip
 
-This folder is a fictional student project used to test Doctor Duck. Nothing in it is a real result.
+Skip attention blocks whose estimated contribution is small, to speed up long-context inference.
 
-- paper/main.tex: a short workshop-style draft with a few planted problems
-- code/skip_attn.py: a toy block-skipping attention routine
-- notes.md: the student's working notes
+- paper/main.tex: workshop draft
+- code/skip_attn.py: block-skipping attention routine
+- notes.md: working notes

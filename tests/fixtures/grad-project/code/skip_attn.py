@@ -1,4 +1,4 @@
-"""Toy block-skipping attention. Made up for testing; not a real implementation."""
+"""Block-skipping attention: skip (query block, key block) pairs with a small estimated score."""
 import numpy as np
 
 BLOCK = 64

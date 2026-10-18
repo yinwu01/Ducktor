@@ -2,30 +2,140 @@
 
 > Trust me, I'm a Ducktor.
 
-基于 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的科研导师插件，开发中。它把 Supervisor-Skills 的 11 个技能做成 `/duck-*` 命令，每做完一步，再把背后的道理讲给你听。
+Doctor Duck 是给研究生用的科研导师插件，跑在 Claude Code 和 Codex 里。它把 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的 11 个科研技能（文献综述、评估 idea、理论文逻辑、写引言、写正文、润色、作图、投稿前审稿等）做成 `/duck-*` 命令；每做完一步，再把这一步背后的道理讲给你听，记进你自己项目里的笔记本。
+
+它不替你做研究。研究往哪走、哪个结论能写，你说了算；它负责把 AI 做事的取舍摊开，让你下次自己先想到。
+
+## 用起来什么样
+
+一个虚构的学生项目里（`tests/fixtures/grad-project`），学生问为什么按 64 个 token 一块来跳过注意力。下面是 Claude Code（Sonnet）的真实回复，节选：
+
+```
+你：/duck-why code/skip_attn.py 为什么按 64 个 token 一块来跳
+
+鸭子：用的思路：块稀疏注意力。skip_attn.py:5 设 BLOCK = 64……
+  为什么：块越大，掩码判断和访存越规整，墙钟时间省得越多。你在笔记 10-05
+    自己测到，逐 token 跳过只省 4%。……64 是不是 GPU 友好的 tile 大小，是我的
+    判断，不是项目里的记录。
+  这次的过程：为什么选 64、没选 32 或 128：记录里没有。……
+  对账时有三处对不上：……论文 Method 写「estimate the attention mass」，代码算的
+    是块均值点积的绝对值，不是 softmax 之后的注意力质量。
+  （以上根据代码和过程记录重建，不是 AI 内部过程的回放。）
+  你能带走的一条：块大小是要扫的超参数，不是常数。选定前至少扫 3 个值，
+    速度和准确率一起记。
+  要核对的话：把 BLOCK 依次改成 16、32、64、128、256，其余不动，各跑几个 seed……
+```
+
+「你能带走的一条」同时记进了项目的 `.duck/notebook.md`：
+
+```
+- 10-17 做实验｜块大小是要扫的超参数，选定前至少扫 3 个值，速度和准确率一起记（出处：我自己的判断，来自 /duck-why 拆 code/skip_attn.py）
+```
+
+## 安装
+
+需要 Claude Code 或 Codex，外加 Node.js 18 以上。仓库现在是私有的，要有访问权限。
+
+```
+# Claude Code
+claude plugin marketplace add JoeyWu-tech/Doctor-Duck
+claude plugin install duck@doctor-duck
+
+# Codex（装好后在 /hooks 里信任 Doctor Duck 的 hook）
+codex plugin marketplace add JoeyWu-tech/Doctor-Duck
+codex plugin add duck@doctor-duck
+```
+
+开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。更新、卸载、本地试用和常见问题见 [INSTALL.md](INSTALL.md)。
+
+## 命令
+
+Codex 里把 `/duck-review` 写成 `$duck:duck-review`。
+
+| 命令 | 做什么 | 背后的技能 |
+|---|---|---|
+| `/duck` | 列出全部命令；`/duck on`、`quiet`、`off` 切开关；后面接一句话时，替你挑一条命令，先说按哪条处理再照做 | |
+| `/duck-survey` | 摸方向、文献综述 | deep-research |
+| `/duck-idea` | 评估 idea | idea-evaluator |
+| `/duck-outline` | 理论文逻辑，技术论文和 benchmark 论文各用一个模板 | tech-paper-template、benchmark-paper-template |
+| `/duck-intro` | 写引言 | intro-drafter |
+| `/duck-write` | 写正文 | paper-writer |
+| `/duck-polish` | 润色 | paper-polish |
+| `/duck-figure` | 设计图、出图质检 | figure-designer |
+| `/duck-review` | 投稿前审稿 | pre-submission-reviewer |
+| `/duck-vibe` | 这块该让 AI 干到哪、用什么工具 | vibe-research-workflow |
+| `/duck-why` | 拆解刚才那一步，或者指定的文件、函数、提交、段落 | |
+| `/duck-learn` | 阶段复盘 | |
+| `/duck-notes` | 看、改笔记本 | |
+| `/duck-skill` | 关掉或打开命令、改命令的副本、加你们组的卡 | |
+
+不敲命令照常干活时，鸭子按常驻规则陪着：要做的研究决定会改变做法时先问一句；做完实质性的一步附一行「为什么」；有取舍时写一行决策（选了什么、放弃了什么、谁定的）；你的要求正好归某条命令管时，告诉你那条命令。它不出题、不留作业、不给你打分。
+
+## 开关
+
+| | 对话里 | 写进 `.duck/` |
+|---|---|---|
+| `/duck on`（默认） | 结果，加 5 到 8 行「为什么」和决策行 | 报告、决策、笔记 |
+| `/duck quiet` | 只有结果 | 报告、决策、笔记 |
+| `/duck off` | 只有结果，常驻规则也不加载 | 不写 |
+
+说一句「这类我懂了」，这一类以后只记不讲。
+
+## 你的项目里会多什么
+
+只多一个 `.duck/` 文件夹：开关设定、笔记本、决策记录、完整报告、你们组的卡、你改过的命令副本。都是普通的 markdown，可以进 git。插件本身不往你的项目以外写东西。
+
+## 支持哪些 agent
+
+| | 状态 |
+|---|---|
+| Claude Code 2.1.301 | 实测：从 GitHub 安装、命令、开关、开场注入、读插件文件的放行 |
+| Codex 0.163.0 | 实测：同上 |
+| Cursor、Gemini CLI、Qwen Code | 有适配文件，未实测 |
+| 只读 `AGENTS.md` 的 agent | 只有常驻规则，未实测 |
+
+详见 [docs/agent-portability.md](docs/agent-portability.md)。
+
+## 怎么运行的
+
+- 开会话时，hook 把插件位置、常驻规则（`rules/core.md`）和你项目的开关注入上下文。
+- 每条 `/duck-*` 命令是一层包装：先查你的设定和你们组的卡，再读 `library/` 里原样存放的 Supervisor-Skills 技能照做，最后按开关写「为什么」。
+- 原技能一字不改，和上游逐文件比对（`library/upstream.lock.json`）。
+
+详见 [docs/how-it-works.md](docs/how-it-works.md)。
+
+## 开发
+
+```
+npm test                         # 不调模型：hook 脚本、清单、命令、生成文件、上游副本
+npm run build                    # 改了 rules/ 里的模板以后，重新生成命令和 AGENTS.md
+npm run check                    # 生成文件是否最新、library/ 是否还和上游一致
+node tests/e2e/flow.js claude    # 用真模型把研究生流程走一遍（要花钱）
+node tests/e2e/flow.js codex
+```
+
+测试怎么设计的、上一次跑的结果，见 [docs/testing.md](docs/testing.md)。
 
 ## 仓库结构
 
-仓库根目录就是插件本身：
+```
+.claude-plugin/  .codex-plugin/  .cursor-plugin/  .agents/plugins/  gemini-extension.json   各宿主的清单
+hooks/  bin/duck.js     开场注入、读插件文件的放行（Node，不装依赖）
+rules/                  常驻规则、命令模板、命令表
+skills/                 15 条命令
+library/                Supervisor-Skills 的 11 个原技能（上游提交 aff5de9），原样存放
+handbook/               科研导师手册的文字版（zh、en）
+cards/                  经验卡片（第一批还在写）
+scripts/  tests/        生成、同步上游、测试
+docs/                   说明文档、设计记录、调研；docs/supervisor-skills/ 是上游仓库的存档
+AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的）
+```
 
-- `skills/`：你能敲的命令，`/duck` 总入口和各条 `/duck-*`
-- `library/`：Supervisor-Skills 的 11 个原技能，原样存放，不是命令
-- `handbook/`：科研导师手册的文字版
-- `cards/`：经验卡片
-- `rules/`：常驻规则，开会话时由开场 hook 注入
-- `hooks/`、`bin/`：开场 hook，用 Node 写，不装依赖
-- `.claude-plugin/`、`.codex-plugin/`、`.agents/plugins/`：Claude Code 和 Codex 的插件清单和安装入口
-- `LICENSE`、`LICENSES/`：按目录分的许可
+## 来源和致谢
 
-本仓库从 Supervisor-Skills 的提交 c243997（2026-07-01）分出来，那时的整个仓库原样放在 `docs/supervisor-skills/`，上游的提交历史和原作者都保留着。插件用到的 11 个技能和手册文字，取自上游后来的提交 aff5de9（2026-07-16），见 `library/README.md`。
-
-## 本地试用
-
-- Claude Code：`claude --plugin-dir <本仓库路径>`，再敲 `/duck`
-- Codex：`codex plugin marketplace add <本仓库路径>`，再 `codex plugin add duck@doctor-duck`；开 Codex 后在 `/hooks` 里信任开场 hook，再敲 `$duck:duck`
-
-运行要求：Node（开场 hook 用）。
+- 方法论、手册和 11 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库从它的提交 c243997（2026-07-01）分出来，那时的整个仓库原样放在 `docs/supervisor-skills/`，上游的提交历史和作者保留在本仓库里。
+- 多宿主的做法参考了 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
 ## 许可
 
-按目录分：我们写的文字用 CC BY-NC-SA 4.0，代码用 MIT，原技能各自保留原来的许可。详见 `LICENSE` 和 `LICENSES/README.md`。
+按目录分：我们写的文字（`skills/`、`rules/`、`cards/`）用 CC BY-NC-SA 4.0，不可商用；代码（`bin/`、`hooks/`、`scripts/`、`tests/`）用 MIT；`library/` 里的原技能各自保留原来的许可，`handbook/` 是 CC BY-NC-SA 4.0，`docs/supervisor-skills/` 照上游自己的 LICENSE。详见 [LICENSE](LICENSE) 和 [LICENSES/README.md](LICENSES/README.md)。

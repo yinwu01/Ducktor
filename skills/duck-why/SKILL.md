@@ -37,7 +37,7 @@ disable-model-invocation: true
 不出题，不考学生，不给学生打分。
 
 ## 4. 收尾
-- 开关是 on 或 quiet（没有 .duck/config.md 就是 on）：整份拆解写进 .duck/reports/今天的日期-why.md，日期写成 YYYY-MM-DD，重名就在后面加 -2、-3；「你能带走的一条」追加到 .duck/notebook.md，一行一条：「- MM-DD 阶段｜原则（出处）」，阶段按这次拆的事来写，比如「做实验」「写引言」。
+- 开关是 on 或 quiet（没有 .duck/config.md 就是 on）：整份拆解写进 .duck/reports/今天的日期-why.md，日期写成 YYYY-MM-DD，重名就在后面加 -2、-3；「你能带走的一条」追加到 .duck/notebook.md，一行一条：「- MM-DD 阶段｜原则（出处）」，前后不空行，阶段按这次拆的事来写，比如「做实验」「写引言」。
 - 开关是 off：只在对话里讲，不写文件。
 
 .duck/ 和里面的文件不存在时，用到才建。
