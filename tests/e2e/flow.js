@@ -1,0 +1,255 @@
+#!/usr/bin/env node
+// End-to-end run of a grad student's session with Doctor Duck, on a real model.
+// Code here is MIT. It costs real tokens (a few US dollars per run on Sonnet).
+//
+//   node tests/e2e/flow.js claude    Claude Code, loads this checkout with --plugin-dir
+//   node tests/e2e/flow.js codex     Codex, uses the installed duck@doctor-duck plugin
+//
+// Environment:
+//   DUCK_E2E_MODEL   model for the host (default: sonnet for claude, Codex's own default for codex)
+//   DUCK_E2E_WRAP    command prefix for the host, e.g. "setpriv --inh-caps=-all --ambient-caps=-all"
+//                    when bwrap refuses to start under ambient capabilities (Codex sandbox)
+//   DUCK_E2E_ONLY    comma-separated stage names to run (later stages may depend on earlier ones)
+//
+// The fixture project is copied to evals/results/e2e-<host>-<time>/project/ and every
+// stage's transcript, plus summary.json and summary.md, land next to it.
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const ROOT = path.resolve(__dirname, '..', '..');
+const HOST = process.argv[2];
+if (!['claude', 'codex'].includes(HOST)) {
+  console.error('usage: node tests/e2e/flow.js claude|codex');
+  process.exit(2);
+}
+const MODEL = process.env.DUCK_E2E_MODEL || (HOST === 'claude' ? 'sonnet' : '');
+const WRAP = (process.env.DUCK_E2E_WRAP || '').split(' ').filter(Boolean);
+const ONLY = (process.env.DUCK_E2E_ONLY || '').split(',').filter(Boolean);
+const STAMP = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+const OUT = path.join(ROOT, 'evals', 'results', `e2e-${HOST}-${STAMP}`);
+const PROJECT = path.join(OUT, 'project');
+
+// /duck-review in Claude Code is $duck:duck-review in Codex.
+const cmd = (name) => (HOST === 'claude' ? `/${name}` : `$duck:${name}`);
+
+// ---------- running the host ----------
+
+function runClaude(prompt, session) {
+  const args = ['-p', prompt, '--plugin-dir', ROOT, '--output-format', 'stream-json', '--verbose',
+    '--permission-mode', 'acceptEdits'];
+  if (MODEL) args.push('--model', MODEL);
+  if (session) args.push('--resume', session);
+  return spawnSync(WRAP[0] || 'claude', [...WRAP.slice(1), ...(WRAP.length ? ['claude'] : []), ...args],
+    { cwd: PROJECT, encoding: 'utf8', timeout: 900000, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
+}
+
+function runCodex(prompt, session) {
+  // `exec resume` takes no -s, so the sandbox mode goes in as a config override on both.
+  const common = ['--json', '--dangerously-bypass-hook-trust', '-c', 'sandbox_mode="workspace-write"'];
+  if (MODEL) common.push('-m', MODEL);
+  const args = session
+    ? ['exec', 'resume', ...common, session, prompt]
+    : ['exec', ...common, '-C', PROJECT, prompt];
+  return spawnSync(WRAP[0] || 'codex', [...WRAP.slice(1), ...(WRAP.length ? ['codex'] : []), ...args],
+    { cwd: PROJECT, encoding: 'utf8', timeout: 900000, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
+}
+
+// Normalizes one host transcript into { session, reply, reads, tools, injected, cost }.
+function parse(stdout) {
+  const t = { session: null, reply: '', reads: [], tools: [], injected: '', cost: 0, errors: [] };
+  for (const line of stdout.split('\n')) {
+    let ev;
+    try { ev = JSON.parse(line); } catch (err) { continue; }
+    if (HOST === 'claude') {
+      if (ev.type === 'system' && ev.session_id) t.session = ev.session_id;
+      if (ev.type === 'system' && ev.subtype === 'hook_response') t.injected += String(ev.output || ev.stdout || '');
+      if (ev.type === 'assistant') {
+        for (const c of ev.message.content || []) {
+          if (c.type !== 'tool_use') continue;
+          t.tools.push(`${c.name} ${c.input.file_path || c.input.command || c.input.path || ''}`);
+          if (c.name === 'Read') t.reads.push(c.input.file_path);
+        }
+      }
+      if (ev.type === 'result') { t.reply = ev.result || ''; t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; }
+    } else {
+      if (ev.type === 'thread.started') t.session = ev.thread_id;
+      const it = ev.item || {};
+      if (ev.type === 'item.completed' && it.type === 'agent_message') t.reply += `${it.text}\n`;
+      if (ev.type === 'item.completed' && it.type === 'command_execution') {
+        t.tools.push(`shell ${it.command}`);
+        t.reads.push(it.command);
+      }
+      if (ev.type === 'item.completed' && it.type === 'file_change') t.tools.push(`edit ${(it.changes || []).map((c) => c.path).join(' ')}`);
+      if (ev.type === 'turn.failed' || ev.type === 'error') t.errors.push(JSON.stringify(ev).slice(0, 300));
+    }
+  }
+  return t;
+}
+
+// ---------- checks ----------
+
+const duckFile = (rel) => path.join(PROJECT, '.duck', rel);
+const exists = (rel) => fs.existsSync(duckFile(rel));
+const text = (rel) => (exists(rel) ? fs.readFileSync(duckFile(rel), 'utf8') : '');
+const reports = (suffix) => (fs.existsSync(duckFile('reports'))
+  ? fs.readdirSync(duckFile('reports')).filter((f) => f.endsWith(`${suffix}.md`) || f.includes(`${suffix}-`)) : []);
+const allReports = () => (fs.existsSync(duckFile('reports')) ? fs.readdirSync(duckFile('reports')) : []);
+const readOf = (t, skill) => t.reads.some((r) => r && r.includes(`library/${skill}/SKILL.md`));
+const switchIs = (mode) => new RegExp(`^[\\s>*#-]*开关\\s*[:：]\\s*${mode}`, 'm').test(text('config.md'));
+const QUIZ = /考考你|小测|测验|课后作业|留个作业|布置.{0,4}作业|给你打分|你的得分|成长档案/;
+const paperHash = () => fs.readFileSync(path.join(PROJECT, 'paper', 'main.tex'), 'utf8');
+
+// Each stage: name, prompt, resume (continue the session) and checks. A check is
+// [severity, label, fn(transcript, before)] where severity is must or should.
+function stages() {
+  return [
+    { name: 'menu', prompt: cmd('duck'), checks: [
+      ['must', 'menu lists the commands', (t) => /duck-review/.test(t.reply) && /duck-learn/.test(t.reply)],
+      ['must', 'says the switch is on', (t) => /\bon\b/.test(t.reply)],
+      ['must', 'hook injected the plugin root', (t) => HOST !== 'claude' || /插件根目录/.test(t.injected)],
+    ] },
+    { name: 'idea', resume: true, prompt: `${cmd('duck-idea')} 我想做长文本推理加速：注意力里贡献很小的块整块跳过。背景在 notes.md 里。`, checks: [
+      ['must', 'read library/idea-evaluator', (t) => readOf(t, 'idea-evaluator')],
+      ['must', 'wrote an idea report', () => reports('idea').length > 0],
+      ['must', 'notebook got a line', () => /评估 idea|idea/.test(text('notebook.md'))],
+      ['should', 'reply has the why part', (t) => /为什么/.test(t.reply)],
+    ] },
+    { name: 'review', resume: true, prompt: `${cmd('duck-review')} paper/main.tex`, checks: [
+      ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
+      ['must', 'wrote a review report', () => reports('review').length > 0],
+      ['must', 'caught the single-run claim', (t) => /seed|种子|单次|一次|方差|标准差/.test(t.reply)],
+      ['should', 'caught the em-dash', (t) => /em-dash|破折号|em dash/i.test(t.reply)],
+    ] },
+    { name: 'propose', resume: true, prompt: '帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。', before: paperHash, checks: [
+      ['must', 'offers /duck-polish instead of running it', (t) => /duck-polish/.test(t.reply)],
+      ['should', 'did not edit the paper before the student agreed', (t, before) => paperHash() === before],
+    ] },
+    { name: 'why', resume: true, prompt: cmd('duck-why'), checks: [
+      ['must', 'says it is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
+      ['must', 'wrote a why report', () => reports('why').length > 0],
+    ] },
+    { name: 'quiet', resume: true, prompt: `${cmd('duck')} quiet`, checks: [
+      ['must', 'config says quiet', () => switchIs('quiet')],
+    ] },
+    { name: 'polish-quiet', resume: true, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的摘要`, before: () => allReports().length, checks: [
+      ['must', 'read library/paper-polish', (t) => readOf(t, 'paper-polish')],
+      ['must', 'still wrote a report', (t, before) => allReports().length > before],
+      ['must', 'no why part in the reply', (t) => !/你能带走的一条|下次自己先做什么/.test(t.reply)],
+    ] },
+    { name: 'card-draft', resume: true, prompt: `${cmd('duck-skill')} card new 我们组规定：结果表里每个数都要写明跑了几个随机种子`, checks: [
+      ['should', 'shows the card before writing it', () => !exists('cards/G01.md')],
+    ] },
+    { name: 'card-ok', resume: true, prompt: '可以，写吧。', checks: [
+      ['must', 'wrote .duck/cards/G01.md', () => exists('cards/G01.md')],
+      ['must', 'INDEX lists G01', () => /G01/.test(text('cards/INDEX.md'))],
+    ] },
+    { name: 'learn-ask', resume: true, prompt: cmd('duck-learn'), checks: [
+      ['must', 'opens with the one question', (t) => /最想重来/.test(t.reply)],
+    ] },
+    { name: 'learn', resume: true, prompt: '补 seed 是我定的。最想重来的是摸方向，搜得太窄了。', checks: [
+      ['must', 'wrote a learn report', () => reports('learn').length > 0],
+      ['should', 'lists what was left to the AI', (t) => /交给 ?AI|AI 定/.test(t.reply)],
+      ['should', 'next step uses the answer', (t) => /摸方向|检索|搜/.test(t.reply)],
+    ] },
+    { name: 'off', resume: true, prompt: `${cmd('duck')} off`, checks: [
+      ['must', 'config says off', () => switchIs('off')],
+    ] },
+    { name: 'off-new-session', resume: false, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的结论一节`,
+      before: () => ({ reports: allReports().length, notebook: text('notebook.md') }), checks: [
+        ['must', 'hook injected the off note', (t) => HOST !== 'claude' || /鸭子现在是 off/.test(t.injected)],
+        ['must', 'no new report', (t, before) => allReports().length === before.reports],
+        ['must', 'notebook untouched', (t, before) => text('notebook.md') === before.notebook],
+      ] },
+  ];
+}
+
+function globalChecks(transcripts) {
+  const notebook = text('notebook.md').split('\n').filter((l) => l.trim());
+  return [
+    ['must', 'notebook lines follow "- MM-DD 阶段｜原则（出处）"', () => notebook.length > 0 && notebook.every((l) => /^- \d{2}-\d{2} .+｜.+/.test(l))],
+    ['should', 'decision lines start with ▸ 决策', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /▸ ?决策/.test(l))],
+    ['must', 'no em-dash in notebook or decisions', () => !/—/.test(text('notebook.md') + text('decisions.md'))],
+    ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
+  ];
+}
+
+// ---------- main ----------
+
+function setup() {
+  fs.mkdirSync(OUT, { recursive: true });
+  fs.cpSync(path.join(ROOT, 'tests', 'fixtures', 'grad-project'), PROJECT, { recursive: true });
+  const git = (...a) => spawnSync('git', a, { cwd: PROJECT });
+  git('init', '-q');
+  git('add', '-A');
+  git('-c', 'user.name=student', '-c', 'user.email=student@example.com', 'commit', '-q', '-m', '初稿和实验代码');
+  if (HOST === 'codex') {
+    const cache = path.join(process.env.HOME, '.codex', 'plugins', 'cache', 'doctor-duck', 'duck');
+    const head = spawnSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
+    const versions = fs.existsSync(cache) ? fs.readdirSync(cache) : [];
+    const installed = versions.map((v) => spawnSync('git', ['-C', path.join(cache, v), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim());
+    if (!installed.includes(head)) {
+      console.warn(`warning: the Codex plugin cache is not at ${head.slice(0, 7)}; run: codex plugin add duck@doctor-duck`);
+    }
+  }
+}
+
+function main() {
+  setup();
+  const results = [];
+  const transcripts = [];
+  let session = null;
+  for (const stage of stages()) {
+    if (ONLY.length && !ONLY.includes(stage.name)) continue;
+    const before = stage.before ? stage.before() : undefined;
+    const started = Date.now();
+    const run = HOST === 'claude'
+      ? runClaude(stage.prompt, stage.resume ? session : null)
+      : runCodex(stage.prompt, stage.resume ? session : null);
+    fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}.jsonl`), run.stdout || '');
+    const t = parse(run.stdout || '');
+    if (stage.resume !== false && !session) session = t.session;
+    if (stage.resume === false) session = t.session;
+    transcripts.push(t);
+    const checks = stage.checks.map(([severity, label, fn]) => {
+      let ok = false;
+      try { ok = Boolean(fn(t, before)); } catch (err) { ok = false; }
+      return { severity, label, ok };
+    });
+    results.push({ stage: stage.name, prompt: stage.prompt, seconds: Math.round((Date.now() - started) / 1000),
+      exit: run.status, cost: t.cost, tools: t.tools, errors: t.errors, checks, reply: t.reply });
+    const mark = checks.every((c) => c.ok) ? 'ok  ' : (checks.some((c) => !c.ok && c.severity === 'must') ? 'FAIL' : 'warn');
+    console.log(`${mark} ${stage.name} (${results.at(-1).seconds}s)`);
+    for (const c of checks.filter((x) => !x.ok)) console.log(`       ${c.severity}: ${c.label}`);
+  }
+  const global = globalChecks(transcripts).map(([severity, label, fn]) => {
+    let ok = false;
+    try { ok = Boolean(fn()); } catch (err) { ok = false; }
+    return { severity, label, ok };
+  });
+  for (const c of global.filter((x) => !x.ok)) console.log(`FAIL global ${c.severity}: ${c.label}`);
+  const all = [...results.flatMap((r) => r.checks), ...global];
+  const summary = {
+    host: HOST, model: MODEL || '(host default)', commit: spawnSync('git', ['-C', ROOT, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).stdout.trim(),
+    when: new Date().toISOString(), cost_usd: results.reduce((s, r) => s + (r.cost || 0), 0),
+    must_failed: all.filter((c) => !c.ok && c.severity === 'must').length,
+    should_failed: all.filter((c) => !c.ok && c.severity === 'should').length,
+    passed: all.filter((c) => c.ok).length, total: all.length, stages: results, global,
+  };
+  fs.writeFileSync(path.join(OUT, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
+  const md = [`# e2e ${HOST} ${summary.commit} (${summary.model})`, '',
+    `${summary.passed}/${summary.total} checks passed; must failed ${summary.must_failed}, should failed ${summary.should_failed}; cost $${summary.cost_usd.toFixed(2)}`, ''];
+  for (const r of results) {
+    md.push(`## ${r.stage}: \`${r.prompt}\` (${r.seconds}s)`, '');
+    for (const c of r.checks) md.push(`- [${c.ok ? 'x' : ' '}] ${c.severity}: ${c.label}`);
+    md.push('', '<details><summary>reply</summary>', '', r.reply.trim(), '', '</details>', '');
+  }
+  md.push('## global', '', ...global.map((c) => `- [${c.ok ? 'x' : ' '}] ${c.severity}: ${c.label}`), '');
+  fs.writeFileSync(path.join(OUT, 'summary.md'), md.join('\n'));
+  console.log(`\n${summary.passed}/${summary.total} checks passed, must failed ${summary.must_failed}. ${path.relative(ROOT, OUT)}/summary.md`);
+  process.exit(summary.must_failed ? 1 : 0);
+}
+
+main();
