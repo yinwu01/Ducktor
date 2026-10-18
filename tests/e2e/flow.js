@@ -240,10 +240,11 @@ function main() {
       return { severity, label, ok };
     });
     let checks = evaluate(t);
-    // The original skills sometimes stop to ask for missing details. Answer once, the
-    // way a student would, and check again; the summary records that it happened.
+    // The original skills and core rule 1 sometimes stop to ask for missing details, and
+    // the questions are not always the last line. Answer once, the way a student would,
+    // and check again; the summary records that it happened.
     let followup = false;
-    if (stage.name !== 'learn-ask' && checks.some((c) => !c.ok && c.severity === 'must') && /[？?]\s*$|[？?][^？?]{0,80}$/.test(t.reply.trim())) {
+    if (stage.name !== 'learn-ask' && checks.some((c) => !c.ok && c.severity === 'must') && /[？?]/.test(t.reply)) {
       followup = true;
       const again = HOST === 'claude' ? runClaude(FOLLOWUP, session) : runCodex(FOLLOWUP, session);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
