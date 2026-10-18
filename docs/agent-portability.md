@@ -29,7 +29,7 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 ## 每个宿主要注意的
 
 **Claude Code**
-- 文档里插件命令的全名是 `/duck:duck-review`，短名 `/duck-review` 文档没写，但两种写法在 `claude -p` 里都实测能触发。短名叫不出来时用全名。
+- 文档里插件命令的全名是 `/duck:duck-review`，短名 `/duck-review` 文档没写。端到端流程用的是短名；全名在 10-17 用 `claude -p '/duck:duck-notes'` 单独试过，能触发。短名叫不出来时用全名。
 - 读插件目录要靠插件自带的 PreToolUse hook 放行（`docs/how-it-works.md`）。用户关掉了全部 hook（`disableAllHooks`）或者没装 Node 时，每次读 `library/` 会弹窗问，`-p` 模式下会被拒。
 
 **Codex**

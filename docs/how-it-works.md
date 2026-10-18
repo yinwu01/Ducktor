@@ -20,7 +20,7 @@
 2. 常驻规则：项目里有学生改过的 `.duck/skills/core.md` 就用它，否则用插件的 `rules/core.md`。开关是 off 时，换成 `rules/off.md` 那一小段。
 3. 项目 `.duck/config.md` 的内容（最多 1,200 字），以及从中读出的开关。
 
-注入约 2,400 字符（10-17 实测：项目里没有 config.md 时 2,430 字符，加上 config.md 的上限 1,200 字也在 3,700 以内）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
+注入约 2,600 字符（10-17 实测：项目里没有 config.md 时 2,628 字符，加上 config.md 的上限 1,200 字也在 4,000 以内）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
 
 `bin/duck.js` 只读文件、拼文字，规则的原文都在 `rules/` 下，不写进代码。这样代码可以用 MIT，文字用 CC BY-NC-SA，两者不混（见 `LICENSES/README.md`）。
 
@@ -47,9 +47,9 @@
 
 ## 读插件自己的文件
 
-Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep，调 `bin/duck.js allow-read`。目标路径（解开符号链接以后）在插件根目录下才回答 allow，别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
+Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep，调 `bin/duck.js allow-read`。目标路径（解开符号链接以后）在插件根目录下才回答 allow，别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，照宿主原来的规矩走（交互时弹窗问，`-p` 模式下拒绝），所以常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
 
-这条 hook 只跳过「要不要允许」的询问；用户自己设的 deny、ask 规则照样生效。用户开了 `blockReadsOutsideWorkingDirectories` 时它还管不管用，文档没写，我们也没测。
+这条 hook 只跳过「要不要允许」的询问；据 Claude Code 的权限文档，用户自己设的 deny、ask 规则照样生效。用户开了 `blockReadsOutsideWorkingDirectories` 时它还管不管用，文档没写，我们也没测。
 
 Codex 的沙箱默认能读整个文件系统，不需要这条；它的工具名也不叫 Read，这条 hook 在 Codex 里匹配不到任何东西。
 

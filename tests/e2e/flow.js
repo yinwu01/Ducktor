@@ -91,6 +91,25 @@ function parse(stdout) {
   return t;
 }
 
+// Codex's --json stream does not carry hook output; the session's rollout file under
+// $CODEX_HOME/sessions/YYYY/MM/DD/ does, so the hook checks read that.
+function codexInjected(thread) {
+  if (!thread) return '';
+  const root = path.join(process.env.CODEX_HOME || path.join(process.env.HOME, '.codex'), 'sessions');
+  const found = [];
+  const walk = (dir, depth) => {
+    let entries = [];
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (err) { return; }
+    for (const e of entries) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory() && depth < 3) walk(p, depth + 1);
+      else if (e.isFile() && e.name.includes(thread)) found.push(p);
+    }
+  };
+  walk(root, 0);
+  return found.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+}
+
 // ---------- checks ----------
 
 const duckFile = (rel) => path.join(PROJECT, '.duck', rel);
@@ -102,7 +121,7 @@ const allReports = () => (fs.existsSync(duckFile('reports')) ? fs.readdirSync(du
 const readOf = (t, skill) => t.reads.some((r) => r && r.includes(`library/${skill}/SKILL.md`));
 const switchIs = (mode) => new RegExp(`^[\\s>*#-]*开关\\s*[:：]\\s*${mode}`, 'm').test(text('config.md'));
 const FOLLOWUP = '信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行。';
-const QUIZ = /考考你|小测|测验|课后作业|留个作业|布置.{0,4}作业|给你打分|你的得分|成长档案/;
+const QUIZ = /考考你|小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 
 // Each stage: name, prompt, resume (continue the session) and checks. A check is
 // [severity, label, fn(transcript, before)] where severity is must or should.
@@ -110,8 +129,8 @@ function stages() {
   return [
     { name: 'menu', prompt: cmd('duck'), checks: [
       ['must', 'menu lists the commands', (t) => /duck-review/.test(t.reply) && /duck-learn/.test(t.reply)],
-      ['must', 'says the switch is on', (t) => /\bon\b/.test(t.reply)],
-      ['must', 'hook injected the plugin root', (t) => HOST !== 'claude' || /插件根目录/.test(t.injected)],
+      ['must', 'says the switch is on', (t) => /开关[^\n]{0,12}\bon\b|\bon\b[^\n]{0,6}(档|模式|状态)/.test(t.reply)],
+      ['must', 'hook injected the plugin root', (t) => /插件根目录/.test(t.injected)],
     ] },
     { name: 'idea', resume: true, prompt: `${cmd('duck-idea')} 我想做长文本推理加速：用块均值估计注意力里每一对 64 token 的块贡献多大，贡献很小的整块跳过。目标是 7B 模型在 LongBench 上省 30% 以上时间、准确率不掉。对手是 token 级剪枝和稠密注意力。现有结果在 notes.md 里。`, checks: [
       ['must', 'read library/idea-evaluator', (t) => readOf(t, 'idea-evaluator')],
@@ -160,7 +179,7 @@ function stages() {
     ] },
     { name: 'off-new-session', resume: false, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的结论一节`,
       before: () => ({ reports: allReports().length, notebook: text('notebook.md') }), checks: [
-        ['must', 'hook injected the off note', (t) => HOST !== 'claude' || /鸭子现在是 off/.test(t.injected)],
+        ['must', 'hook injected the off note', (t) => /鸭子现在是 off/.test(t.injected)],
         ['must', 'no new report', (t, before) => allReports().length === before.reports],
         ['must', 'notebook untouched', (t, before) => text('notebook.md') === before.notebook],
       ] },
@@ -171,7 +190,7 @@ function globalChecks(transcripts) {
   const notebook = text('notebook.md').split('\n').filter((l) => l.trim());
   return [
     ['must', 'notebook lines follow "- MM-DD 阶段｜原则（出处）"', () => notebook.length > 0 && notebook.every((l) => /^- \d{2}-\d{2} .+｜.+/.test(l))],
-    ['should', 'decision lines read "- YYYY-MM-DD ▸ 决策：…"', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /^- \d{4}-\d{2}-\d{2} ▸ ?决策[:：]/.test(l))],
+    ['must', 'decision lines read "- YYYY-MM-DD ▸ 决策：…"', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /^- \d{4}-\d{2}-\d{2} ▸ ?决策[:：]/.test(l))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
     ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
   ];
@@ -191,7 +210,8 @@ function setup() {
     const head = spawnSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
     const versions = fs.existsSync(cache) ? fs.readdirSync(cache) : [];
     const installed = versions.map((v) => spawnSync('git', ['-C', path.join(cache, v), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim());
-    if (!installed.includes(head)) {
+    const pluginDiffers = (rev) => spawnSync('git', ['-C', ROOT, 'diff', '--quiet', rev, 'HEAD', '--', '.', ':!tests', ':!docs', ':!README.md', ':!INSTALL.md']).status !== 0;
+    if (!installed.includes(head) && installed.every(pluginDiffers)) {
       console.warn(`warning: the Codex plugin cache is not at ${head.slice(0, 7)}; run: codex plugin add duck@doctor-duck`);
     }
   }
@@ -213,6 +233,7 @@ function main() {
     let t = parse(run.stdout || '');
     if (stage.resume !== false && !session) session = t.session;
     if (stage.resume === false) session = t.session;
+    if (HOST === 'codex') t.injected = codexInjected(t.session || session);
     const evaluate = (tr) => stage.checks.map(([severity, label, fn]) => {
       let ok = false;
       try { ok = Boolean(fn(tr, before)); } catch (err) { ok = false; }

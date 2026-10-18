@@ -1,5 +1,5 @@
 {
-  "_note": "The nine /duck-* commands that wrap a Supervisor-Skills skill. scripts/build-wrappers.js fills rules/wrapper-template.md with each entry and writes skills/<name>/. Text here is CC BY-NC-SA 4.0 like the rest of rules/.",
+  "_note": "The nine /duck-* commands that wrap a Supervisor-Skills skill. scripts/build.js fills rules/wrapper-template.md with each entry and writes skills/<name>/. Text here is CC BY-NC-SA 4.0 like the rest of rules/.",
   "default_skill_block": "读 library/{{skill}}/SKILL.md，把学生的输入当作它的输入，照它从头做到尾。",
   "commands": [
     {

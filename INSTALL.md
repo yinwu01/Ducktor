@@ -31,7 +31,7 @@ codex plugin marketplace add JoeyWu-tech/Doctor-Duck
 codex plugin add duck@doctor-duck
 ```
 
-然后开 Codex，在 `/hooks` 里信任 Doctor Duck 的两条 hook，敲 `$duck:duck` 看菜单。
+然后开 Codex，在 `/hooks` 里信任 Doctor Duck 的两条 hook（第二条是给 Claude Code 放行读文件用的，在 Codex 里不会触发），敲 `$duck:duck` 看菜单。
 
 - **更新**：`codex plugin marketplace upgrade doctor-duck`，再 `codex plugin add duck@doctor-duck`；hook 有改动时要重新信任。
 - **卸载**：`codex plugin remove duck@doctor-duck`，`codex plugin marketplace remove doctor-duck`。
