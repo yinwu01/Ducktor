@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 // Doctor Duck hook script. Code in bin/ is MIT; see LICENSES/README.md.
-// One job for now: at session start, tell the AI where the plugin lives,
-// load the always-on rules, and pass along the project's .duck/config.md.
+// Two jobs:
+//   session-start  tell the AI where the plugin lives, load the always-on rules,
+//                  and pass along the project's .duck/config.md
+//   allow-read     let Claude Code read the plugin's own files (library/, cards/,
+//                  handbook/ ...) without a permission prompt; nothing outside the root
 // Rule text stays in rules/ (or the student's copy in .duck/skills/), never in this file.
 'use strict';
 
@@ -91,7 +94,39 @@ function sessionStart() {
   return buildContext(cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd());
 }
 
+// True when target (a file or folder) sits inside the plugin root, symlinks resolved.
+function insideRoot(target) {
+  if (typeof target !== 'string' || !target) return false;
+  let real;
+  try {
+    real = fs.realpathSync(path.resolve(target));
+  } catch (err) {
+    return false;
+  }
+  const rel = path.relative(fs.realpathSync(ROOT), real);
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+// PreToolUse for Read, Glob and Grep. Says allow only for paths under the plugin root;
+// for anything else it prints nothing, so the host's usual permission rules apply.
+function allowRead() {
+  const input = readInput();
+  const toolInput = input.tool_input || {};
+  if (!insideRoot(toolInput.file_path || toolInput.path)) return;
+  fs.writeSync(1, JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'allow',
+      permissionDecisionReason: 'Doctor Duck reads its own plugin files',
+    },
+  }));
+}
+
 function main(command) {
+  if (command === 'allow-read') {
+    try { allowRead(); } catch (err) { /* stay silent: the host asks as usual */ }
+    return;
+  }
   let context = '';
   try {
     if (command === 'session-start') context = sessionStart();
@@ -106,6 +141,6 @@ function main(command) {
   }));
 }
 
-module.exports = { main, modeOf, buildContext, ROOT };
+module.exports = { main, modeOf, buildContext, insideRoot, ROOT };
 
 if (require.main === module) main(process.argv[2]);
