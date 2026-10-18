@@ -45,7 +45,7 @@ disable-model-invocation: true
 2. 告诉学生改成了什么，以及这一档的意思：
    - on：每次命令跑完出「为什么」报告，对话里放短版，完整版存进 .duck/reports/；
    - quiet：照记照存，对话里不放；
-   - off：常驻规则不再加载。/duck-xxx 命令照样能用，只是不附「为什么」报告，也不往 .duck/ 里记；/duck-why、/duck-learn 照常讲。
+   - off：常驻规则不再加载。/duck-xxx 命令照样能用，只是不附「为什么」报告，也不自动记决策行、报告和笔记；学生自己要求的改动照做。/duck-why、/duck-learn 照常讲。
 3. 从这一轮起，你就按新开关做。下次开会话时，开场注入也会按新开关来。
 
 新建 config.md 用这个格式：

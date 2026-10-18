@@ -2,12 +2,13 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|clear|compact",
+        "matcher": "startup|resume|clear|compact|fork",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"require(require('path').resolve(process.env.CLAUDE_PLUGIN_ROOT || process.env.PLUGIN_ROOT || '.', 'bin', 'duck.js')).main('session-start')\"",
-            "timeout": 10
+            "command": "node -e \"const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(r)require(require('path').join(r,'bin','duck.js')).main('session-start');else process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:'Doctor Duck: the session-start hook got no plugin root, so the always-on rules were not loaded. The plugin root is two levels above skills/duck/SKILL.md.'}}))\"",
+            "timeout": 10,
+            "statusMessage": "Loading Doctor Duck..."
           }
         ]
       }

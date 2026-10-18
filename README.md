@@ -17,7 +17,7 @@
 - `.claude-plugin/`、`.codex-plugin/`、`.agents/plugins/`：Claude Code 和 Codex 的插件清单和安装入口
 - `LICENSE`、`LICENSES/`：按目录分的许可
 
-Supervisor-Skills 截至提交 aff5de9（2026-07-16）的历史完整保留，原作者的提交都在。标签 `upstream-aff5de9` 指向那个提交。
+本仓库从 Supervisor-Skills 的提交 c243997（2026-07-01）分出来，那时的整个仓库原样放在 `docs/supervisor-skills/`，上游的提交历史和原作者都保留着。插件用到的 11 个技能和手册文字，取自上游后来的提交 aff5de9（2026-07-16），见 `library/README.md`。
 
 ## 本地试用
 

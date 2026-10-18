@@ -1,7 +1,7 @@
 # Licenses by directory
 
 Doctor Duck is adapted from [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)
-(commit aff5de9, 2026-07-16), Copyright (c) 2026 Yuyu Luo (methodology) and contributors,
+(skills and handbook text taken at commit aff5de9, 2026-07-16), Copyright (c) 2026 Yuyu Luo (methodology) and contributors,
 licensed under CC BY-NC-SA 4.0.
 
 | Path | License | Notes |
