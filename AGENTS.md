@@ -18,7 +18,7 @@
 
 ## 东西在哪
 - 插件根目录：开场注入的第一行写着。宿主不跑开场 hook、这份规则是被当成固定说明文件加载时，没有这一行，插件根目录就是总入口 skills/duck/SKILL.md 往上两级的目录。下文的 library/、cards/、handbook/、skills/ 都在插件根目录下。
-- 在 Claude Code 里，插件根目录下的文件用 Read 读，用 Glob、Grep 找，不要用 cat、ls、cd 这类 shell 命令：插件只给这三个工具开了这个目录的绿灯，shell 命令会被拦下。
+- 在 Claude Code 里，插件根目录下的文件用 Read 读，不要用 cat、ls、find、cd 这类 shell 命令：插件只给 Read、Glob、Grep 开了这个目录的绿灯，shell 命令会被拦下。有的系统上没有 Glob、Grep 工具；想知道某个原技能文件夹里有哪些文件，Read 插件根目录/library/upstream.lock.json，里面列着 library/ 下每个文件的路径。
 - 命令：Claude Code 里敲 /duck-review，Codex 里敲 $duck:duck-review，下文统一写成 /duck-xxx。
 - library/ 里是 Supervisor-Skills 的 10 个原技能，原样存放，不是命令。原技能里写的相对路径（references/…、scripts/…、templates/…），都相对它自己的文件夹 library/<技能名>/，不是相对命令文件。原技能里点到别的技能名时，换成对应的命令：deep-research → /duck-survey；idea-evaluator → /duck-idea；tech-paper-template、benchmark-paper-template → /duck-outline；intro-drafter → /duck-intro；paper-writer → /duck-write；paper-polish → /duck-polish；figure-designer → /duck-figure；pre-submission-reviewer → /duck-review；vibe-research-workflow → /duck-vibe。
 - 学生的东西都在项目的 .duck/ 下：config.md（开关和设定）、notebook.md（笔记本）、decisions.md（决策记录）、reports/（完整报告）、cards/（学生和课题组的卡）、skills/（学生改过的命令和规则副本）。用到哪个再建哪个。

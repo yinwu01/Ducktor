@@ -112,10 +112,32 @@ function insideRoot(target) {
 
 // PreToolUse for Read, Glob and Grep. Says allow only for paths under the plugin root;
 // for anything else it prints nothing, so the host's usual permission rules apply.
+// The fixed leading part of a glob pattern: '/a/b/**/*.md' gives '/a/b'.
+function globBase(pattern) {
+  const fixed = [];
+  for (const part of pattern.split(/[\\/]/)) {
+    if (/[*?[\]{}]/.test(part)) break;
+    fixed.push(part);
+  }
+  return fixed.join(path.sep) || path.sep;
+}
+
 function allowRead() {
   const input = readInput();
   const toolInput = input.tool_input || {};
-  if (!insideRoot(toolInput.file_path || toolInput.path)) return;
+  let target = toolInput.file_path || toolInput.path;
+  // Glob and Grep can also reach files through a pattern (Glob's pattern, Grep's glob
+  // filter). Allow only patterns that stay inside the root: no '..', no '~', and an
+  // absolute pattern must start inside the root.
+  const pattern = input.tool_name === 'Glob' ? toolInput.pattern : input.tool_name === 'Grep' ? toolInput.glob : undefined;
+  if (typeof pattern === 'string' && pattern) {
+    if (pattern.startsWith('~') || pattern.split(/[\\/]/).includes('..')) return;
+    if (path.isAbsolute(pattern)) {
+      if (!insideRoot(globBase(pattern))) return;
+      if (!target) target = globBase(pattern);
+    }
+  }
+  if (!insideRoot(target)) return;
   fs.writeSync(1, JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',

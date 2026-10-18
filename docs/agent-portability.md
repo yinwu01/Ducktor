@@ -2,7 +2,7 @@
 
 Doctor Duck 的内容只有一份：`skills/`、`rules/`、`library/`、`cards/`、`handbook/`。每个 agent 只加一层薄的适配：一份清单，或者一份说明文件。这个做法照 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
-**规矩：在本机真跑过一遍，才算支持。** 下表「实测」一列写的是哪个版本跑过、跑了什么；没写的就是还没跑过，适配文件照别的项目已经跑通的格式写，可能要改。
+**规矩：在本机真跑过一遍，才算支持。** 端到端流程跑了 14 条命令里的 7 条（见下表）；另外 7 条（`/duck-survey`、`/duck-outline`、`/duck-intro`、`/duck-write`、`/duck-figure`、`/duck-vibe`、`/duck-notes`）只做了静态检查，还没有用真模型跑过。其中前 6 条是包装命令，和跑过的 `/duck-idea`、`/duck-review`、`/duck-polish` 由同一份模板生成，只是读的原技能不同；`/duck-notes` 是手写的。下表「实测」一列写的是哪个版本跑过、跑了什么；没写的就是还没跑过，适配文件照别的项目已经跑通的格式写，可能要改。
 
 ## 三档
 
@@ -18,8 +18,8 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 
 | 宿主 | 档 | 用到的文件 | 实测 |
 |---|---|---|---|
-| Claude Code | 一 | `.claude-plugin/`、`hooks/claude-codex-hooks.json`、`skills/` | 2.1.301，Sonnet：15 条命令里跑过 11 条（见 `docs/testing.md`），开关三档，hook 注入，读插件文件的放行 hook |
-| Codex | 一 | `.codex-plugin/`、`.agents/plugins/marketplace.json`、同一份 hooks 文件、`skills/*/agents/openai.yaml` | 0.163.0：同上的流程；本地路径安装 |
+| Claude Code | 一 | `.claude-plugin/`、`hooks/claude-codex-hooks.json`、`skills/` | 2.1.301，Sonnet，`--plugin-dir` 加载：端到端流程（`docs/testing.md`）跑了 15 条命令里的 7 条（`/duck`、`/duck-idea`、`/duck-review`、`/duck-why`、`/duck-polish`、`/duck-skill`、`/duck-learn`），开关三档，hook 注入，读插件文件的放行 hook。从 GitHub 安装：在隔离的配置目录里装成功，没在这份安装上跑流程 |
+| Codex | 一 | `.codex-plugin/`、`.agents/plugins/marketplace.json`、同一份 hooks 文件、`skills/*/agents/openai.yaml` | 0.163.0，默认模型，本地路径安装：同上的流程和命令。从 GitHub 安装：同上，装成功，没跑流程 |
 | Cursor | 一 | `.cursor-plugin/plugin.json`、`hooks/hooks-cursor.json`；`bin/duck.js` 在有 `CURSOR_PLUGIN_ROOT` 时输出 `additional_context` | 未实测 |
 | Gemini CLI | 二 | `gemini-extension.json`（`contextFileName: AGENTS.md`）、`skills/` | 未实测 |
 | Qwen Code | 二 | 同 Gemini CLI 的扩展文件 | 未实测 |
@@ -29,13 +29,13 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 ## 每个宿主要注意的
 
 **Claude Code**
-- 插件技能的命令名是 `/duck-review`；和别的插件撞名时用全名 `/duck:duck-review`。两种写法在 `claude -p` 里都实测能触发。
+- 文档里插件命令的全名是 `/duck:duck-review`，短名 `/duck-review` 文档没写，但两种写法在 `claude -p` 里都实测能触发。短名叫不出来时用全名。
 - 读插件目录要靠插件自带的 PreToolUse hook 放行（`docs/how-it-works.md`）。用户关掉了全部 hook（`disableAllHooks`）或者没装 Node 时，每次读 `library/` 会弹窗问，`-p` 模式下会被拒。
 
 **Codex**
 - 命令写成 `$duck:duck-review`。
 - 第一次用要在 `/hooks` 里信任 Doctor Duck 的 hook；hook 定义改了要重新信任。`codex exec` 测试时可以加 `--dangerously-bypass-hook-trust`，只对这一次生效。
-- 本地路径安装会把整个目录连 `.git` 拷进 `~/.codex/plugins/cache/`，目前约 85 MB（其中 `docs/supervisor-skills/` 约 40 MB）。改了插件要重新 `codex plugin add duck@doctor-duck`。
+- 安装会把整个目录拷进 `~/.codex/plugins/cache/`：本地路径安装连 `.git` 一起，约 85 MB；从 GitHub 安装约 77 MB，另有一份同样大小的 marketplace 副本。大头是 `docs/supervisor-skills/` 的上游存档。改了插件要重新 `codex plugin add duck@doctor-duck`。
 - 沙箱用 bubblewrap。进程带着 ambient capabilities 时（比如继承了 CAP_NET_ADMIN），bwrap 0.6.1 会拒绝启动，表现为 AI 写不了文件。先用 `setpriv --inh-caps=-all --ambient-caps=-all` 去掉再启动 Codex 就好，这是机器环境的问题，和插件无关。
 
 **Cursor**

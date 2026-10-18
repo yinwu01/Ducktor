@@ -152,6 +152,19 @@ test('PreToolUse hook allows reads inside the plugin root only', () => {
   assert.equal(allow({ file_path: '/etc/hostname' }), null);
   assert.equal(allow({ pattern: '**/*.md' }), null);
 
+  const allowTool = (tool, toolInput) => {
+    const run = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: ROOT }, JSON.stringify({ tool_name: tool, tool_input: toolInput }));
+    assert.equal(run.status, 0, run.stderr);
+    return run.stdout ? JSON.parse(run.stdout).hookSpecificOutput.permissionDecision : null;
+  };
+  assert.equal(allowTool('Glob', { pattern: '**/*.md', path: path.join(ROOT, 'library') }), 'allow');
+  assert.equal(allowTool('Glob', { pattern: path.join(ROOT, 'library', '*', 'SKILL.md') }), 'allow');
+  assert.equal(allowTool('Glob', { pattern: '../../**/*', path: path.join(ROOT, 'library') }), null);
+  assert.equal(allowTool('Glob', { pattern: '/etc/*', path: ROOT }), null);
+  assert.equal(allowTool('Glob', { pattern: '~/.ssh/*', path: ROOT }), null);
+  assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '*.md' }), 'allow');
+  assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '../**/*.md' }), null);
+
   // A symlink inside a project that points into the plugin is fine; one inside the
   // plugin that points out is not followed.
   const outside = project({ 'secret.txt': 'x' });

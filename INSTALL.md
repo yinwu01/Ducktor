@@ -51,4 +51,4 @@ Cursor、Gemini CLI、Qwen Code 有适配文件，但还没在本机实测过；
 - **每次开会话都看到一条 hook 报错**：多半是没装 Node（`node: command not found`）。命令照样能用，只是没有常驻规则；Claude Code 里读插件文件时还会多弹几次询问。装上 Node 就好。
 - **Claude Code 里命令跑起来一直问能不能读某个 `library/` 文件**：说明放行的 hook 没跑。看看是不是关掉了全部 hook（设置里的 `disableAllHooks`），或者没装 Node。
 - **Codex 里 AI 写不了 `.duck/` 下的文件**：看 Codex 的报错里有没有 bwrap 的 `Unexpected capabilities`。有的话见 `docs/agent-portability.md` 的 Codex 一节。
-- **`/duck-review` 和别的插件撞名**：用全名 `/duck:duck-review`。
+- **`/duck-review` 叫不出来，或者叫到了别的东西**：用插件命令的全名 `/duck:duck-review`。
