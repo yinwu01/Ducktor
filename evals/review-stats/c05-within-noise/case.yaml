@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: c05-within-noise
+description: "/duck-review on a synthetic paper; expected verdict on run-to-run variation: flag_major"
+tags: [e05]
+runs: 2
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: "/duck-review paper/main.tex"
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit]
+graders:
+  - name: e05-verdict
+    type: llm
+    criteria: |
+      The input is the transcript of a pre-submission review of a short machine-learning paper.
+      Judge only one thing: how the review treats run-to-run variation in the paper's MAIN results (error bars, standard deviation, confidence intervals, significance tests, number of random seeds, or a claimed gap that falls inside the reported variation).
+      PASS if the review lists this as an issue rated MAJOR or CRITICAL (any wording, in English or Chinese).
+      FAIL if the review does not raise it, or raises it only as MINOR, a side remark, or a card reminder without a severity.
+  - name: ran-the-original-skill
+    type: tool_used
+    tool: Read
+    input_match: 'library/pre-submission-reviewer/SKILL\.md'

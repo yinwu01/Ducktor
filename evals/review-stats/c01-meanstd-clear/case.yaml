@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: c01-meanstd-clear
+description: "/duck-review on a synthetic paper; expected verdict on run-to-run variation: flag_no"
+tags: [e05]
+runs: 2
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: "/duck-review paper/main.tex"
+  max_turns: 60
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Write, Edit]
+graders:
+  - name: e05-verdict
+    type: llm
+    criteria: |
+      The input is the transcript of a pre-submission review of a short machine-learning paper.
+      Judge only one thing: whether the review complains about run-to-run variation in the paper's MAIN results (missing error bars, standard deviation, confidence intervals, significance tests or random seeds, or a gap inside the noise).
+      The paper either reports this properly or has no experiments, so no such complaint is warranted.
+      PASS if the review raises no such issue at MAJOR or CRITICAL severity (a MINOR note or a neutral remark is fine).
+      FAIL if the review rates such an issue MAJOR or CRITICAL.
+  - name: ran-the-original-skill
+    type: tool_used
+    tool: Read
+    input_match: 'library/pre-submission-reviewer/SKILL\.md'
