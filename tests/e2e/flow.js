@@ -68,6 +68,7 @@ function runCodex(prompt, session, opts = {}) {
 // Normalizes one host transcript into { session, reply, reads, tools, injected, cost }.
 function parse(stdout) {
   const t = { session: null, reply: '', reads: [], tools: [], injected: '', cost: 0, errors: [] };
+  const texts = [];
   for (const line of stdout.split('\n')) {
     let ev;
     try { ev = JSON.parse(line); } catch (err) { continue; }
@@ -76,12 +77,14 @@ function parse(stdout) {
       if (ev.type === 'system' && ev.subtype === 'hook_response') t.injected += String(ev.output || ev.stdout || '');
       if (ev.type === 'assistant') {
         for (const c of ev.message.content || []) {
+          if (c.type === 'text' && c.text.trim()) texts.push(c.text);
           if (c.type !== 'tool_use') continue;
           t.tools.push(`${c.name} ${c.input.file_path || c.input.command || c.input.path || ''}`);
           if (c.name === 'Read') t.reads.push(c.input.file_path);
         }
       }
-      if (ev.type === 'result') { t.reply = ev.result || ''; t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; }
+      // The student sees every message of the turn, not only the last one in `result`.
+      if (ev.type === 'result') { t.reply = texts.length ? texts.join('\n\n') : (ev.result || ''); t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; }
     } else {
       if (ev.type === 'thread.started') t.session = ev.thread_id;
       const it = ev.item || {};
