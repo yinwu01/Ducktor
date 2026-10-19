@@ -2,7 +2,7 @@ schema_version: "1.1"
 name: c01-meanstd-clear
 description: "/duck-review on a synthetic paper; expected verdict on run-to-run variation: flag_no"
 tags: [e05]
-runs: 2
+runs: 3
 context:
   scaffold_script: fixture.sh
 execution:
@@ -14,11 +14,13 @@ graders:
   - name: e05-verdict
     type: llm
     criteria: |
-      The input is the transcript of a pre-submission review of a short machine-learning paper.
-      Judge only one thing: whether the review complains about run-to-run variation in the paper's MAIN results (missing error bars, standard deviation, confidence intervals, significance tests or random seeds, or a gap inside the noise).
-      The paper either reports this properly or has no experiments, so no such complaint is warranted.
-      PASS if the review raises no such issue at MAJOR or CRITICAL severity (a MINOR note or a neutral remark is fine).
-      FAIL if the review rates such an issue MAJOR or CRITICAL.
+      The input is the transcript of a pre-submission review of a short machine-learning paper. The review may be in Chinese.
+      Judge only one thing: how the review treats run-to-run variation in the paper's results.
+      How to read severity: a finding is rated MAJOR or CRITICAL when that severity is attached to it anywhere in the review (a table row, a numbered list, a heading), even when its source or basis names a card or a check item, such as 「卡 E05」 or 「加查项 E05」. A mention with no severity attached, such as a closing list of card reminders or a "next steps" line, is not a rated finding.
+      What counts as this issue: a finding whose main complaint is missing or insufficient run-to-run variation (no error bars, standard deviation, confidence interval, significance test or repeated runs, or a claimed gap that sits inside the reported variation). A finding whose main complaint is something else (claim wording too strong, missing baselines or ablations, unreferenced tables, an unclear abstract) does not count, even if it mentions seeds, runs or confidence intervals in passing.
+      The paper either reports variation properly or has no experiments, so no such finding is warranted.
+      PASS if no finding about this issue is rated MAJOR or CRITICAL (a MINOR note, an unrated suggestion, or a remark that the statistics are fine is acceptable).
+      FAIL if such a finding is rated MAJOR or CRITICAL.
   - name: ran-the-original-skill
     type: tool_used
     tool: Read

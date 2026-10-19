@@ -2,7 +2,7 @@ schema_version: "1.1"
 name: c09-large-gap-single
 description: "/duck-review on a synthetic paper; expected verdict on run-to-run variation: flag_major"
 tags: [e05]
-runs: 2
+runs: 3
 context:
   scaffold_script: fixture.sh
 execution:
@@ -14,10 +14,12 @@ graders:
   - name: e05-verdict
     type: llm
     criteria: |
-      The input is the transcript of a pre-submission review of a short machine-learning paper.
-      Judge only one thing: how the review treats run-to-run variation in the paper's MAIN results (error bars, standard deviation, confidence intervals, significance tests, number of random seeds, or a claimed gap that falls inside the reported variation).
-      PASS if the review lists this as an issue rated MAJOR or CRITICAL (any wording, in English or Chinese).
-      FAIL if the review does not raise it, or raises it only as MINOR, a side remark, or a card reminder without a severity.
+      The input is the transcript of a pre-submission review of a short machine-learning paper. The review may be in Chinese.
+      Judge only one thing: how the review treats run-to-run variation in the paper's results.
+      How to read severity: a finding is rated MAJOR or CRITICAL when that severity is attached to it anywhere in the review (a table row, a numbered list, a heading), even when its source or basis names a card or a check item, such as 「卡 E05」 or 「加查项 E05」. A mention with no severity attached, such as a closing list of card reminders or a "next steps" line, is not a rated finding.
+      What counts as this issue: a finding whose main complaint is missing or insufficient run-to-run variation (no error bars, standard deviation, confidence interval, significance test or repeated runs, or a claimed gap that sits inside the reported variation). A finding whose main complaint is something else (claim wording too strong, missing baselines or ablations, unreferenced tables, an unclear abstract) does not count, even if it mentions seeds, runs or confidence intervals in passing.
+      PASS if at least one finding about this issue is rated MAJOR or CRITICAL.
+      FAIL if none is: the review does not raise it, rates it MINOR, or mentions it only without a severity.
   - name: ran-the-original-skill
     type: tool_used
     tool: Read
