@@ -4,6 +4,8 @@
 //
 //   node tests/e2e/flow.js claude    Claude Code, loads this checkout with --plugin-dir
 //   node tests/e2e/flow.js codex     Codex, uses the installed duck@doctor-duck plugin
+//   node tests/e2e/flow.js claude more   the second flow: survey, outline, intro, write,
+//                                        figure, vibe and notes (main is the default)
 //
 // Environment:
 //   DUCK_E2E_MODEL   model for the host (default: sonnet for claude, Codex's own default for codex)
@@ -23,15 +25,16 @@ const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const HOST = process.argv[2];
-if (!['claude', 'codex'].includes(HOST)) {
-  console.error('usage: node tests/e2e/flow.js claude|codex');
+const FLOW = process.argv[3] || 'main';
+if (!['claude', 'codex'].includes(HOST) || !['main', 'more'].includes(FLOW)) {
+  console.error('usage: node tests/e2e/flow.js claude|codex [main|more]');
   process.exit(2);
 }
 const MODEL = process.env.DUCK_E2E_MODEL || (HOST === 'claude' ? 'sonnet' : '');
 const WRAP = (process.env.DUCK_E2E_WRAP || '').split(' ').filter(Boolean);
 const ONLY = (process.env.DUCK_E2E_ONLY || '').split(',').filter(Boolean);
 const STAMP = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-const OUT = path.join(ROOT, 'evals', 'results', `e2e-${HOST}-${STAMP}`);
+const OUT = path.join(ROOT, 'evals', 'results', `e2e-${HOST}${FLOW === 'main' ? '' : `-${FLOW}`}-${STAMP}`);
 const PROJECT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `doctor-duck-e2e-${HOST}-`)), 'project');
 
 // /duck-review in Claude Code is $duck:duck-review in Codex.
@@ -39,24 +42,27 @@ const cmd = (name) => (HOST === 'claude' ? `/${name}` : `$duck:${name}`);
 
 // ---------- running the host ----------
 
-function runClaude(prompt, session) {
+// opts.search lets the model search the web, as a student would allow when asked.
+function runClaude(prompt, session, opts = {}) {
   const args = ['-p', prompt, '--plugin-dir', ROOT, '--output-format', 'stream-json', '--verbose',
     '--permission-mode', 'acceptEdits'];
+  if (opts.search) args.push('--allowedTools', 'WebSearch,WebFetch');
   if (MODEL) args.push('--model', MODEL);
   if (session) args.push('--resume', session);
   return spawnSync(WRAP[0] || 'claude', [...WRAP.slice(1), ...(WRAP.length ? ['claude'] : []), ...args],
-    { cwd: PROJECT, encoding: 'utf8', timeout: 900000, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
+    { cwd: PROJECT, encoding: 'utf8', timeout: opts.timeout || 900000, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
-function runCodex(prompt, session) {
+function runCodex(prompt, session, opts = {}) {
   // `exec resume` takes no -s, so the sandbox mode goes in as a config override on both.
   const common = ['--json', '--dangerously-bypass-hook-trust', '-c', 'sandbox_mode="workspace-write"'];
   if (MODEL) common.push('-m', MODEL);
-  const args = session
+  // --search is a top-level flag, so it goes before exec.
+  const args = [...(opts.search ? ['--search'] : []), ...(session
     ? ['exec', 'resume', ...common, session, prompt]
-    : ['exec', ...common, '-C', PROJECT, prompt];
+    : ['exec', ...common, '-C', PROJECT, prompt])];
   return spawnSync(WRAP[0] || 'codex', [...WRAP.slice(1), ...(WRAP.length ? ['codex'] : []), ...args],
-    { cwd: PROJECT, encoding: 'utf8', timeout: 900000, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
+    { cwd: PROJECT, encoding: 'utf8', timeout: opts.timeout || 900000, maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
 // Normalizes one host transcript into { session, reply, reads, tools, injected, cost }.
@@ -121,11 +127,25 @@ const allReports = () => (fs.existsSync(duckFile('reports')) ? fs.readdirSync(du
 const readOf = (t, skill) => t.reads.some((r) => r && r.includes(`library/${skill}/SKILL.md`));
 const switchIs = (mode) => new RegExp(`^[\\s>*#-]*开关\\s*[:：]\\s*${mode}`, 'm').test(text('config.md'));
 const FOLLOWUP = '信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行。';
+const newestReport = (suffix) => {
+  const f = reports(suffix).sort().at(-1);
+  return f ? fs.readFileSync(duckFile(path.join('reports', f)), 'utf8') : '';
+};
+const fixture = (rel) => fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'grad-project', rel), 'utf8');
+const projectFile = (rel) => (fs.existsSync(path.join(PROJECT, rel)) ? fs.readFileSync(path.join(PROJECT, rel), 'utf8') : '');
+const notebookLines = () => text('notebook.md').split('\n').filter((l) => l.trim());
+// Card numbers in lines that talk about cards (other lines may say P99 or similar).
+const PLUGIN_CARDS = new Set(fs.readdirSync(path.join(ROOT, 'cards')).filter((f) => /^[A-Z]\d{2}\.md$/.test(f)).map((f) => f.slice(0, 3)));
+const cardIds = (s) => s.split('\n').filter((l) => /卡/.test(l)).flatMap((l) => [...l.matchAll(/\b([A-Z]\d{2})\b/g)].map((m) => m[1]));
 const QUIZ = /考考你|小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 
-// Each stage: name, prompt, resume (continue the session) and checks. A check is
-// [severity, label, fn(transcript, before)] where severity is must or should.
+// Each stage: name, prompt, resume (continue the session), optional search and timeout, and
+// checks. A check is [severity, label, fn(transcript, before)] where severity is must or should.
 function stages() {
+  return FLOW === 'main' ? mainStages() : moreStages();
+}
+
+function mainStages() {
   return [
     { name: 'menu', prompt: cmd('duck'), checks: [
       ['must', 'menu lists the commands', (t) => /duck-review/.test(t.reply) && /duck-learn/.test(t.reply)],
@@ -186,6 +206,56 @@ function stages() {
   ];
 }
 
+// The seven commands the main flow does not reach, in the order a student would meet them.
+function moreStages() {
+  const wrapped = (command, short, skill, prompt, extra = [], opts = {}) => ({ name: short, resume: true, prompt: `${cmd(command)} ${prompt}`, ...opts, checks: [
+    ['must', `read library/${skill}`, (t) => readOf(t, skill)],
+    ['must', `wrote a ${short} report`, () => reports(short).length > 0],
+    ['should', 'reply has the why part', (t) => /为什么/.test(t.reply)],
+    ['should', 'shows a card reminder with a plugin card number', (t) => /卡片提醒/.test(t.reply + newestReport(short))
+      && cardIds(t.reply + newestReport(short)).some((id) => PLUGIN_CARDS.has(id))],
+    ...extra,
+  ] });
+  const untouched = (rel) => ['should', `${rel} untouched`, () => projectFile(rel) === fixture(rel)];
+  const notes = {};
+  return [
+    wrapped('duck-survey', 'survey', 'deep-research', '块稀疏注意力用于长文本推理加速。范围小一点：只看 2023 年以后，十篇以内，研究问题你来定两个。', [
+      ['should', 'cites checkable sources', (t) => /arxiv\.org|doi\.org|\b\d{4}\.\d{4,5}\b/i.test(t.reply + newestReport('survey'))],
+    ], { search: true, timeout: 1800000 }),
+    wrapped('duck-outline', 'outline', 'tech-paper-template', 'paper/main.tex', [
+      ['should', 'says it uses the technical-paper template', (t) => /技术论文|tech-paper-template/.test(t.reply)],
+    ]),
+    wrapped('duck-intro', 'intro', 'intro-drafter', '按 paper/main.tex 的内容重写引言。先在对话里给草稿，不要改文件。', [
+      ['must', 'reminds the student to check facts, numbers and citations', (t) => /核对/.test(t.reply)],
+      untouched('paper/main.tex'),
+    ]),
+    wrapped('duck-write', 'write', 'paper-writer', '写方法一节，依据 code/skip_attn.py 和 paper/main.tex。先在对话里给草稿，不要改文件。', [
+      ['must', 'reminds the student to check facts, numbers and citations', (t) => /核对/.test(t.reply)],
+      ['should', 'notices the method text and the code disagree', (t) => /对不上|不一致|不符|矛盾|不是.{0,12}(注意力质量|attention mass)/.test(t.reply)],
+      untouched('paper/main.tex'),
+    ]),
+    wrapped('duck-figure', 'figure', 'figure-designer', '给 notes.md 里的速度和准确率结果设计一张主图。'),
+    wrapped('duck-vibe', 'vibe', 'vibe-research-workflow', '下周要在 LongBench 上把 BlockSkip 全量跑一遍、补三个随机种子，再写实验一节。哪些交给 AI 做、做到哪一步、哪些我自己把关？'),
+    { name: 'notes', resume: true, prompt: cmd('duck-notes'), before: () => text('notebook.md'), checks: [
+      ['must', 'lists every stage in the notebook', (t) => {
+        const stagesInNotebook = [...new Set(notebookLines().map((l) => (l.match(/^- \d{2}-\d{2} (.+?)｜/) || [])[1]).filter(Boolean))];
+        return stagesInNotebook.length > 0 && stagesInNotebook.every((st) => t.reply.includes(st));
+      }],
+      ['must', 'notebook untouched', (t, before) => text('notebook.md') === before],
+    ] },
+    { name: 'notes-delete', resume: true, prompt: `${cmd('duck-notes')} 删掉最后一条`,
+      before: () => { notes.lines = notebookLines(); return text('notebook.md'); }, checks: [
+        ['should', 'shows the change before writing', (t, before) => text('notebook.md') === before],
+      ] },
+    { name: 'notes-ok', resume: true, prompt: '可以，删吧。', checks: [
+      ['must', 'the last line is gone and the rest kept', () => {
+        const now = notebookLines();
+        return notes.lines.length > 0 && now.length === notes.lines.length - 1 && now.every((l, i) => l === notes.lines[i]);
+      }],
+    ] },
+  ];
+}
+
 function globalChecks(transcripts) {
   const notebook = text('notebook.md').split('\n').filter((l) => l.trim());
   return [
@@ -193,6 +263,10 @@ function globalChecks(transcripts) {
     ['must', 'decision lines read "- YYYY-MM-DD ▸ 决策：…"', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /^- \d{4}-\d{2}-\d{2} ▸ ?决策[:：]/.test(l))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
     ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
+    ['must', 'every card number the replies cite exists', () => {
+      const group = fs.existsSync(duckFile('cards')) ? fs.readdirSync(duckFile('cards')).map((f) => f.slice(0, 3)) : [];
+      return transcripts.every((t) => cardIds(t.reply).every((id) => PLUGIN_CARDS.has(id) || group.includes(id)));
+    }],
   ];
 }
 
@@ -226,9 +300,10 @@ function main() {
     if (ONLY.length && !ONLY.includes(stage.name)) continue;
     const before = stage.before ? stage.before() : undefined;
     const started = Date.now();
+    const opts = { search: stage.search, timeout: stage.timeout };
     const run = HOST === 'claude'
-      ? runClaude(stage.prompt, stage.resume ? session : null)
-      : runCodex(stage.prompt, stage.resume ? session : null);
+      ? runClaude(stage.prompt, stage.resume ? session : null, opts)
+      : runCodex(stage.prompt, stage.resume ? session : null, opts);
     fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}.jsonl`), run.stdout || '');
     let t = parse(run.stdout || '');
     if (stage.resume !== false && !session) session = t.session;
@@ -246,7 +321,7 @@ function main() {
     let followup = false;
     if (stage.name !== 'learn-ask' && checks.some((c) => !c.ok && c.severity === 'must') && /[？?]/.test(t.reply)) {
       followup = true;
-      const again = HOST === 'claude' ? runClaude(FOLLOWUP, session) : runCodex(FOLLOWUP, session);
+      const again = HOST === 'claude' ? runClaude(FOLLOWUP, session, opts) : runCodex(FOLLOWUP, session, opts);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
       const t2 = parse(again.stdout || '');
       t = { ...t2, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${FOLLOWUP}\n\n${t2.reply}`, cost: t.cost + t2.cost };
@@ -267,7 +342,7 @@ function main() {
   for (const c of global.filter((x) => !x.ok)) console.log(`FAIL global ${c.severity}: ${c.label}`);
   const all = [...results.flatMap((r) => r.checks), ...global];
   const summary = {
-    host: HOST, model: MODEL || '(host default)', commit: spawnSync('git', ['-C', ROOT, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).stdout.trim(),
+    host: HOST, flow: FLOW, model: MODEL || '(host default)', commit: spawnSync('git', ['-C', ROOT, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).stdout.trim(),
     when: new Date().toISOString(), cost_usd: results.reduce((s, r) => s + (r.cost || 0), 0),
     must_failed: all.filter((c) => !c.ok && c.severity === 'must').length,
     should_failed: all.filter((c) => !c.ok && c.severity === 'should').length,
@@ -275,7 +350,7 @@ function main() {
   };
   if (fs.existsSync(path.join(PROJECT, '.duck'))) fs.cpSync(path.join(PROJECT, '.duck'), path.join(OUT, 'duck-files'), { recursive: true });
   fs.writeFileSync(path.join(OUT, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
-  const md = [`# e2e ${HOST} ${summary.commit} (${summary.model})`, '',
+  const md = [`# e2e ${HOST} ${FLOW} ${summary.commit} (${summary.model})`, '',
     `${summary.passed}/${summary.total} checks passed; must failed ${summary.must_failed}, should failed ${summary.should_failed}; cost $${summary.cost_usd.toFixed(2)}`, ''];
   for (const r of results) {
     md.push(`## ${r.stage}: \`${r.prompt}\` (${r.seconds}s${r.followup ? ', one follow-up answer' : ''})`, '');
