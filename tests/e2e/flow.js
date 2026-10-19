@@ -170,10 +170,24 @@ function stages() {
 
 function mainStages() {
   return [
-    { name: 'menu', prompt: cmd('duck'), checks: [
+    // A fresh project: the duck has not been turned on, so a free request gets no duck.
+    { name: 'idle', prompt: '帮我把 paper/main.tex 摘要的最后一句改得更紧凑一点。先在对话里给，文件先别改。', checks: [
+      ['must', 'hook injected the idle note, not the resident rules', (t) => /没在这个项目开启/.test(t.injected) && !/# Doctor Duck 常驻规则/.test(t.injected)],
+      ['must', 'no .duck/ folder', () => !fs.existsSync(path.join(PROJECT, '.duck'))],
+      ['must', 'no decision line', (t) => !/▸ ?决策/.test(t.reply)],
+      ['should', 'does not bring up the duck', (t) => !/duck-|Doctor Duck|鸭子/i.test(t.reply)],
+      ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
+    ] },
+    { name: 'menu', resume: true, prompt: cmd('duck'), checks: [
       ['must', 'menu lists the commands', (t) => /duck-review/.test(t.reply) && /duck-learn/.test(t.reply)],
-      ['must', 'says the switch is on', (t) => /开关[^\n]{0,12}\bon\b|\bon\b[^\n]{0,6}(档|模式|状态)/.test(t.reply)],
+      ['must', 'says the duck is not on in this project', (t) => /没开启|未开启|没有开启|还没开|没在这个项目/.test(t.reply)],
+      ['must', 'the menu did not turn it on', () => !switchIs('on')],
       ['must', 'hook injected the plugin root', (t) => /插件根目录/.test(t.injected)],
+    ] },
+    // Turning it on mid-session: the rules were not injected at session start, so the AI reads them now.
+    { name: 'enable', resume: true, prompt: `${cmd('duck')} on`, checks: [
+      ['must', 'config says on', () => switchIs('on')],
+      ['must', 'read the resident rules this turn', (t) => t.reads.some((r) => r && /rules\/core\.md|\.duck\/skills\/core\.md/.test(r))],
     ] },
     { name: 'idea', resume: true, prompt: `${cmd('duck-idea')} 我想做长文本推理加速：用块均值估计注意力里每一对 64 token 的块贡献多大，贡献很小的整块跳过。目标是 7B 模型在 LongBench 上省 30% 以上时间、准确率不掉。对手是 token 级剪枝和稠密注意力。现有结果在 notes.md 里。`, checks: [
       ['must', 'read library/idea-evaluator', (t) => readOf(t, 'idea-evaluator')],
@@ -243,6 +257,7 @@ function moreStages() {
   const notes = {};
   return [
     wrapped('duck-survey', 'survey', 'deep-research', '块稀疏注意力用于长文本推理加速。范围小一点：只看 2023 年以后，十篇以内，研究问题你来定两个。', [
+      ['must', 'not turned on: hook injected the idle note', (t) => /没在这个项目开启/.test(t.injected)],
       ['should', 'cites checkable sources', (t) => /arxiv\.org|doi\.org|\b\d{4}\.\d{4,5}\b/i.test(t.reply + newestReport('survey'))],
     ], { search: true, timeout: 1800000 }),
     wrapped('duck-outline', 'outline', 'tech-paper-template', 'paper/main.tex', [
@@ -285,6 +300,9 @@ const LOOP_NOTEBOOK = [
   '- 10-12 写引言｜挑战段写问题本身为什么难，不写方法实现起来难（卡 W09）',
 ];
 
+// The loop flow's .duck/config.md: the format /duck on writes (skills/duck/SKILL.md, section 二).
+const LOOP_CONFIG = '# Doctor Duck 设定\n\n开关：on\n\n## 按类静音\n学生说「这类我懂了」时，在这里记一行。\n\n## 静音的卡\n\n## 关掉的命令\n';
+
 // The knowledge loop and the resident rules: /duck picks a command, old notebook entries come
 // back in later commands, a free conversation about a single-run result, and 「这类我懂了」.
 function loopStages() {
@@ -326,6 +344,7 @@ function paperStages() {
   const main = mainTex();
   return [
     { name: 'review', prompt: `${cmd('duck-review')} paper/${main}`, checks: [
+      ['must', 'not turned on: hook injected the idle note', (t) => /没在这个项目开启/.test(t.injected)],
       ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
       ['must', 'wrote a review report', () => reports('review').length > 0],
       ['should', 'grades issues CRITICAL / MAJOR / MINOR', (t) => /CRITICAL|MAJOR|MINOR/.test(t.reply)],
@@ -380,9 +399,12 @@ function setup() {
   git('init', '-q');
   git('add', '-A');
   git('-c', 'user.name=student', '-c', 'user.email=student@example.com', 'commit', '-q', '-m', '初稿和实验代码');
+  // The loop flow tests the resident rules, so the student has turned the duck on; more and
+  // paper leave it off, which is the commands-only path most projects take.
   if (FLOW === 'loop') {
     fs.mkdirSync(path.join(PROJECT, '.duck'), { recursive: true });
     fs.writeFileSync(path.join(PROJECT, '.duck', 'notebook.md'), `${LOOP_NOTEBOOK.join('\n')}\n`);
+    fs.writeFileSync(path.join(PROJECT, '.duck', 'config.md'), LOOP_CONFIG);
   }
   if (HOST === 'codex') {
     const cache = path.join(process.env.HOME, '.codex', 'plugins', 'cache', 'doctor-duck', 'duck');

@@ -7,8 +7,8 @@
 Node 自带的 `node:test`，不装依赖，几秒跑完。
 
 `tests/duck.test.js` 测 `bin/duck.js` 和两条 hook：
-- 开关行的各种写法（中文同义词、markdown 修饰、`=`、说明行排在前面），认不出时按 on 并提示 AI。
-- 三档开关下注入的内容；学生改过的 `.duck/skills/core.md` 优先；过长的 config 被截断，非 UTF-8 的 config 被提示。
+- 开关行的各种写法（中文同义词、markdown 修饰、`=`、说明行排在前面），认不出时按没开启处理并提示 AI。
+- 没开启（没有 config.md、没有开关行、值认不出）和三档开关下注入的内容；学生改过的 `.duck/skills/core.md` 优先；过长的 config 被截断，非 UTF-8 的 config 被提示。
 - 注入长度远低于宿主上限。
 - 用 `sh -c` 真跑 hooks 文件里的命令：设了 `CLAUDE_PLUGIN_ROOT`、只设了 `PLUGIN_ROOT`（Codex 两个都设，这条防它以后只设一个）、两个都没有、stdin 是坏的，都退出 0 并给出可读的文字。
 - Cursor 只拿到 `additional_context` 一个字段。
@@ -40,7 +40,9 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
-| menu | `/duck` | 列出命令；说开关是 on；hook 注入了插件根目录 |
+| idle | 新项目、新会话，不敲命令，让 AI 把摘要最后一句改紧凑 | 注入的是没开启那一段，没有常驻规则；没建 `.duck/`；回复里没有决策行 |
+| menu | `/duck` | 列出命令；说鸭子在这个项目还没开启；没有因此开启；hook 注入了插件根目录 |
+| enable | `/duck on` | config 里开关是 on；这一轮就读了常驻规则（会话中途开启不用等下次开会话） |
 | idea | `/duck-idea` 加一段 idea 描述 | 读了 `library/idea-evaluator`；写了报告；笔记本多一行 |
 | review | `/duck-review paper/main.tex` | 读了 `library/pre-submission-reviewer`；写了报告；指出只跑了一次 |
 | propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish` |
@@ -52,7 +54,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | off | `/duck off` | config 里开关是 off |
 | off-new-session | 新会话里 `/duck-polish` | 注入的是 off 那一段；没有新报告；笔记本没动 |
 
-第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，顺序是学生实际碰到它们的顺序：
+第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，顺序是学生实际碰到它们的顺序。这个项目不开启鸭子，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
@@ -67,7 +69,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 
 每条包装命令还有几条 should：回复里有「为什么」；列出了卡片提醒，带插件自带卡的卡号；intro 和 write 没改 `paper/main.tex`；write 指出方法描述和代码对不上；notes-delete 先给学生看再删。
 
-第三套流程 `loop` 开始前，测试先往项目的笔记本里写两条「前几周」的条目（10-09 写摘要：只跑了一次的结果不写 significantly，卡 W11；10-12 写引言：挑战段写问题本身为什么难，卡 W09），再走：
+第三套流程 `loop` 开始前，测试先写好开着鸭子的 `.duck/config.md`（`开关：on`），再往项目的笔记本里写两条「前几周」的条目（10-09 写摘要：只跑了一次的结果不写 significantly，卡 W11；10-12 写引言：挑战段写问题本身为什么难，卡 W09），再走：
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
@@ -78,7 +80,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | mute | 「多 seed 和方差这类我懂了，以后别讲了」 | config 的「按类静音」里记了这一类 |
 | mute-check | 又一个单次结果，让它记进 notes.md | should：记了；不再讲种子和波动 |
 
-`paper` 流程不用虚构项目，把 `DUCK_E2E_PAPER` 指向的一篇论文的 LaTeX 源码拷进空项目的 `paper/`，走 `/duck-review`、`/duck-why`、`/duck-learn`。论文源码不进仓库。
+`paper` 流程不用虚构项目，把 `DUCK_E2E_PAPER` 指向的一篇论文的 LaTeX 源码拷进空项目的 `paper/`，走 `/duck-review`、`/duck-why`、`/duck-learn`。这个项目也不开启鸭子，第一步查注入的是没开启那一段。论文源码不进仓库。
 
 hook 注入的内容，Claude Code 从 stream-json 的 hook 事件里读；Codex 的 `--json` 输出不带它，从会话记录 `~/.codex/sessions/…/rollout-*.jsonl` 里读。
 

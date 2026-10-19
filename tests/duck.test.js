@@ -38,28 +38,43 @@ test('modeOf reads the switch line in the forms students write', () => {
   const cases = [
     ['开关：quiet', 'quiet'], ['开关: off', 'off'], ['- 开关：OFF', 'off'], ['> 开关：quiet', 'quiet'],
     ['**开关**：off', 'off'], ['## 开关：off', 'off'], ['开关 = off', 'off'], ['开关：quiet（这周先静音）', 'quiet'],
-    ['开关：关', 'off'], ['开关：关闭', 'off'], ['开关：静音', 'quiet'], ['开关：开', 'on'],
+    ['开关：关', 'off'], ['开关：关闭', 'off'], ['开关：静音', 'quiet'], ['开关：开', 'on'], ['开关：开启', 'on'],
     ['﻿开关：quiet\r\n', 'quiet'], ['开关：on、quiet、off 三选一\n开关：off', 'off'],
-    ['', 'on'], ['# Doctor Duck 设定\n\n## 按类静音\n', 'on'],
+    ['', 'unset'], ['# Doctor Duck 设定\n\n## 按类静音\n', 'unset'],
   ];
   for (const [config, mode] of cases) {
     assert.equal(duck.modeOf(config).mode, mode, JSON.stringify(config));
     assert.equal(duck.modeOf(config).note, null, JSON.stringify(config));
   }
-  assert.deepEqual(duck.modeOf(null), { mode: 'on', note: null });
+  assert.deepEqual(duck.modeOf(null), { mode: 'unset', note: null });
 });
 
-test('modeOf falls back to on and says so when the value is unknown', () => {
+test('modeOf treats an unknown value as not turned on and says so', () => {
   const { mode, note } = duck.modeOf('开关：offline');
-  assert.equal(mode, 'on');
+  assert.equal(mode, 'unset');
   assert.match(note, /offline/);
 });
 
-test('no config: rules load, mode defaults to on', () => {
+test('no config: only the idle note, no resident rules', () => {
   const text = duck.buildContext(project());
   assert.ok(text.startsWith(`Doctor Duck 插件根目录：${ROOT}`));
+  assert.doesNotMatch(text, /# Doctor Duck 常驻规则/);
+  assert.match(text, /没在这个项目开启/);
+  assert.ok(text.length < 600, `${text.length} characters`);
+});
+
+test('a config without a switch line is not turned on, and is passed through', () => {
+  const text = duck.buildContext(project({ '.duck/config.md': '# Doctor Duck 设定\n\n## 关掉的命令\nfigure\n' }));
+  assert.doesNotMatch(text, /# Doctor Duck 常驻规则/);
+  assert.match(text, /没在这个项目开启/);
+  assert.match(text, /开关：没开启）/);
+  assert.match(text, /figure/);
+});
+
+test('on: rules load', () => {
+  const text = duck.buildContext(project({ '.duck/config.md': '开关：on\n' }));
   assert.match(text, /# Doctor Duck 常驻规则/);
-  assert.match(text, /还没有 \.duck\/config\.md/);
+  assert.doesNotMatch(text, /没在这个项目开启/);
 });
 
 test('quiet: rules load and the config is passed through', () => {
@@ -74,13 +89,14 @@ test('off: the off note replaces the rules', () => {
   assert.match(text, /鸭子现在是 off/);
 });
 
-test('an unknown switch value is reported to the AI', () => {
+test('an unknown switch value is reported to the AI and does not turn the duck on', () => {
   const text = duck.buildContext(project({ '.duck/config.md': '开关：offline\n' }));
   assert.match(text, /只认 on、quiet、off/);
+  assert.doesNotMatch(text, /# Doctor Duck 常驻规则/);
 });
 
 test("the student's copy of the rules wins over the plugin's", () => {
-  const text = duck.buildContext(project({ '.duck/skills/core.md': '# 我们组改过的规则\n' }));
+  const text = duck.buildContext(project({ '.duck/config.md': '开关：on\n', '.duck/skills/core.md': '# 我们组改过的规则\n' }));
   assert.match(text, /# 我们组改过的规则/);
   assert.doesNotMatch(text, /# Doctor Duck 常驻规则/);
   assert.match(text, /项目里的副本/);

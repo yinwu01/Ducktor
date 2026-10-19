@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Doctor Duck hook script. Code in bin/ is MIT; see LICENSES/README.md.
 // Two jobs:
-//   session-start  tell the AI where the plugin lives, load the always-on rules,
-//                  and pass along the project's .duck/config.md
+//   session-start  tell the AI where the plugin lives and pass along the project's
+//                  .duck/config.md; load the resident rules only when the project has
+//                  turned the duck on (开关：on or quiet), otherwise a short idle note
 //   allow-read     let Claude Code read the plugin's own files (library/, cards/,
 //                  handbook/ ...) without a permission prompt; nothing outside the root
 // Rule text stays in rules/ (or the student's copy in .duck/skills/), never in this file.
@@ -15,7 +16,10 @@ const ROOT = path.resolve(__dirname, '..');
 const CONFIG_LIMIT = 1200; // characters of .duck/config.md passed through as-is
 
 // Values the switch line may carry. The Chinese words are what students tend to type.
-const MODES = { on: 'on', quiet: 'quiet', off: 'off', 开: 'on', 打开: 'on', 静音: 'quiet', 安静: 'quiet', 关: 'off', 关闭: 'off' };
+const MODES = {
+  on: 'on', quiet: 'quiet', off: 'off',
+  开: 'on', 打开: 'on', 开启: 'on', 启用: 'on', 静音: 'quiet', 安静: 'quiet', 关: 'off', 关闭: 'off', 关掉: 'off',
+};
 // A switch line looks like "开关：quiet". Leading list marks, quotes, headings and bold are allowed.
 const SWITCH_LINE = /^[\s>#*-]*\**开关\**\s*[:：=]\s*(.*)$/gm;
 
@@ -38,10 +42,12 @@ function readInput() {
   }
 }
 
-// Returns { mode, note }. note is a sentence for the AI when the switch line
-// was there but could not be read; no file or no switch line simply means on.
+// Returns { mode, note }. mode is on, quiet, off, or unset: the duck has not been turned
+// on in this project (no file, no switch line, or a value we cannot read). Only an explicit
+// on or quiet loads the resident rules. note is a sentence for the AI when the switch line
+// was there but could not be read.
 function modeOf(config) {
-  if (!config) return { mode: 'on', note: null };
+  if (!config) return { mode: 'unset', note: null };
   const seen = [];
   for (const m of config.matchAll(SWITCH_LINE)) {
     const value = m[1].replace(/\*/g, '').trim();
@@ -49,10 +55,10 @@ function modeOf(config) {
     if (MODES[word]) return { mode: MODES[word], note: null };
     seen.push(value);
   }
-  if (seen.length === 0) return { mode: 'on', note: null };
+  if (seen.length === 0) return { mode: 'unset', note: null };
   return {
-    mode: 'on',
-    note: `.duck/config.md 的开关行写的是「${seen[0]}」，只认 on、quiet、off，这次按 on 处理。请提醒学生改成这三个词之一。`,
+    mode: 'unset',
+    note: `.duck/config.md 的开关行写的是「${seen[0]}」，只认 on、quiet、off，这次按没开启处理。请提醒学生改成这三个词之一。`,
   };
 }
 
@@ -69,19 +75,19 @@ function buildContext(project) {
   const { mode, note } = modeOf(config);
   const parts = [`Doctor Duck 插件根目录：${ROOT}`];
 
-  if (mode === 'off') {
+  if (mode === 'unset') {
+    parts.push(readText(path.join(ROOT, 'rules', 'idle.md')) || 'Doctor Duck 没在这个项目开启。');
+  } else if (mode === 'off') {
     parts.push(readText(path.join(ROOT, 'rules', 'off.md')) || '开关：off。');
   } else {
     parts.push(coreRules(project));
   }
 
-  if (config === null) {
-    parts.push('这个项目还没有 .duck/config.md，开关按默认的 on。');
-  } else {
+  if (config !== null) {
     const shown = config.length > CONFIG_LIMIT
       ? `${config.slice(0, CONFIG_LIMIT)}\n……（后面太长没放进来，要用时直接读这个文件）`
       : config;
-    parts.push(`项目的 .duck/config.md（开关：${mode}）：\n${shown}`);
+    parts.push(`项目的 .duck/config.md（开关：${mode === 'unset' ? '没开启' : mode}）：\n${shown}`);
     if (note) parts.push(note);
     if (config.includes('�')) parts.push('.duck/config.md 里有读不出的字节（可能不是 UTF-8 编码），开关可能没认对。');
   }

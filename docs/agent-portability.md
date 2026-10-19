@@ -44,7 +44,7 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 
 **Gemini CLI、Qwen Code**
 - 扩展清单把 `AGENTS.md` 设成固定说明。Gemini CLI 会自动加载扩展里的 `hooks/hooks.json`，所以我们的 hooks 文件故意不叫这个名字，免得把给 Claude Code 写的 hook 也加载进去。
-- 没有开场注入，`AGENTS.md` 里写了插件根目录怎么找、开关要自己读 `.duck/config.md`。
+- 没有开场注入，`AGENTS.md` 里写了插件根目录怎么找、开关要自己读 `.duck/config.md`。「没开启就不用常驻规则」在这里靠 AI 自己读完 config.md 再照做，不像 hook 那样根本不加载，没实测过它守不守。
 
 **只读 `AGENTS.md` 的宿主**
 - 把仓库放到本机某处，把 `AGENTS.md` 的内容复制进项目的 `AGENTS.md`（或这个宿主自己的规则文件），告诉 AI Doctor Duck 放在哪。命令要靠学生说「照 Doctor Duck 的 /duck-review 做」，AI 再去读 `skills/duck-review/SKILL.md`。

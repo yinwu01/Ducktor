@@ -43,12 +43,12 @@ Cursor、Gemini CLI、Qwen Code 有适配文件，但还没在本机实测过；
 
 ## 装好了，怎么确认
 
-1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。鸭子 quack 一声，列出 13 条命令，说现在的开关是 on。
-2. 在一个项目里敲 `/duck quiet`，项目里会出现 `.duck/config.md`，开关那一行是 quiet。敲 `/duck on` 改回来。
+1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。鸭子 quack 一声，列出 13 条命令，说它在这个项目里还没开启。
+2. 在一个项目里敲 `/duck on`，项目里会出现 `.duck/config.md`，开关那一行是 on。从这一轮起它平时也跟着；敲 `/duck off` 或删掉那一行就不跟了。
 
 ## 常见问题
 
-- **每次开会话都看到一条 hook 报错**：多半是没装 Node（`node: command not found`）。命令照样能用，只是没有常驻规则；Claude Code 里读插件文件时还会多弹几次询问。装上 Node 就好。
+- **每次开会话都看到一条 hook 报错**：多半是没装 Node（`node: command not found`）。命令照样能用，只是开启了的项目也没有常驻规则；Claude Code 里读插件文件时还会多弹几次询问。装上 Node 就好。
 - **Claude Code 里命令跑起来一直问能不能读某个 `library/` 文件**：说明放行的 hook 没跑。看看是不是关掉了全部 hook（设置里的 `disableAllHooks`），或者没装 Node。
 - **Codex 里 AI 写不了 `.duck/` 下的文件**：看 Codex 的报错里有没有 bwrap 的 `Unexpected capabilities`。有的话见 `docs/agent-portability.md` 的 Codex 一节。
 - **`/duck-review` 叫不出来，或者叫到了别的东西**：用插件命令的全名 `/duck:duck-review`。

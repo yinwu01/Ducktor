@@ -37,7 +37,7 @@ disable-model-invocation: true
 不出题，不留作业，不打分，不写成长档案，不评价人。
 
 ## 5. 收尾
-- 开关是 on 或 quiet（没有 .duck/config.md 就是 on）：整份复盘写进 .duck/reports/今天的日期-learn.md，日期写成 YYYY-MM-DD，重名就在后面加 -2、-3；「顶级导师会盯哪里」里的原则，各追加一行到 .duck/notebook.md：「- MM-DD 复盘｜原则（出处）」，前后不空行，笔记本里已经有同一条的不重复记。
+- 开关是 on 或 quiet，或者鸭子没在这个项目开启（没有 .duck/config.md，或者没有「开关：」那一行；敲了这条命令就是要它）：整份复盘写进 .duck/reports/今天的日期-learn.md，日期写成 YYYY-MM-DD，重名就在后面加 -2、-3；「顶级导师会盯哪里」里的原则，各追加一行到 .duck/notebook.md：「- MM-DD 复盘｜原则（出处）」，前后不空行，笔记本里已经有同一条的不重复记。
 - 开关是 off：只在对话里讲，不写文件。
 
 .duck/ 和里面的文件不存在时，用到才建。
