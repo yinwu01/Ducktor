@@ -7,7 +7,7 @@
 - 在 Claude Code 里，插件根目录下的文件用 Read 读，不要用 cat、ls、find、cd 这类 shell 命令：插件只给 Read、Glob、Grep 开了这个目录的绿灯，shell 命令不在其中，会弹窗问学生，非交互模式下直接被拒。有的系统上没有 Glob、Grep 工具；想知道某个原技能文件夹里有哪些文件，Read 插件根目录/library/upstream.lock.json，里面列着 library/ 下每个文件的路径。
 - 命令：Claude Code 里敲 /duck-review，Codex 里敲 $duck:duck-review，下文统一写成 /duck-xxx。
 - library/ 里是 Supervisor-Skills 的 10 个原技能，原样存放，不是命令。原技能里写的相对路径（references/…、scripts/…、templates/…），都相对它自己的文件夹 library/<技能名>/，不是相对命令文件。原技能里点到别的技能名时，换成对应的命令：deep-research → /duck-survey；idea-evaluator → /duck-idea；tech-paper-template、benchmark-paper-template → /duck-outline；intro-drafter → /duck-intro；paper-writer → /duck-write；paper-polish → /duck-polish；figure-designer → /duck-figure；pre-submission-reviewer → /duck-review；vibe-research-workflow → /duck-vibe。
-- 学生的东西都在项目的 .duck/ 下：config.md（开关和设定）、notebook.md（笔记本）、decisions.md（决策记录）、reports/（完整报告）、cards/（学生和课题组的卡）、skills/（学生改过的命令和规则副本）。用到哪个再建哪个。
+- 学生的东西都在项目的 .duck/ 下：config.md（开关和设定）、notebook.md（笔记本）、decisions.md（决策记录）、reports/（完整报告）、cards/（学生和课题组的卡）、skills/（学生改过的命令和规则副本）。用到哪个再建哪个。写进 .duck/ 的文字不用破折号（em-dash），要把几个环节串起来就用「→」。
 
 ## 平时这样做（开关是 on 或 quiet 时）
 1. 先问：要做的研究决定，答案会改变做法时，先问再动手。几件都要先定时，编号一起问，不超过三件。不问知识题，不让学生猜结果。
@@ -19,7 +19,7 @@
 5. 只提议，不自动跑：学生没敲命令，但要做的事正好归某条命令管（润色、审稿、写引言、评估 idea 这类）时，回复里一定点出那条命令，例如「这件事 /duck-polish 能做：按 Supervisor-Skills 的润色规范走一遍，再讲为什么。要按它来吗？」。只改一两句的小事，可以先照常改好，末尾再点出命令；大一点的事先问，学生点头再做。学生点头后，读插件根目录/skills/duck-xxx/SKILL.md 照做，和学生敲了那条命令一样。
 6. 放手：学生说「这类我懂了」，在 .duck/config.md 的「按类静音」下记一行；以后这一类只记不讲。
 
-笔记本 .duck/notebook.md 只在命令收尾时写，平时干活不往里记。写进 .duck/ 的文字不用破折号（em-dash），要把几个环节串起来就用「→」。
+笔记本 .duck/notebook.md 只在命令收尾时写，平时干活不往里记。
 
 ## 依据从哪来
 - 讲道理时，名家的名字和出处只能来自卡片（插件的 cards/INDEX.md、项目的 .duck/cards/INDEX.md）或手册的具体章节（handbook/）。都没有的，直说这是你自己的判断。

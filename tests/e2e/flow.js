@@ -159,6 +159,22 @@ const cardIds = (s) => {
   }
   return lines.flatMap((l) => [...l.matchAll(/\b([A-Z]\d{2})\b/g)].map((m) => m[1]));
 };
+// The hook injected the not-turned-on note and not the resident rules. Matches idle.md's first
+// words, which no command file contains (Codex's rollout also holds the command files it read).
+const IDLE_ONLY = (t) => /Doctor Duck 没在这个项目开启：/.test(t.injected) && !/# Doctor Duck 常驻规则/.test(t.injected);
+// Every file under .duck/ with its size, to see whether a turn wrote anything there.
+const duckSnapshot = () => {
+  const out = [];
+  const walk = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p); else out.push(`${path.relative(PROJECT, p)}:${fs.statSync(p).size}`);
+    }
+  };
+  walk(path.join(PROJECT, '.duck'));
+  return out.sort().join('\n');
+};
 // 「最小测试」is a minimal test run, not a quiz.
 const QUIZ = /考考你|(?<!最)小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 
@@ -170,15 +186,16 @@ function stages() {
 
 function mainStages() {
   return [
-    // A fresh project: the duck has not been turned on, so a free request gets no duck.
-    { name: 'idle', prompt: '帮我把 paper/main.tex 摘要的最后一句改得更紧凑一点。先在对话里给，文件先别改。', checks: [
-      ['must', 'hook injected the idle note, not the resident rules', (t) => /没在这个项目开启/.test(t.injected) && !/# Doctor Duck 常驻规则/.test(t.injected)],
+    // A fresh project: the duck has not been turned on, so a free request gets no duck. Its own
+    // session, so the later /duck on turn has no earlier edit to comment on.
+    { name: 'idle', resume: false, prompt: '帮我把 paper/main.tex 摘要的最后一句改得更紧凑一点。先在对话里给，文件先别改。', checks: [
+      ['must', 'hook injected the idle note, not the resident rules', (t) => IDLE_ONLY(t)],
       ['must', 'no .duck/ folder', () => !fs.existsSync(path.join(PROJECT, '.duck'))],
       ['must', 'no decision line', (t) => !/▸ ?决策/.test(t.reply)],
       ['should', 'does not bring up the duck', (t) => !/duck-|Doctor Duck|鸭子/i.test(t.reply)],
       ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
     ] },
-    { name: 'menu', resume: true, prompt: cmd('duck'), checks: [
+    { name: 'menu', resume: false, prompt: cmd('duck'), checks: [
       ['must', 'menu lists the commands', (t) => /duck-review/.test(t.reply) && /duck-learn/.test(t.reply)],
       ['must', 'says the duck is not on in this project', (t) => /没开启|未开启|没有开启|还没开|没在这个项目/.test(t.reply)],
       ['must', 'the menu did not turn it on', () => !switchIs('on')],
@@ -257,7 +274,7 @@ function moreStages() {
   const notes = {};
   return [
     wrapped('duck-survey', 'survey', 'deep-research', '块稀疏注意力用于长文本推理加速。范围小一点：只看 2023 年以后，十篇以内，研究问题你来定两个。', [
-      ['must', 'not turned on: hook injected the idle note', (t) => /没在这个项目开启/.test(t.injected)],
+      ['must', 'not turned on: hook injected the idle note', (t) => IDLE_ONLY(t)],
       ['should', 'cites checkable sources', (t) => /arxiv\.org|doi\.org|\b\d{4}\.\d{4,5}\b/i.test(t.reply + newestReport('survey'))],
     ], { search: true, timeout: 1800000 }),
     wrapped('duck-outline', 'outline', 'tech-paper-template', 'paper/main.tex', [
@@ -344,7 +361,7 @@ function paperStages() {
   const main = mainTex();
   return [
     { name: 'review', prompt: `${cmd('duck-review')} paper/${main}`, checks: [
-      ['must', 'not turned on: hook injected the idle note', (t) => /没在这个项目开启/.test(t.injected)],
+      ['must', 'not turned on: hook injected the idle note', (t) => IDLE_ONLY(t)],
       ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
       ['must', 'wrote a review report', () => reports('review').length > 0],
       ['should', 'grades issues CRITICAL / MAJOR / MINOR', (t) => /CRITICAL|MAJOR|MINOR/.test(t.reply)],
@@ -361,6 +378,13 @@ function paperStages() {
       ['must', 'wrote a learn report', () => reports('learn').length > 0],
       ['should', 'next step is about the experiments', (t) => /实验/.test(t.reply)],
     ] },
+    // Not turned on: after the commands, a free request still gets no duck.
+    { name: 'free', resume: true, prompt: `帮我把 paper/${main} 里摘要的第一句改得更紧凑一点（摘要在别的文件里就去那里找）。先在对话里给，文件先别改。`,
+      before: () => duckSnapshot(), checks: [
+        ['should', 'no decision line', (t) => !/▸ ?决策/.test(t.reply)],
+        ['should', 'nothing new under .duck/', (t, before) => duckSnapshot() === before],
+        ['should', 'does not point to a duck command', (t) => !/duck-/.test(t.reply)],
+      ] },
   ];
 }
 

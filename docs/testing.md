@@ -40,9 +40,9 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
-| idle | 新项目、新会话，不敲命令，让 AI 把摘要最后一句改紧凑 | 注入的是没开启那一段，没有常驻规则；没建 `.duck/`；回复里没有决策行 |
-| menu | `/duck` | 列出命令；说鸭子在这个项目还没开启；没有因此开启；hook 注入了插件根目录 |
-| enable | `/duck on` | config 里开关是 on；这一轮就读了常驻规则（会话中途开启不用等下次开会话） |
+| idle | 新项目、单独一个会话，不敲命令，让 AI 把摘要最后一句改紧凑 | 注入的是没开启那一段，没有常驻规则；没建 `.duck/`；回复里没有决策行 |
+| menu | 新会话里 `/duck`，后面各步接着这个会话 | 列出命令；说鸭子在这个项目还没开启；没有因此开启；hook 注入了插件根目录 |
+| enable | `/duck on` | config 里开关是 on；这一轮就读了常驻规则。后面几步每步都恢复会话，hook 会重新注入规则，所以中途开启以后规则能不能一直管住，这套流程测不到 |
 | idea | `/duck-idea` 加一段 idea 描述 | 读了 `library/idea-evaluator`；写了报告；笔记本多一行 |
 | review | `/duck-review paper/main.tex` | 读了 `library/pre-submission-reviewer`；写了报告；指出只跑了一次 |
 | propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish` |

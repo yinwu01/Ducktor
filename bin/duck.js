@@ -70,15 +70,28 @@ function coreRules(project) {
   return readText(path.join(ROOT, 'rules', 'core.md')) || '（没读到 rules/core.md，常驻规则这次缺席。）';
 }
 
+// The 「东西在哪」 section of the plugin's rules/core.md: where files live, how to read them,
+// the skill-name table. Commands need it even when the resident rules are not loaded.
+function basics() {
+  const core = readText(path.join(ROOT, 'rules', 'core.md')) || '';
+  const start = core.indexOf('## 东西在哪\n');
+  if (start < 0) return '';
+  const end = core.indexOf('\n## ', start + 1);
+  return core.slice(start, end < 0 ? undefined : end).trim();
+}
+
 function buildContext(project) {
   const config = readText(path.join(project, '.duck', 'config.md'));
   const { mode, note } = modeOf(config);
   const parts = [`Doctor Duck 插件根目录：${ROOT}`];
 
-  if (mode === 'unset') {
-    parts.push(readText(path.join(ROOT, 'rules', 'idle.md')) || 'Doctor Duck 没在这个项目开启。');
-  } else if (mode === 'off') {
-    parts.push(readText(path.join(ROOT, 'rules', 'off.md')) || '开关：off。');
+  if (mode === 'unset' || mode === 'off') {
+    const note = mode === 'unset'
+      ? readText(path.join(ROOT, 'rules', 'idle.md')) || 'Doctor Duck 没在这个项目开启。'
+      : readText(path.join(ROOT, 'rules', 'off.md')) || '开关：off。';
+    parts.push(note);
+    const b = basics();
+    if (b) parts.push(b);
   } else {
     parts.push(coreRules(project));
   }

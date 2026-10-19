@@ -35,7 +35,7 @@ disable-model-invocation: true
 在 Codex 里，表里的命令写成 $duck:duck-review 这样。
 
 列完再做三件事：
-- 读项目的 .duck/config.md，说一句鸭子在这个项目开没开、开在哪一档。没有这个文件，或者文件里没有「开关：」那一行，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」。
+- 读项目的 .duck/config.md，说一句鸭子在这个项目开没开、开在哪一档。没有这个文件，文件里没有「开关：」那一行，或者写的不是 on、quiet、off，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」。
 - 项目的 .claude/skills/ 和 .agents/skills/ 下，名字以 duck- 开头的文件夹是学生自己加的命令，接在表后面列出来。
 - 最后一句：「/duck on 在这个项目开启（/duck quiet 只记不说，/duck off 关掉报告）；/duck 后面接一句话，我替你挑命令。」
 

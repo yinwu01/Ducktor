@@ -60,7 +60,19 @@ test('no config: only the idle note, no resident rules', () => {
   assert.ok(text.startsWith(`Doctor Duck 插件根目录：${ROOT}`));
   assert.doesNotMatch(text, /# Doctor Duck 常驻规则/);
   assert.match(text, /没在这个项目开启/);
-  assert.ok(text.length < 600, `${text.length} characters`);
+  assert.ok(text.length < 2500, `${text.length} characters`);
+});
+
+test('not turned on and off: commands still get the basics from core.md', () => {
+  for (const config of [null, '开关：off\n']) {
+    const text = duck.buildContext(project(config ? { '.duck/config.md': config } : {}));
+    assert.match(text, /## 东西在哪/);
+    assert.match(text, /用 Read 读，不要用 cat/);
+    assert.match(text, /upstream\.lock\.json/);
+    assert.match(text, /deep-research → \/duck-survey/);
+    assert.match(text, /不用破折号/);
+    assert.doesNotMatch(text, /## 平时这样做/);
+  }
 });
 
 test('a config without a switch line is not turned on, and is passed through', () => {
