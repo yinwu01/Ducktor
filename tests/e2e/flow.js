@@ -197,7 +197,7 @@ function mainStages() {
     ] },
     { name: 'menu', resume: false, prompt: cmd('duck'), checks: [
       ['must', 'menu lists the commands', (t) => /duck-review/.test(t.reply) && /duck-learn/.test(t.reply)],
-      ['must', 'says the duck is not on in this project', (t) => /没开启|未开启|没有开启|还没开|没在这个项目/.test(t.reply)],
+      ['must', 'says the duck is not on in this project', (t) => /(没|未)[^\n]{0,8}开启|还没开|没在这个项目/.test(t.reply.replace(/\*/g, ''))],
       ['must', 'the menu did not turn it on', () => !switchIs('on')],
       ['must', 'hook injected the plugin root', (t) => /插件根目录/.test(t.injected)],
     ] },
