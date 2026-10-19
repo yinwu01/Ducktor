@@ -1,7 +1,7 @@
 {
   "name": "duck",
   "version": "0.1.0",
-  "description": "Doctor Duck: a research mentor built on Supervisor-Skills. Runs the research skills as $duck:duck-* commands and explains the why behind each step. Trust me, I'm a Ducktor.",
+  "description": "Doctor Duck: a research mentor built on Supervisor-Skills. Runs the research skills as $duck:duck-* commands and opens up the why behind each AI step, so you can still learn while the AI does the work. Trust me, I'm a Ducktor.",
   "author": {
     "name": "JoeyWu-tech"
   },

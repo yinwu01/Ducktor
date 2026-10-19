@@ -45,10 +45,11 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | enable | `/duck on` | config 里开关是 on；这一轮就读了常驻规则。后面几步每步都恢复会话，hook 会重新注入规则，所以中途开启以后规则能不能一直管住，这套流程测不到 |
 | idea | `/duck-idea` 加一段 idea 描述 | 读了 `library/idea-evaluator`；写了报告；笔记本多一行 |
 | review | `/duck-review paper/main.tex` | 读了 `library/pre-submission-reviewer`；写了报告；指出只跑了一次 |
-| propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish` |
+| propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish`；（should）只改一句，笔记本不多一行 |
 | why | `/duck-why` | 说明是重建，不是 AI 内部过程的回放；写了报告 |
 | quiet | `/duck quiet` | config 里开关是 quiet |
 | polish-quiet | `/duck-polish` 润色摘要 | 读了 `library/paper-polish`；照样写了报告；对话里没有「为什么」 |
+| quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有鸭子的话；（should）笔记本多了一行，带「这次」 |
 | card-draft、card-ok | `/duck-skill card new …`，再说「可以，写吧」 | 写了 `.duck/cards/G01.md`，INDEX 里有 G01 |
 | learn-ask、learn | `/duck-learn`，再答它的一个问题 | 开头只问那一个问题；写了复盘报告 |
 | off | `/duck off` | config 里开关是 off |

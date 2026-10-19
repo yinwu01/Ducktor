@@ -178,6 +178,13 @@ const duckSnapshot = () => {
   walk(path.join(PROJECT, '.duck'));
   return out.sort().join('\n');
 };
+// The short why after a command: a quote line that is bold from end to end, and a quote line
+// starting with 下次. The original skills quote sentences too, so neither alone is enough.
+const WHY_BLOCK = { test: (s) => /^[ \t]*>\s*\*\*[^\n]+\*\*\s*$/m.test(s) && /^[ \t]*>\s*下次/m.test(s) };
+// What quiet must not show: the 下次 line or a decision line inside a quote.
+const DUCK_QUOTE = /^[ \t]*>\s*(下次|▸ ?决策)/m;
+// The principle part of a notebook line: between the first ｜ and ｜这次 (or the end).
+const principleOf = (l) => l.split('｜')[1] || l;
 // 「最小测试」is a minimal test run, not a quiz.
 const QUIZ = /考考你|(?<!最)小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 
@@ -213,7 +220,7 @@ function mainStages() {
       ['must', 'read library/idea-evaluator', (t) => readOf(t, 'idea-evaluator')],
       ['must', 'wrote an idea report', () => reports('idea').length > 0],
       ['must', 'notebook got a line', () => /评估 idea|idea/.test(text('notebook.md'))],
-      ['should', 'reply has the why part', (t) => /为什么/.test(t.reply)],
+      ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
     ] },
     { name: 'review', resume: true, prompt: `${cmd('duck-review')} paper/main.tex`, checks: [
       ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
@@ -221,11 +228,13 @@ function mainStages() {
       ['must', 'caught the single-run claim', (t) => /seed|种子|单次|一次|方差|标准差/.test(t.reply)],
       ['should', 'caught the em-dash', (t) => /em-dash|破折号|em dash/i.test(t.reply)],
     ] },
-    { name: 'propose', resume: true, prompt: '帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。', checks: [
+    { name: 'propose', resume: true, prompt: '帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。', before: () => text('notebook.md'), checks: [
       ['must', 'names /duck-polish in the reply', (t) => /duck-polish/.test(t.reply)],
+      ['should', 'a one-sentence edit adds no notebook line', (t, before) => text('notebook.md') === before],
     ] },
     { name: 'why', resume: true, prompt: cmd('duck-why'), checks: [
       ['must', 'says it is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
+      ['should', 'the breakdown is a blockquote', (t) => /^[ \t]*>[^\n]*用的思路/m.test(t.reply)],
       ['must', 'wrote a why report', () => reports('why').length > 0],
     ] },
     { name: 'quiet', resume: true, prompt: `${cmd('duck')} quiet`, checks: [
@@ -234,8 +243,14 @@ function mainStages() {
     { name: 'polish-quiet', resume: true, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的摘要`, before: () => allReports().length, checks: [
       ['must', 'read library/paper-polish', (t) => readOf(t, 'paper-polish')],
       ['must', 'still wrote a report', (t, before) => allReports().length > before],
-      ['must', 'no why part in the reply', (t) => !/你能带走的一条|下次自己先做什么/.test(t.reply)],
+      ['must', 'no why part in the reply', (t) => !DUCK_QUOTE.test(t.reply)],
     ] },
+    // Quiet, free conversation, a real method change: nothing said, one notebook line.
+    { name: 'quiet-free', resume: true, prompt: '把 code/skip_attn.py 里跳过块的阈值从固定的 1e-3 改成每一层按块分数的 90% 分位数来定，其他你定，直接改代码。',
+      before: () => notebookLines().length, checks: [
+        ['must', 'nothing of the duck in the reply', (t) => !DUCK_QUOTE.test(t.reply) && !WHY_BLOCK.test(t.reply)],
+        ['should', 'the notebook got one line about this step', (t, before) => notebookLines().length === before + 1 && /｜这次[:：]/.test(notebookLines().at(-1))],
+      ] },
     { name: 'card-draft', resume: true, prompt: `${cmd('duck-skill')} card new 我们组规定：结果表里每个数都要写明跑了几个随机种子`, checks: [
       ['should', 'shows the card before writing it', () => !exists('cards/G01.md')],
     ] },
@@ -268,7 +283,7 @@ function moreStages() {
   const wrapped = (command, short, skill, prompt, extra = [], opts = {}) => ({ name: short, resume: true, prompt: `${cmd(command)} ${prompt}`, ...opts, checks: [
     ['must', `read library/${skill}`, (t) => readOf(t, skill)],
     ['must', `wrote a ${short} report`, () => reports(short).length > 0],
-    ['should', 'reply has the why part', (t) => /为什么/.test(t.reply)],
+    ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
     ['should', 'shows a card reminder with a plugin card number', (t) => /卡片提醒/.test(t.reply + newestReport(short))
       && cardIds(t.reply + newestReport(short)).some((id) => PLUGIN_CARDS.has(id))],
     ...extra,
@@ -337,7 +352,7 @@ function loopStages() {
     { name: 'intro', resume: true, prompt: `${cmd('duck-intro')} 按 paper/main.tex 的内容重写引言。先在对话里给草稿，paper/ 里的文件先别改。`, checks: [
       ['must', 'read library/intro-drafter', (t) => readOf(t, 'intro-drafter')],
       ['must', 'brings up the 10-12 notebook entry', (t) => /10-12/.test(withReport(t, 'intro'))],
-      ['must', 'notebook has no repeated line', () => new Set(notebookLines()).size === notebookLines().length],
+      ['must', 'notebook has no repeated principle', () => new Set(notebookLines().map(principleOf)).size === notebookLines().length],
       ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
     ] },
     { name: 'exp', resume: true, prompt: '新结果出来了：32k 长度上 BlockSkip 准确率 70.9，稠密注意力 70.6，只跑了一次。帮我把这一行加进 paper/main.tex 的表里。',
@@ -354,7 +369,7 @@ function loopStages() {
     ] },
     { name: 'mute-check', resume: true, prompt: '64k 长度上也出来了：BlockSkip 69.8，稠密 69.9，也只跑了一次。先记进 notes.md，表等补完 seed 再说。', checks: [
       ['should', 'notes.md got the 64k result', () => /64k/i.test(projectFile('notes.md'))],
-      ['should', 'does not explain seeds again', (t) => !/为什么[:：]/.test(t.reply) && !/波动/.test(t.reply)],
+      ['should', 'does not explain seeds again', (t) => !/为什么[:：]/.test(t.reply) && !/波动/.test(t.reply) && !/^[ \t]*>[^\n]*(seed|种子|方差)/im.test(t.reply)],
     ] },
   ];
 }
@@ -368,10 +383,11 @@ function paperStages() {
       ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
       ['must', 'wrote a review report', () => reports('review').length > 0],
       ['should', 'grades issues CRITICAL / MAJOR / MINOR', (t) => /CRITICAL|MAJOR|MINOR/.test(t.reply)],
-      ['should', 'reply has the why part', (t) => /为什么/.test(t.reply)],
+      ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
     ] },
     { name: 'why', resume: true, prompt: cmd('duck-why'), checks: [
       ['must', 'says it is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
+      ['should', 'the breakdown is a blockquote', (t) => /^[ \t]*>[^\n]*用的思路/m.test(t.reply)],
       ['must', 'wrote a why report', () => reports('why').length > 0],
     ] },
     { name: 'learn-ask', resume: true, prompt: cmd('duck-learn'), checks: [
@@ -403,6 +419,7 @@ function globalChecks(transcripts) {
   return [
     ['must', 'notebook lines follow "- MM-DD 阶段｜原则（出处）"', () => notebook.length > 0 && notebook.every((l) => /^- \d{2}-\d{2} .+｜.+/.test(l))],
     ['must', 'decision lines read "- YYYY-MM-DD ▸ 决策：…"', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /^- \d{4}-\d{2}-\d{2} ▸ ?决策[:：]/.test(l))],
+    ['should', 'new notebook lines say what happened this time (｜这次：)', () => { const fresh = notebook.filter((l) => !LOOP_NOTEBOOK.includes(l)); return fresh.length > 0 && fresh.every((l) => /｜这次[:：]/.test(l)); }],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
     ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
     ['must', 'every card number the replies cite exists', () => {

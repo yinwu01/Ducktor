@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "duck",
-      "description": "Runs the Supervisor-Skills research skills as /duck-* commands and explains the why behind each step.",
+      "description": "Runs the Supervisor-Skills research skills as /duck-* commands and opens up the why behind each AI step, so you can still learn while the AI does the work.",
       "source": ".",
       "category": "productivity"
     }
