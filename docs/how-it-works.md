@@ -6,11 +6,11 @@
 
 | 层 | 在哪 | 是什么 | 谁写的 |
 |---|---|---|---|
-| 常驻规则 | `rules/core.md` | 平时怎么陪学生：先问、讲为什么、记决策、只提议不自动跑 | 我们 |
+| 常驻规则 | `rules/core.md` | 平时怎么陪学生：先问、讲为什么、记决策、结果进论文前对标准、只提议不自动跑、放手 | 我们 |
 | 命令 | `skills/duck*/SKILL.md` | 学生敲的 `/duck`、`/duck-review` 等 14 条 | 我们 |
 | 原技能 | `library/` | Supervisor-Skills 的 10 个技能，逐字节照搬 | 上游 |
 
-命令只是一层包装：先查设定、读组里的卡，再让 AI 去读 `library/` 里的原技能照做，最后按开关写「为什么」报告。原技能一字不改，上游更新时整体同步。
+命令只是一层包装：先查设定、读组里的卡和学生的笔记本，再让 AI 去读 `library/` 里的原技能照做，最后按开关写「为什么」报告。原技能一字不改，上游更新时整体同步。
 
 ## 开场：hook 注入三样东西
 
@@ -20,7 +20,7 @@
 2. 常驻规则：项目里有学生改过的 `.duck/skills/core.md` 就用它，否则用插件的 `rules/core.md`。开关是 off 时，换成 `rules/off.md` 那一小段。
 3. 项目 `.duck/config.md` 的内容（最多 1,200 字），以及从中读出的开关。
 
-注入约 2,600 字符（10-18 实测：项目里没有 config.md 时 2,634 字符，加上 config.md 的上限 1,200 字也在 4,000 以内）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
+注入约 2,900 字符（10-19 实测：项目里没有 config.md 时 2,884 字符，加上 config.md 的上限 1,200 字也在 4,100 以内）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
 
 `bin/duck.js` 只读文件、拼文字，规则的原文都在 `rules/` 下，不写进代码。这样代码可以用 MIT，文字用 CC BY-NC-SA，两者不混（见 `LICENSES/README.md`）。
 
@@ -29,11 +29,11 @@
 以 `/duck-review paper/main.tex` 为例，`skills/duck-review/SKILL.md` 让 AI：
 
 1. **先查两件事**：`.duck/config.md` 的「关掉的命令」里有没有 review；项目里有没有学生改过的副本 `.duck/skills/duck-review/SKILL.md`，有就改读副本。
-2. **读组里的卡**：项目的 `.duck/cards/INDEX.md`，挑出相关的，当作这一次的规矩。
+2. **读组里的卡和笔记本**：项目的 `.duck/cards/INDEX.md`，挑出相关的，当作这一次的规矩；项目的 `.duck/notebook.md`，挑至多三条和这次任务相关的旧条目照着做，收尾的「为什么」里用上了就点出来（「你 MM-DD 记下的：……」）。开关是 off 时不翻笔记本。
 3. **照原技能做**：读 `library/pre-submission-reviewer/SKILL.md`，从头做到尾。原技能里的相对路径（`references/…`）相对它自己的文件夹。
 4. **加查项**：经过评测的额外检查钉在这里，现在还是空的。
 5. **卡片提醒**：从插件的 `cards/INDEX.md` 挑至多三张共识卡对照，只提醒。插件自带的卡现在有 23 张（写作、选题、实验、作图、报告、找反馈、审稿），每张写明道理、怎么用、出处和认同程度（共识、有出处、有分歧），出处都是我们自己的话转述。
-6. **收尾**：按开关。on 时对话里附 5 到 8 行「为什么」，决策行追加到 `.duck/decisions.md`，完整报告写进 `.duck/reports/`，「你能带走的一条」追加到 `.duck/notebook.md`；quiet 时只写文件；off 时只交原技能的结果。
+6. **收尾**：按开关。on 时对话里附 5 到 8 行「为什么」，决策行追加到 `.duck/decisions.md`，完整报告写进 `.duck/reports/`，「你能带走的一条」追加到 `.duck/notebook.md`（已有同一条的不重复记）；quiet 时只写文件；off 时只交原技能的结果。
 
 九条包装命令结构相同，由 `scripts/build.js` 从 `rules/wrapper-template.md` 和 `rules/commands.json` 生成。要改步骤就改模板，再跑 `npm run build`。`/duck`、`/duck-why`、`/duck-learn`、`/duck-notes`、`/duck-skill` 是手写的。
 

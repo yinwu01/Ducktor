@@ -423,7 +423,7 @@ function main() {
     // the questions are not always the last line. Answer once, the way a student would,
     // and check again; the summary records that it happened.
     let followup = false;
-    if (stage.name !== 'learn-ask' && checks.some((c) => !c.ok && c.severity === 'must') && /[？?]/.test(t.reply)) {
+    if (stage.name !== 'learn-ask' && checks.some((c) => !c.ok && c.severity === 'must') && /[？?]|你希望|请选择|请确认|选哪/.test(t.reply)) {
       followup = true;
       const again = HOST === 'claude' ? runClaude(FOLLOWUP, session, opts) : runCodex(FOLLOWUP, session, opts);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
