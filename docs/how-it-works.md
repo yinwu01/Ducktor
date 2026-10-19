@@ -32,7 +32,7 @@
 2. **读组里的卡**：项目的 `.duck/cards/INDEX.md`，挑出相关的，当作这一次的规矩。
 3. **照原技能做**：读 `library/pre-submission-reviewer/SKILL.md`，从头做到尾。原技能里的相对路径（`references/…`）相对它自己的文件夹。
 4. **加查项**：经过评测的额外检查钉在这里，现在还是空的。
-5. **卡片提醒**：从插件的 `cards/INDEX.md` 挑至多三张共识卡对照，只提醒。插件自带的卡现在有 22 张（写作、选题、实验、作图、报告、找反馈、审稿），每张写明道理、怎么用、出处和认同程度（共识、有出处、有分歧），出处都是我们自己的话转述。
+5. **卡片提醒**：从插件的 `cards/INDEX.md` 挑至多三张共识卡对照，只提醒。插件自带的卡现在有 23 张（写作、选题、实验、作图、报告、找反馈、审稿），每张写明道理、怎么用、出处和认同程度（共识、有出处、有分歧），出处都是我们自己的话转述。
 6. **收尾**：按开关。on 时对话里附 5 到 8 行「为什么」，决策行追加到 `.duck/decisions.md`，完整报告写进 `.duck/reports/`，「你能带走的一条」追加到 `.duck/notebook.md`；quiet 时只写文件；off 时只交原技能的结果。
 
 九条包装命令结构相同，由 `scripts/build.js` 从 `rules/wrapper-template.md` 和 `rules/commands.json` 生成。要改步骤就改模板，再跑 `npm run build`。`/duck`、`/duck-why`、`/duck-learn`、`/duck-notes`、`/duck-skill` 是手写的。

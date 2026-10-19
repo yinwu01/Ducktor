@@ -125,7 +125,7 @@ rules/                  常驻规则、命令模板、命令表
 skills/                 14 条命令
 library/                Supervisor-Skills 的 10 个原技能（上游提交 aff5de9），原样存放
 handbook/               科研导师手册的文字版（zh、en）
-cards/                  经验卡片，22 张，每张写明道理和出处
+cards/                  经验卡片，23 张，每张写明道理和出处
 scripts/  tests/        生成、同步上游、测试
 docs/                   说明文档、设计记录、调研；docs/supervisor-skills/ 是上游仓库的存档
 AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的）
