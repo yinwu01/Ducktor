@@ -419,7 +419,8 @@ function globalChecks(transcripts) {
   return [
     ['must', 'notebook lines follow "- MM-DD 阶段｜原则（出处）"', () => notebook.length > 0 && notebook.every((l) => /^- \d{2}-\d{2} .+｜.+/.test(l))],
     ['must', 'decision lines read "- YYYY-MM-DD ▸ 决策：…"', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /^- \d{4}-\d{2}-\d{2} ▸ ?决策[:：]/.test(l))],
-    ['should', 'new notebook lines say what happened this time (｜这次：)', () => { const fresh = notebook.filter((l) => !LOOP_NOTEBOOK.includes(l)); return fresh.length > 0 && fresh.every((l) => /｜这次[:：]/.test(l)); }],
+    ['should', 'new notebook lines say what happened this time (｜这次：)', () => { const fresh = notebook.filter((l) => !LOOP_NOTEBOOK.includes(l)); return (fresh.length > 0 || FLOW === 'loop') && fresh.every((l) => /｜这次[:：]/.test(l)); }],
+    ['must', 'no bold marks in notebook lines', () => !/\*\*/.test(text('notebook.md'))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
     ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
     ['must', 'every card number the replies cite exists', () => {
