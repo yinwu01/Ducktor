@@ -105,7 +105,7 @@ test('hook commands use no shell syntax that differs between sh, PowerShell and 
 
 test('our own text has no em-dash', () => {
   const ours = ['README.md', 'INSTALL.md', 'AGENTS.md', 'LICENSE', 'rules', 'skills', 'cards', 'bin', 'hooks', 'scripts', 'tests', 'docs'];
-  const skip = [/^docs\/(supervisor-skills|design|research)\//, /^tests\/fixtures\//];
+  const skip = [/^docs\/(design|research)\//, /^tests\/fixtures\//];
   const hits = [];
   const visit = (rel) => {
     const full = path.join(ROOT, rel);

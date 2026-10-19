@@ -35,7 +35,7 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 **Codex**
 - 命令写成 `$duck:duck-review`。
 - 第一次用要在 `/hooks` 里信任 Doctor Duck 的 hook；hook 定义改了要重新信任。`codex exec` 测试时可以加 `--dangerously-bypass-hook-trust`，只对这一次生效。
-- 安装会把整个目录拷进 `~/.codex/plugins/cache/`：本地路径安装连 `.git` 一起，约 85 MB；从 GitHub 安装约 77 MB，另有一份同样大小的 marketplace 副本。大头是 `docs/supervisor-skills/` 的上游存档。改了插件要重新 `codex plugin add duck@doctor-duck`。
+- 安装会把整个目录拷进 `~/.codex/plugins/cache/`：本地路径安装连 `.git` 一起拷，`.git` 里有完整历史，有几十 MB；从 GitHub 安装是浅克隆，另有一份 marketplace 副本。10-17 量的是约 77 MB，大头是当时 `docs/supervisor-skills/` 下的上游存档；10-19 删掉存档后，仓库里的文件约 1.7 MB，安装体积还没重新量。改了插件要重新 `codex plugin add duck@doctor-duck`。
 - 沙箱用 bubblewrap。进程带着 ambient capabilities 时（比如继承了 CAP_NET_ADMIN），bwrap 0.6.1 会拒绝启动，表现为 AI 写不了文件。先用 `setpriv --inh-caps=-all --ambient-caps=-all` 去掉再启动 Codex 就好，这是机器环境的问题，和插件无关。
 
 **Cursor**

@@ -10,7 +10,6 @@ licensed under CC BY-NC-SA 4.0.
 | `handbook/` | CC-BY-NC-SA-4.0 | Unmodified copies of the handbook text. See `CC-BY-NC-SA-4.0.txt`. |
 | `skills/`, `rules/`, `cards/` | CC-BY-NC-SA-4.0 | Doctor Duck's own text, adapted from Supervisor-Skills. Not for commercial use. |
 | `bin/`, `hooks/`, `scripts/`, `tests/` | MIT | Code. See `MIT.txt`. Code files read the text in `rules/` at run time and do not embed it. |
-| `docs/supervisor-skills/` | As upstream | A snapshot of the whole Supervisor-Skills repository at commit c243997 (2026-07-01), with its own `LICENSE`. Archive only; the plugin does not read it. |
 | `README.md`, `INSTALL.md`, `AGENTS.md` (generated from `rules/`), `library/README.md` | CC-BY-NC-SA-4.0 | Doctor Duck's own text. |
 | `library/upstream.lock.json`, `package.json`, `gemini-extension.json`, `.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`, `.agents/`, `.gitignore` | MIT | Manifests and configuration. |
 | other `docs/` | CC-BY-NC-SA-4.0 | Doctor Duck's design notes and research. Passages quoted from third-party guides and documentation remain under their authors' terms. |

@@ -127,15 +127,15 @@ library/                Supervisor-Skills 的 10 个原技能（上游提交 aff
 handbook/               科研导师手册的文字版（zh、en）
 cards/                  经验卡片，23 张，每张写明道理和出处
 scripts/  tests/        生成、同步上游、测试
-docs/                   说明文档、设计记录、调研；docs/supervisor-skills/ 是上游仓库的存档
+docs/                   说明文档、设计记录、调研
 AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的）
 ```
 
 ## 来源和致谢
 
-- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库从它的提交 c243997（2026-07-01）分出来，那时的整个仓库原样放在 `docs/supervisor-skills/`，上游的提交历史和作者保留在本仓库里。
+- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库从它的提交 c243997（2026-07-01）分出来，上游到那时为止的提交历史和作者都保留在本仓库的历史里。
 - 多宿主的做法参考了 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
 ## 许可
 
-按目录分：我们写的文字（`skills/`、`rules/`、`cards/`）用 CC BY-NC-SA 4.0，不可商用；代码（`bin/`、`hooks/`、`scripts/`、`tests/`）用 MIT；`library/` 里的原技能各自保留原来的许可，`handbook/` 是 CC BY-NC-SA 4.0，`docs/supervisor-skills/` 照上游自己的 LICENSE。详见 [LICENSE](LICENSE) 和 [LICENSES/README.md](LICENSES/README.md)。
+按目录分：我们写的文字（`skills/`、`rules/`、`cards/`）用 CC BY-NC-SA 4.0，不可商用；代码（`bin/`、`hooks/`、`scripts/`、`tests/`）用 MIT；`library/` 里的原技能各自保留原来的许可，`handbook/` 是 CC BY-NC-SA 4.0。详见 [LICENSE](LICENSE) 和 [LICENSES/README.md](LICENSES/README.md)。
