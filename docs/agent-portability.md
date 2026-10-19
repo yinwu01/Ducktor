@@ -8,7 +8,7 @@ Doctor Duck 的内容只有一份：`skills/`、`rules/`、`library/`、`cards/`
 
 | 档 | 宿主能做什么 | Doctor Duck 能做到什么 |
 |---|---|---|
-| 一 | 装整个插件，开会话时跑 hook | 全部：常驻规则、开关、15 条命令 |
+| 一 | 装整个插件，开会话时跑 hook | 全部：常驻规则、开关、14 条命令 |
 | 二 | 装整个插件，命令能用；常驻说明是一份固定文件，不跑 hook | 命令能用；常驻规则是固定的 `AGENTS.md`，开关要 AI 自己去读 `.duck/config.md` |
 | 三 | 只读项目里的说明文件 | 只有常驻规则；要先把 Doctor Duck 放到本机某处，在说明里写上路径 |
 
@@ -18,7 +18,7 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 
 | 宿主 | 档 | 用到的文件 | 实测 |
 |---|---|---|---|
-| Claude Code | 一 | `.claude-plugin/`、`hooks/claude-codex-hooks.json`、`skills/` | 2.1.301，Sonnet，`--plugin-dir` 加载：端到端流程（`docs/testing.md`）跑了 15 条命令里的 7 条（`/duck`、`/duck-idea`、`/duck-review`、`/duck-why`、`/duck-polish`、`/duck-skill`、`/duck-learn`），开关三档，hook 注入，读插件文件的放行 hook。从 GitHub 安装：在隔离的配置目录里装成功，没在这份安装上跑流程 |
+| Claude Code | 一 | `.claude-plugin/`、`hooks/claude-codex-hooks.json`、`skills/` | 2.1.301，Sonnet，`--plugin-dir` 加载：端到端流程（`docs/testing.md`）跑了 14 条命令里的 7 条（`/duck`、`/duck-idea`、`/duck-review`、`/duck-why`、`/duck-polish`、`/duck-skill`、`/duck-learn`），开关三档，hook 注入，读插件文件的放行 hook。从 GitHub 安装：在隔离的配置目录里装成功，没在这份安装上跑流程 |
 | Codex | 一 | `.codex-plugin/`、`.agents/plugins/marketplace.json`、同一份 hooks 文件、`skills/*/agents/openai.yaml` | 0.163.0，默认模型，本地路径安装：同上的流程和命令。从 GitHub 安装：同上，装成功，没跑流程 |
 | Cursor | 一 | `.cursor-plugin/plugin.json`、`hooks/hooks-cursor.json`；`bin/duck.js` 在有 `CURSOR_PLUGIN_ROOT` 时输出 `additional_context` | 未实测 |
 | Gemini CLI | 二 | `gemini-extension.json`（`contextFileName: AGENTS.md`）、`skills/` | 未实测 |

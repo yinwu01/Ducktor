@@ -43,7 +43,7 @@ Cursor、Gemini CLI、Qwen Code 有适配文件，但还没在本机实测过；
 
 ## 装好了，怎么确认
 
-1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。鸭子 quack 一声，列出 14 条命令，说现在的开关是 on。
+1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。鸭子 quack 一声，列出 13 条命令，说现在的开关是 on。
 2. 在一个项目里敲 `/duck quiet`，项目里会出现 `.duck/config.md`，开关那一行是 quiet。敲 `/duck on` 改回来。
 
 ## 常见问题

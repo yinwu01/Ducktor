@@ -15,8 +15,8 @@ Node 自带的 `node:test`，不装依赖，几秒跑完。
 - 读文件放行的 hook：插件根目录内才放行，根目录外、`..` 跳出、符号链接指出去、输入是坏的，都不放行。
 
 `tests/structure.test.js` 测仓库本身：
-- 15 条命令，frontmatter 只有 name、description、`disable-model-invocation: true`，每条都有 Codex 的 `agents/openai.yaml`。
-- 总入口的菜单正好列全；11 个原技能都有命令，`core.md` 的映射一个不漏。
+- 14 条命令，frontmatter 只有 name、description、`disable-model-invocation: true`，每条都有 Codex 的 `agents/openai.yaml`。
+- 总入口的菜单正好列全；10 个原技能都有命令，`core.md` 的映射一个不漏。
 - 生成的命令和 `AGENTS.md` 是最新的；`library/`、`handbook/` 和上游锁文件逐文件一致。
 - 命令和规则里点到的路径都存在。
 - 各宿主清单能解析，名字和版本号一致，指向的文件存在；没有 `hooks/hooks.json`（会被 Gemini CLI 自动加载）。

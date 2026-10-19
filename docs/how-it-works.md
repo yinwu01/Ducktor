@@ -7,8 +7,8 @@
 | 层 | 在哪 | 是什么 | 谁写的 |
 |---|---|---|---|
 | 常驻规则 | `rules/core.md` | 平时怎么陪学生：先问、讲为什么、记决策、只提议不自动跑 | 我们 |
-| 命令 | `skills/duck*/SKILL.md` | 学生敲的 `/duck`、`/duck-review` 等 15 条 | 我们 |
-| 原技能 | `library/` | Supervisor-Skills 的 11 个技能，逐字节照搬 | 上游 |
+| 命令 | `skills/duck*/SKILL.md` | 学生敲的 `/duck`、`/duck-review` 等 14 条 | 我们 |
+| 原技能 | `library/` | Supervisor-Skills 的 10 个技能，逐字节照搬 | 上游 |
 
 命令只是一层包装：先查设定、读组里的卡，再让 AI 去读 `library/` 里的原技能照做，最后按开关写「为什么」报告。原技能一字不改，上游更新时整体同步。
 
@@ -35,7 +35,7 @@
 5. **卡片提醒**：从插件的 `cards/INDEX.md` 挑至多三张共识卡对照，只提醒。
 6. **收尾**：按开关。on 时对话里附 5 到 8 行「为什么」，决策行追加到 `.duck/decisions.md`，完整报告写进 `.duck/reports/`，「你能带走的一条」追加到 `.duck/notebook.md`；quiet 时只写文件；off 时只交原技能的结果。
 
-十条包装命令结构相同，由 `scripts/build.js` 从 `rules/wrapper-template.md` 和 `rules/commands.json` 生成。要改步骤就改模板，再跑 `npm run build`。`/duck`、`/duck-why`、`/duck-learn`、`/duck-notes`、`/duck-skill` 是手写的。
+九条包装命令结构相同，由 `scripts/build.js` 从 `rules/wrapper-template.md` 和 `rules/commands.json` 生成。要改步骤就改模板，再跑 `npm run build`。`/duck`、`/duck-why`、`/duck-learn`、`/duck-notes`、`/duck-skill` 是手写的。
 
 ## 三条路进到同一份命令文件
 
@@ -79,7 +79,7 @@ Codex 的沙箱默认能读整个文件系统，不需要这条；它的工具�
 
 ## 生成的文件和上游副本
 
-- `npm run build`：重新生成十条包装命令和 `AGENTS.md`。
+- `npm run build`：重新生成九条包装命令和 `AGENTS.md`。
 - `npm run check`：生成的文件是否最新；`library/`、`handbook/` 是否还和上游一致（`library/upstream.lock.json` 记着每个文件的 sha256 和上游提交）。
 - `node scripts/upstream.js sync <上游仓库目录>`：从新版 Supervisor-Skills 同步，同时更新锁文件，并列出变了哪些文件。
 

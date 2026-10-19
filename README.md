@@ -2,7 +2,7 @@
 
 > Trust me, I'm a Ducktor.
 
-Doctor Duck 是给研究生用的科研导师插件，跑在 Claude Code 和 Codex 里。它把 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的 11 个科研技能（文献综述、评估 idea、理论文逻辑、写引言、写正文、润色、作图、投稿前审稿等）做成 `/duck-*` 命令；每条命令跑完，再把这一步背后的道理讲给你听，记进你自己项目里的笔记本。
+Doctor Duck 是给研究生用的科研导师插件，跑在 Claude Code 和 Codex 里。它把 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的 10 个科研技能（文献综述、评估 idea、理论文逻辑、写引言、写正文、润色、作图、投稿前审稿等）做成 `/duck-*` 命令；每条命令跑完，再把这一步背后的道理讲给你听，记进你自己项目里的笔记本。
 
 它不替你做研究。研究往哪走、哪个结论能写，你说了算；它负责把 AI 做事的取舍摊开，让你下次自己先想到。
 
@@ -89,7 +89,7 @@ Codex 里把 `/duck-review` 写成 `$duck:duck-review`。
 
 | | 状态 |
 |---|---|
-| Claude Code 2.1.301 | 实测（本地加载）：15 条命令里的 7 条、三档开关、开场注入、读插件文件的放行。从 GitHub 安装只验证了能装上 |
+| Claude Code 2.1.301 | 实测（本地加载）：14 条命令里的 7 条、三档开关、开场注入、读插件文件的放行。从 GitHub 安装只验证了能装上 |
 | Codex 0.163.0 | 实测（本地路径安装）：同上。从 GitHub 安装只验证了能装上 |
 | Cursor、Gemini CLI、Qwen Code | 有适配文件，未实测 |
 | 只读 `AGENTS.md` 的 agent | 只有常驻规则，未实测 |
@@ -122,8 +122,8 @@ node tests/e2e/flow.js codex
 .claude-plugin/  .codex-plugin/  .cursor-plugin/  .agents/plugins/  gemini-extension.json   各宿主的清单
 hooks/  bin/duck.js     开场注入、读插件文件的放行（Node，不装依赖）
 rules/                  常驻规则、命令模板、命令表
-skills/                 15 条命令
-library/                Supervisor-Skills 的 11 个原技能（上游提交 aff5de9），原样存放
+skills/                 14 条命令
+library/                Supervisor-Skills 的 10 个原技能（上游提交 aff5de9），原样存放
 handbook/               科研导师手册的文字版（zh、en）
 cards/                  经验卡片（第一批还在写）
 scripts/  tests/        生成、同步上游、测试
@@ -133,7 +133,7 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 
 ## 来源和致谢
 
-- 方法论、手册和 11 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库从它的提交 c243997（2026-07-01）分出来，那时的整个仓库原样放在 `docs/supervisor-skills/`，上游的提交历史和作者保留在本仓库里。
+- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库从它的提交 c243997（2026-07-01）分出来，那时的整个仓库原样放在 `docs/supervisor-skills/`，上游的提交历史和作者保留在本仓库里。
 - 多宿主的做法参考了 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
 ## 许可
