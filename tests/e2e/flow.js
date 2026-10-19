@@ -159,7 +159,8 @@ const cardIds = (s) => {
   }
   return lines.flatMap((l) => [...l.matchAll(/\b([A-Z]\d{2})\b/g)].map((m) => m[1]));
 };
-const QUIZ = /考考你|小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
+// 「最小测试」is a minimal test run, not a quiz.
+const QUIZ = /考考你|(?<!最)小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 
 // Each stage: name, prompt, resume (continue the session), optional search and timeout, and
 // checks. A check is [severity, label, fn(transcript, before)] where severity is must or should.
