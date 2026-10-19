@@ -6,6 +6,9 @@
 //   node tests/e2e/flow.js codex     Codex, uses the installed duck@doctor-duck plugin
 //   node tests/e2e/flow.js claude more   the second flow: survey, outline, intro, write,
 //                                        figure, vibe and notes (main is the default)
+//   node tests/e2e/flow.js claude loop   the third flow: /duck picking a command, old notebook
+//                                        entries coming back, a free conversation about a
+//                                        single-run result, and 「这类我懂了」
 //
 // Environment:
 //   DUCK_E2E_MODEL   model for the host (default: sonnet for claude, Codex's own default for codex)
@@ -26,8 +29,8 @@ const { spawnSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '..', '..');
 const HOST = process.argv[2];
 const FLOW = process.argv[3] || 'main';
-if (!['claude', 'codex'].includes(HOST) || !['main', 'more'].includes(FLOW)) {
-  console.error('usage: node tests/e2e/flow.js claude|codex [main|more]');
+if (!['claude', 'codex'].includes(HOST) || !['main', 'more', 'loop'].includes(FLOW)) {
+  console.error('usage: node tests/e2e/flow.js claude|codex [main|more|loop]');
   process.exit(2);
 }
 const MODEL = process.env.DUCK_E2E_MODEL || (HOST === 'claude' ? 'sonnet' : '');
@@ -157,7 +160,7 @@ const QUIZ = /考考你|小测|测验|测一测|思考题|练习题|课后作业
 // Each stage: name, prompt, resume (continue the session), optional search and timeout, and
 // checks. A check is [severity, label, fn(transcript, before)] where severity is must or should.
 function stages() {
-  return FLOW === 'main' ? mainStages() : moreStages();
+  return { main: mainStages, more: moreStages, loop: loopStages }[FLOW]();
 }
 
 function mainStages() {
@@ -271,6 +274,48 @@ function moreStages() {
   ];
 }
 
+// What a student's notebook holds from earlier weeks when the loop flow starts.
+const LOOP_NOTEBOOK = [
+  '- 10-09 写摘要｜用词强度跟着证据走，只跑了一次的结果不写 significantly（卡 W11）',
+  '- 10-12 写引言｜挑战段写问题本身为什么难，不写方法实现起来难（卡 W09）',
+];
+
+// The knowledge loop and the resident rules: /duck picks a command, old notebook entries come
+// back in later commands, a free conversation about a single-run result, and 「这类我懂了」.
+function loopStages() {
+  const decisions = () => text('decisions.md').split('\n').filter((l) => l.trim());
+  const withReport = (t, short) => t.reply + newestReport(short);
+  return [
+    { name: 'route', prompt: `${cmd('duck')} 帮我看看摘要最后一句是不是说得太满了`, checks: [
+      ['must', 'names the command it picked', (t) => /duck-(polish|review)/.test(t.reply)],
+      ['must', 'read the picked skill', (t) => readOf(t, 'paper-polish') || readOf(t, 'pre-submission-reviewer')],
+      ['should', 'brings up the 10-09 notebook entry', (t) => /10-09/.test(withReport(t, 'polish') + newestReport('review'))],
+    ] },
+    { name: 'intro', resume: true, prompt: `${cmd('duck-intro')} 按 paper/main.tex 的内容重写引言。先在对话里给草稿，paper/ 里的文件先别改。`, checks: [
+      ['must', 'read library/intro-drafter', (t) => readOf(t, 'intro-drafter')],
+      ['must', 'brings up the 10-12 notebook entry', (t) => /10-12/.test(withReport(t, 'intro'))],
+      ['must', 'notebook has no repeated line', () => new Set(notebookLines()).size === notebookLines().length],
+      ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
+    ] },
+    { name: 'exp', resume: true, prompt: '新结果出来了：32k 长度上 BlockSkip 准确率 70.9，稠密注意力 70.6，只跑了一次。帮我把这一行加进 paper/main.tex 的表里。',
+      before: () => projectFile('paper/main.tex'), checks: [
+        ['must', 'raises seeds or run-to-run variation', (t) => /seed|种子|波动|方差|标准差/.test(t.reply)],
+        ['should', 'asks before editing the table', (t, before) => /[？?]/.test(t.reply) && projectFile('paper/main.tex') === before],
+      ] },
+    { name: 'exp-ok', resume: true, prompt: '先补到 3 个 seed，表等结果出来再改。', before: () => decisions().length, checks: [
+      ['must', 'a new decision line says the student decided', (t, before) => decisions().slice(before).some((l) => /你定/.test(l))],
+      ['should', 'reply shows the decision line', (t) => /▸ ?决策/.test(t.reply)],
+    ] },
+    { name: 'mute', resume: true, prompt: '多 seed 和方差这类我懂了，以后别讲了。', checks: [
+      ['must', 'config mutes the category', () => /按类静音[\s\S]*(seed|种子|方差)/.test(text('config.md'))],
+    ] },
+    { name: 'mute-check', resume: true, prompt: '64k 长度上也出来了：BlockSkip 69.8，稠密 69.9，也只跑了一次。先记进 notes.md，表等补完 seed 再说。', checks: [
+      ['should', 'notes.md got the 64k result', () => /64k/i.test(projectFile('notes.md'))],
+      ['should', 'does not explain seeds again', (t) => !/为什么[:：]/.test(t.reply) && !/波动/.test(t.reply)],
+    ] },
+  ];
+}
+
 function globalChecks(transcripts) {
   const notebook = text('notebook.md').split('\n').filter((l) => l.trim());
   return [
@@ -294,6 +339,10 @@ function setup() {
   git('init', '-q');
   git('add', '-A');
   git('-c', 'user.name=student', '-c', 'user.email=student@example.com', 'commit', '-q', '-m', '初稿和实验代码');
+  if (FLOW === 'loop') {
+    fs.mkdirSync(path.join(PROJECT, '.duck'), { recursive: true });
+    fs.writeFileSync(path.join(PROJECT, '.duck', 'notebook.md'), `${LOOP_NOTEBOOK.join('\n')}\n`);
+  }
   if (HOST === 'codex') {
     const cache = path.join(process.env.HOME, '.codex', 'plugins', 'cache', 'doctor-duck', 'duck');
     const head = spawnSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
