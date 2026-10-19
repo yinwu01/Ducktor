@@ -157,7 +157,10 @@ const cardIds = (s) => {
     if (inList && l.trim()) seenItem = true;
     if (inList || /卡/.test(l)) lines.push(l);
   }
-  return lines.flatMap((l) => [...l.matchAll(/\b([A-Z]\d{2})\b/g)].map((m) => m[1]));
+  // Only letters cards use (the plugin's prefixes and G for group cards), so a line reference
+  // such as L14 in a review table that also names a card is not read as a card number.
+  const letters = [...new Set([...PLUGIN_CARDS].map((id) => id[0]).concat('G'))].join('');
+  return lines.flatMap((l) => [...l.matchAll(new RegExp(`\\b([${letters}]\\d{2})\\b`, 'g'))].map((m) => m[1]));
 };
 // The hook injected the not-turned-on note and not the resident rules. Matches idle.md's first
 // words, which no command file contains (Codex's rollout also holds the command files it read).
