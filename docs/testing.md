@@ -30,6 +30,7 @@ Node 自带的 `node:test`，不装依赖，几秒跑完。
 node tests/e2e/flow.js claude                     # 默认 Sonnet
 DUCK_E2E_MODEL=opus node tests/e2e/flow.js claude
 node tests/e2e/flow.js codex                      # 用 Codex 的默认模型
+node tests/e2e/flow.js claude more                # 第二套流程，见下文
 DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 ```
 
@@ -49,13 +50,28 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | off | `/duck off` | config 里开关是 off |
 | off-new-session | 新会话里 `/duck-polish` | 注入的是 off 那一段；没有新报告；笔记本没动 |
 
+第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，顺序是学生实际碰到它们的顺序：
+
+| 步 | 学生做什么 | 必须满足（must） |
+|---|---|---|
+| survey | `/duck-survey` 块稀疏注意力，2023 年以后、十篇以内 | 读了 `library/deep-research`；写了报告。这一步允许联网检索（Claude Code 放行 WebSearch、WebFetch，Codex 加 `--search`），相当于学生在弹窗里点了允许 |
+| outline | `/duck-outline paper/main.tex` | 读了 `library/tech-paper-template`；写了报告 |
+| intro | `/duck-intro` 重写引言，paper/ 里的文件先别改 | 读了 `library/intro-drafter`；写了报告；提醒学生核对事实、数字和引用 |
+| write | `/duck-write` 写方法一节，依据代码 | 读了 `library/paper-writer`；写了报告；提醒核对 |
+| figure | `/duck-figure` 给结果设计主图 | 读了 `library/figure-designer`；写了报告 |
+| vibe | `/duck-vibe` 下周的实验哪些交给 AI | 读了 `library/vibe-research-workflow`；写了报告 |
+| notes | `/duck-notes` | 笔记本里的每个阶段都列出来了；笔记本没动 |
+| notes-delete、notes-ok | `/duck-notes 删掉最后一条`，再说「可以，删吧」 | 删掉的正好是最后一条，其余不变 |
+
+每条包装命令还有几条 should：回复里有「为什么」；列出了卡片提醒，带插件自带卡的卡号；intro 和 write 没改 `paper/main.tex`；write 指出方法描述和代码对不上；notes-delete 先给学生看再删。
+
 hook 注入的内容，Claude Code 从 stream-json 的 hook 事件里读；Codex 的 `--json` 输出不带它，从会话记录 `~/.codex/sessions/…/rollout-*.jsonl` 里读。
 
-全程还查：笔记本每行是「- MM-DD 阶段｜原则（出处）」；决策记录每行是「- YYYY-MM-DD ▸ 决策：……」；两者都没有 em-dash；回复里没有出题、留作业、打分（按一组关键词查，只能抓明显的）。
+两套流程全程都查：笔记本每行是「- MM-DD 阶段｜原则（出处）」；决策记录每行是「- YYYY-MM-DD ▸ 决策：……」；两者都没有 em-dash；回复里没有出题、留作业、打分（按一组关键词查，只能抓明显的）；回复里提到的卡号都真的存在（插件自带的卡或项目里的组卡）。
 
 一些步骤带 should 级检查（比如 card-draft 先给学生看卡再写），不满足只记下，不算失败。原技能有时会停下来追问缺的信息；这时测试替学生答一句「信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行。」再查一遍，结果里标明。
 
-每次跑的记录在 `evals/results/e2e-<宿主>-<时间>/`（不进 git）：每一步的原始 jsonl、`summary.md`、`summary.json`，以及跑完时项目 `.duck/` 的拷贝（`duck-files/`）。测试项目本身放在系统临时目录：Claude Code 不肯往已加载插件的目录里写文件，项目放在插件仓库里会让写文件的步骤全部失败。
+每次跑的记录在 `evals/results/e2e-<宿主>-<时间>/`（第二套流程是 `e2e-<宿主>-more-<时间>/`）（不进 git）：每一步的原始 jsonl、`summary.md`、`summary.json`，以及跑完时项目 `.duck/` 的拷贝（`duck-files/`）。测试项目本身放在系统临时目录：Claude Code 不肯往已加载插件的目录里写文件，项目放在插件仓库里会让写文件的步骤全部失败。
 
 跑 Codex 前要先 `codex plugin add duck@doctor-duck` 刷新它的插件缓存，否则测的是旧版本。
 

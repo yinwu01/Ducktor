@@ -126,7 +126,7 @@ const reports = (suffix) => (fs.existsSync(duckFile('reports'))
 const allReports = () => (fs.existsSync(duckFile('reports')) ? fs.readdirSync(duckFile('reports')) : []);
 const readOf = (t, skill) => t.reads.some((r) => r && r.includes(`library/${skill}/SKILL.md`));
 const switchIs = (mode) => new RegExp(`^[\\s>*#-]*开关\\s*[:：]\\s*${mode}`, 'm').test(text('config.md'));
-const FOLLOWUP = '信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行。';
+const FOLLOWUP = '信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行；我前面说的限制照旧。';
 const newestReport = (suffix) => {
   const f = reports(suffix).sort().at(-1);
   return f ? fs.readFileSync(duckFile(path.join('reports', f)), 'utf8') : '';
