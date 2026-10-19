@@ -39,6 +39,7 @@ function wrappers() {
       ...c,
       skill_block: c.skill_block || fill(defaultBlock, { skill: c.skills[0] }),
       extra: c.extra ? `\n- ${c.extra}` : '',
+      checks: c.checks ? c.checks.join('\n') : '还没有。以后经过评测的查项会钉在这里，每条标卡号。',
     };
     const body = fill(template, values);
     const left = body.match(/\{\{\w+\}\}/);
