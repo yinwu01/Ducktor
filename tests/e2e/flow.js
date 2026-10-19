@@ -243,7 +243,7 @@ function moreStages() {
     ]),
     wrapped('duck-write', 'write', 'paper-writer', '写方法一节，依据 code/skip_attn.py 和 paper/main.tex。先在对话里给草稿，paper/ 里的文件先别改。', [
       ['must', 'reminds the student to check facts, numbers and citations', (t) => /核对/.test(t.reply)],
-      ['should', 'notices the method text and the code disagree', (t) => /对不上|不一致|不符|矛盾|差异|不是.{0,12}(注意力质量|attention mass)/.test(t.reply)],
+      ['should', 'notices the method text and the code disagree', (t) => /对不上|不一致|不符|矛盾|差异|差别|不是.{0,12}(注意力质量|attention mass)/.test(t.reply)],
       untouched('paper/main.tex'),
     ]),
     wrapped('duck-figure', 'figure', 'figure-designer', '给 notes.md 里的速度和准确率结果设计一张主图。'),

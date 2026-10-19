@@ -19,6 +19,7 @@ disable-model-invocation: true
 
 ## 3. 照原技能做
 读 library/pre-submission-reviewer/SKILL.md，把学生的输入当作它的输入，照它从头做到尾。
+- 先把原技能的 SKILL.md 读完再动手。学生只要其中一部分（比如只写一节、只查一项）也一样：SKILL.md 里的硬规则照样管这一部分；references/ 下的文件按 SKILL.md 的指引再读，不跳过 SKILL.md 直接去读 references/。
 - 原技能写的相对路径（references/…、scripts/… 这类）都相对它自己的文件夹，不是相对这份文件。
 - 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在常驻规则里）。
 - 原技能要求的步骤、检查和输出格式全部照做，不因为外面包了一层就省略。
