@@ -134,9 +134,21 @@ const newestReport = (suffix) => {
 const fixture = (rel) => fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'grad-project', rel), 'utf8');
 const projectFile = (rel) => (fs.existsSync(path.join(PROJECT, rel)) ? fs.readFileSync(path.join(PROJECT, rel), 'utf8') : '');
 const notebookLines = () => text('notebook.md').split('\n').filter((l) => l.trim());
-// Card numbers in lines that talk about cards (other lines may say P99 or similar).
+// Card numbers in lines that mention cards, or in the list under a 卡片提醒 heading
+// (other lines may say P99 or similar).
 const PLUGIN_CARDS = new Set(fs.readdirSync(path.join(ROOT, 'cards')).filter((f) => /^[A-Z]\d{2}\.md$/.test(f)).map((f) => f.slice(0, 3)));
-const cardIds = (s) => s.split('\n').filter((l) => /卡/.test(l)).flatMap((l) => [...l.matchAll(/\b([A-Z]\d{2})\b/g)].map((m) => m[1]));
+const cardIds = (s) => {
+  const lines = [];
+  let inList = false;
+  let seenItem = false;
+  for (const l of s.split('\n')) {
+    if (/卡片提醒/.test(l)) { inList = true; seenItem = false; lines.push(l); continue; }
+    if (inList && !l.trim() && seenItem) inList = false;
+    if (inList && l.trim()) seenItem = true;
+    if (inList || /卡/.test(l)) lines.push(l);
+  }
+  return lines.flatMap((l) => [...l.matchAll(/\b([A-Z]\d{2})\b/g)].map((m) => m[1]));
+};
 const QUIZ = /考考你|小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 
 // Each stage: name, prompt, resume (continue the session), optional search and timeout, and
@@ -231,7 +243,7 @@ function moreStages() {
     ]),
     wrapped('duck-write', 'write', 'paper-writer', '写方法一节，依据 code/skip_attn.py 和 paper/main.tex。先在对话里给草稿，paper/ 里的文件先别改。', [
       ['must', 'reminds the student to check facts, numbers and citations', (t) => /核对/.test(t.reply)],
-      ['should', 'notices the method text and the code disagree', (t) => /对不上|不一致|不符|矛盾|不是.{0,12}(注意力质量|attention mass)/.test(t.reply)],
+      ['should', 'notices the method text and the code disagree', (t) => /对不上|不一致|不符|矛盾|差异|不是.{0,12}(注意力质量|attention mass)/.test(t.reply)],
       untouched('paper/main.tex'),
     ]),
     wrapped('duck-figure', 'figure', 'figure-designer', '给 notes.md 里的速度和准确率结果设计一张主图。'),
