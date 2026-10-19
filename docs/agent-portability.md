@@ -2,7 +2,7 @@
 
 Doctor Duck 的内容只有一份：`skills/`、`rules/`、`library/`、`cards/`、`handbook/`。每个 agent 只加一层薄的适配：一份清单，或者一份说明文件。这个做法照 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
-**规矩：在本机真跑过一遍，才算支持。** 端到端流程跑了 14 条命令里的 7 条（见下表）；另外 7 条（`/duck-survey`、`/duck-outline`、`/duck-intro`、`/duck-write`、`/duck-figure`、`/duck-vibe`、`/duck-notes`）只做了静态检查，还没有用真模型跑过。其中前 6 条是包装命令，和跑过的 `/duck-idea`、`/duck-review`、`/duck-polish` 由同一份模板生成，只是读的原技能不同；`/duck-notes` 是手写的。下表「实测」一列写的是哪个版本跑过、跑了什么；没写的就是还没跑过，适配文件照别的项目已经跑通的格式写，可能要改。
+**规矩：在本机真跑过一遍，才算支持。** 端到端测试有两套流程（见 `docs/testing.md`），合起来把 14 条命令都用真模型跑过。下表「实测」一列写的是哪个版本跑过、跑了什么；没写的就是还没跑过，适配文件照别的项目已经跑通的格式写，可能要改。
 
 ## 三档
 
@@ -18,7 +18,7 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 
 | 宿主 | 档 | 用到的文件 | 实测 |
 |---|---|---|---|
-| Claude Code | 一 | `.claude-plugin/`、`hooks/claude-codex-hooks.json`、`skills/` | 2.1.301，Sonnet，`--plugin-dir` 加载：端到端流程（`docs/testing.md`）跑了 14 条命令里的 7 条（`/duck`、`/duck-idea`、`/duck-review`、`/duck-why`、`/duck-polish`、`/duck-skill`、`/duck-learn`），开关三档，hook 注入，读插件文件的放行 hook。从 GitHub 安装：在隔离的配置目录里装成功，没在这份安装上跑流程 |
+| Claude Code | 一 | `.claude-plugin/`、`hooks/claude-codex-hooks.json`、`skills/` | 2.1.303，Sonnet，`--plugin-dir` 加载：两套端到端流程（`docs/testing.md`）跑了全部 14 条命令，开关三档，hook 注入，读插件文件的放行 hook。从 GitHub 安装：在隔离的配置目录里装成功，没在这份安装上跑流程 |
 | Codex | 一 | `.codex-plugin/`、`.agents/plugins/marketplace.json`、同一份 hooks 文件、`skills/*/agents/openai.yaml` | 0.163.0，默认模型，本地路径安装：同上的流程和命令。从 GitHub 安装：同上，装成功，没跑流程 |
 | Cursor | 一 | `.cursor-plugin/plugin.json`、`hooks/hooks-cursor.json`；`bin/duck.js` 在有 `CURSOR_PLUGIN_ROOT` 时输出 `additional_context` | 未实测 |
 | Gemini CLI | 二 | `gemini-extension.json`（`contextFileName: AGENTS.md`）、`skills/` | 未实测 |

@@ -89,7 +89,7 @@ Codex 里把 `/duck-review` 写成 `$duck:duck-review`。
 
 | | 状态 |
 |---|---|
-| Claude Code 2.1.301 | 实测（本地加载）：14 条命令里的 7 条、三档开关、开场注入、读插件文件的放行。从 GitHub 安装只验证了能装上 |
+| Claude Code 2.1.303 | 实测（本地加载）：14 条命令全部、三档开关、开场注入、读插件文件的放行。从 GitHub 安装只验证了能装上 |
 | Codex 0.163.0 | 实测（本地路径安装）：同上。从 GitHub 安装只验证了能装上 |
 | Cursor、Gemini CLI、Qwen Code | 有适配文件，未实测 |
 | 只读 `AGENTS.md` 的 agent | 只有常驻规则，未实测 |
