@@ -9,12 +9,16 @@
 //   node tests/e2e/flow.js claude loop   the third flow: /duck picking a command, old notebook
 //                                        entries coming back, a free conversation about a
 //                                        single-run result, and 「这类我懂了」
+//   node tests/e2e/flow.js claude paper  review, why and learn on a real paper: set
+//                                        DUCK_E2E_PAPER to a folder with its LaTeX source
 //
 // Environment:
 //   DUCK_E2E_MODEL   model for the host (default: sonnet for claude, Codex's own default for codex)
 //   DUCK_E2E_WRAP    command prefix for the host, e.g. "setpriv --inh-caps=-all --ambient-caps=-all"
 //                    when bwrap refuses to start under ambient capabilities (Codex sandbox)
 //   DUCK_E2E_ONLY    comma-separated stage names to run (later stages may depend on earlier ones)
+//   DUCK_E2E_PAPER   for the paper flow: a folder holding one paper's LaTeX source; it is copied
+//                    to paper/ in an empty project
 //
 // The fixture project is copied to a temp folder outside the plugin (Claude Code will not
 // write files that sit inside a loaded plugin). Each stage's transcript, summary.json,
@@ -29,8 +33,8 @@ const { spawnSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '..', '..');
 const HOST = process.argv[2];
 const FLOW = process.argv[3] || 'main';
-if (!['claude', 'codex'].includes(HOST) || !['main', 'more', 'loop'].includes(FLOW)) {
-  console.error('usage: node tests/e2e/flow.js claude|codex [main|more|loop]');
+if (!['claude', 'codex'].includes(HOST) || !['main', 'more', 'loop', 'paper'].includes(FLOW)) {
+  console.error('usage: node tests/e2e/flow.js claude|codex [main|more|loop|paper]');
   process.exit(2);
 }
 const MODEL = process.env.DUCK_E2E_MODEL || (HOST === 'claude' ? 'sonnet' : '');
@@ -160,7 +164,7 @@ const QUIZ = /考考你|小测|测验|测一测|思考题|练习题|课后作业
 // Each stage: name, prompt, resume (continue the session), optional search and timeout, and
 // checks. A check is [severity, label, fn(transcript, before)] where severity is must or should.
 function stages() {
-  return { main: mainStages, more: moreStages, loop: loopStages }[FLOW]();
+  return { main: mainStages, more: moreStages, loop: loopStages, paper: paperStages }[FLOW]();
 }
 
 function mainStages() {
@@ -316,6 +320,37 @@ function loopStages() {
   ];
 }
 
+// A real paper instead of the fixture: review it, ask why, then the stage review.
+function paperStages() {
+  const main = mainTex();
+  return [
+    { name: 'review', prompt: `${cmd('duck-review')} paper/${main}`, checks: [
+      ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
+      ['must', 'wrote a review report', () => reports('review').length > 0],
+      ['should', 'grades issues CRITICAL / MAJOR / MINOR', (t) => /CRITICAL|MAJOR|MINOR/.test(t.reply)],
+      ['should', 'reply has the why part', (t) => /为什么/.test(t.reply)],
+    ] },
+    { name: 'why', resume: true, prompt: cmd('duck-why'), checks: [
+      ['must', 'says it is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
+      ['must', 'wrote a why report', () => reports('why').length > 0],
+    ] },
+    { name: 'learn-ask', resume: true, prompt: cmd('duck-learn'), checks: [
+      ['must', 'opens with the one question', (t) => /最想重来/.test(t.reply)],
+    ] },
+    { name: 'learn', resume: true, prompt: '审稿是我让做的，怎么审都交给你了。最想重来的是实验部分，我想先弄清审稿人最可能抓哪一条。', checks: [
+      ['must', 'wrote a learn report', () => reports('learn').length > 0],
+      ['should', 'next step is about the experiments', (t) => /实验/.test(t.reply)],
+    ] },
+  ];
+}
+
+// The paper flow's main .tex file: the one with \documentclass.
+function mainTex() {
+  const dir = path.join(PROJECT, 'paper');
+  const tex = fs.readdirSync(dir).filter((f) => f.endsWith('.tex'));
+  return tex.find((f) => /\\documentclass/.test(fs.readFileSync(path.join(dir, f), 'utf8'))) || tex[0];
+}
+
 function globalChecks(transcripts) {
   const notebook = text('notebook.md').split('\n').filter((l) => l.trim());
   return [
@@ -334,7 +369,12 @@ function globalChecks(transcripts) {
 
 function setup() {
   fs.mkdirSync(OUT, { recursive: true });
-  fs.cpSync(path.join(ROOT, 'tests', 'fixtures', 'grad-project'), PROJECT, { recursive: true });
+  if (FLOW === 'paper') {
+    if (!process.env.DUCK_E2E_PAPER) { console.error('the paper flow needs DUCK_E2E_PAPER'); process.exit(2); }
+    fs.cpSync(path.resolve(process.env.DUCK_E2E_PAPER), path.join(PROJECT, 'paper'), { recursive: true });
+  } else {
+    fs.cpSync(path.join(ROOT, 'tests', 'fixtures', 'grad-project'), PROJECT, { recursive: true });
+  }
   const git = (...a) => spawnSync('git', a, { cwd: PROJECT });
   git('init', '-q');
   git('add', '-A');
