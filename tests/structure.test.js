@@ -119,3 +119,33 @@ test('our own text has no em-dash', () => {
   ours.forEach(visit);
   assert.deepEqual(hits, []);
 });
+
+test('cards: INDEX lists every card, fields are complete, and cited files and lines exist', () => {
+  const dir = path.join(ROOT, 'cards');
+  const files = fs.readdirSync(dir).filter((f) => /^[A-Z]\d{2}\.md$/.test(f)).sort();
+  const index = read('cards/INDEX.md');
+  const listed = [...index.matchAll(/^\| ([A-Z]\d{2}) \|.*\| \1\.md \|$/gm)].map((m) => `${m[1]}.md`).sort();
+  assert.deepEqual(listed, files);
+  for (const file of files) {
+    const text = read(`cards/${file}`);
+    const fm = frontmatter(text);
+    for (const key of ['id', 'title', 'when', 'strength', 'sources', 'scope', 'verified']) assert.ok(fm[key], `${file} has ${key}`);
+    assert.equal(`${fm.id}.md`, file);
+    assert.ok(['共识', '有出处', '有分歧'].includes(fm.strength), `${file} strength ${fm.strength}`);
+    if (fm.strength === '共识') assert.ok(fm.sources.split(',').length >= 3, `${file} is 共识 with fewer than three sources`);
+    assert.ok(index.includes(`| ${fm.id} | ${fm.title} | ${fm.strength} |`), `${file} matches its INDEX row`);
+    // Every handbook/ or library/ file a card cites exists, and every line it cites is inside the file.
+    for (const line of text.split('\n')) {
+      const cites = [...line.matchAll(/(?:handbook|library)\/[^\s，。；、（）()]+/g)];
+      cites.forEach((m, i) => {
+        const rel = m[0];
+        assert.ok(fs.existsSync(path.join(ROOT, rel)), `${file} cites ${rel}`);
+        const length = read(rel).split('\n').length;
+        const span = line.slice(m.index, i + 1 < cites.length ? cites[i + 1].index : undefined);
+        for (const n of span.matchAll(/第 (\d+)(?: 到 (\d+))? 行/g)) {
+          assert.ok(Number(n[2] || n[1]) <= length, `${file} cites ${rel} line ${n[2] || n[1]}, file has ${length}`);
+        }
+      });
+    }
+  }
+});
