@@ -32,7 +32,7 @@ DUCK_E2E_MODEL=opus node tests/e2e/flow.js claude
 node tests/e2e/flow.js codex                      # 用 Codex 的默认模型
 node tests/e2e/flow.js claude more                # 第二套流程，见下文
 node tests/e2e/flow.js claude loop                # 第三套：笔记本回用、不敲命令时的实验对话、「这类我懂了」
-DUCK_E2E_PAPER=<论文源码目录> node tests/e2e/flow.js claude paper   # 拿一篇真论文走审稿、拆解、复盘
+DUCK_E2E_PAPER=<论文源码目录> node tests/e2e/flow.js claude paper   # 拿一篇真论文走审稿、问 why、复盘
 DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 ```
 
@@ -46,7 +46,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | idea | `/duck-idea` 加一段 idea 描述 | 读了 `library/idea-evaluator`；写了报告；笔记本多一行 |
 | review | `/duck-review paper/main.tex` | 读了 `library/pre-submission-reviewer`；写了报告；指出只跑了一次 |
 | propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish`；（should）只改一句，笔记本不多一行 |
-| why | `/duck-why` | 说明是重建，不是 AI 内部过程的回放；写了报告 |
+| why | `/duck-why` | 一个引用块，有整行加粗的一句和「下次」一句，没有「用的思路：」这类旧标签；点名的名家都在 cards/MENTORS.md 或卡片里；说明「回到这次」是重建，不是 AI 内部过程的回放；写了报告 |
 | quiet | `/duck quiet` | config 里开关是 quiet |
 | polish-quiet | `/duck-polish` 润色摘要 | 读了 `library/paper-polish`；照样写了报告；对话里没有「为什么」 |
 | quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有鸭子的话；（should）笔记本多了一行，带「这次」 |
@@ -55,11 +55,12 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | off | `/duck off` | config 里开关是 off |
 | off-new-session | 新会话里 `/duck-polish` | 注入的是 off 那一段；没有新报告；笔记本没动 |
 
-第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，顺序是学生实际碰到它们的顺序。这个项目不开启鸭子，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
+第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启鸭子，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
 | survey | `/duck-survey` 块稀疏注意力，2023 年以后、十篇以内 | 读了 `library/deep-research`；写了报告。这一步允许联网检索（Claude Code 放行 WebSearch、WebFetch，Codex 加 `--search`），相当于学生在弹窗里点了允许 |
+| survey-why | 检索完接着 `/duck-why`，问从刚才的检索里能学到什么 | 和主流程的 why 一样 |
 | outline | `/duck-outline paper/main.tex` | 读了 `library/tech-paper-template`；写了报告 |
 | intro | `/duck-intro` 重写引言，paper/ 里的文件先别改 | 读了 `library/intro-drafter`；写了报告；提醒学生核对事实、数字和引用 |
 | write | `/duck-write` 写方法一节，依据代码 | 读了 `library/paper-writer`；写了报告；提醒核对 |

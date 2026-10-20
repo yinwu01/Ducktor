@@ -8,14 +8,14 @@
 - 这些建议都有前提。Nagpal 说自己后来不再照单全收别人的建议，Tao 说他的建议很泛，Guo 在《The Ph.D. Grind》里自称只是一个数据点。讲的时候带上适用前提，别当成定律。
 - 名家是用来帮学生理解一条道理的，一次至多一到两位，不堆名人名言。
 
-来源在 2026-10-15 逐条核实过（读到了正文，或经存档、授权转载读到正文），核实方法和许可见 docs/research/C-expert-corpus.md。只核到书目信息、没读到正文的几篇没有收。
+来源在 2026-10-15 逐条核实过（在原址读到正文，或经存档、镜像、转载读到正文），核实方法和许可见 docs/research/C-expert-corpus.md。只核到书目信息、没读到正文的几篇没有收。
 
 ## 选题、品味、读博
 
 | 谁 | 文章 | 讲了什么（转述） | 阶段 | 链接 |
 |---|---|---|---|---|
 | Hamming（前 Bell Labs） | You and Your Research，1986 演讲 | 心里常备十到二十个有攻击路径的重要问题；每周留出想大问题的时间；容忍歧义；做完还要把成果「卖」出去 | 选题、想 idea、读博 | https://www.cs.virginia.edu/~robins/YouAndYourResearch.html |
-| Alon（Weizmann） | How To Choose a Good Scientific Problem，Mol Cell 2009 | 新人头三个月别急着定题；在可行性和兴趣之间按阶段取舍，新生先做容易的题；听自己内心的声音 | 选题、读博 | https://doi.org/10.1016/j.molcel.2009.09.013 |
+| Alon（Weizmann） | How To Choose a Good Scientific Problem，Mol Cell 2009 | 新人头三个月内不定题；在可行性和兴趣之间按阶段取舍，新生先做容易的题；听自己内心的声音 | 选题、读博 | https://doi.org/10.1016/j.molcel.2009.09.013 |
 | Nielsen | Principles of Effective Research，2004 | 主动、对自己负责；「解题」和「出题」是两套技能；刻意培养判断什么重要的品味 | 选题、想 idea、读博 | https://web.archive.org/web/20260824165302/https://michaelnielsen.org/blog/principles-of-effective-research/ |
 | Schulman（OpenAI） | An Opinionated Guide to ML Research，2020 | 品味比技术更重要；推荐目标驱动；先问上限是百分之十还是十倍，增量的方法必须极简；写研究笔记，少半途换题 | 选题、想 idea、实验、读博 | http://joschu.net/blog/opinionated-guide-ml-research.html |
 | Karpathy | A Survival Guide to a PhD，2016 | 品味可以习得；选题要有雄心，但要有攻击路径；动笔前先定下单一的核心贡献，避免写成流水账；内部截止日提前两周 | 选题、写作、报告、读博 | http://karpathy.github.io/2016/09/07/phd/ |
@@ -25,9 +25,9 @@
 | Tao | Career advice，个人博客 | 别过早执着于单一的大问题；怀疑自己的工作，敢于扔掉；把做过的东西写下来并公开 | 读博、读文献、写作 | https://terrytao.wordpress.com/career-advice/ |
 | Ruder | 10 Tips for Research and a PhD，2020 | 广泛阅读；同时推进两件事；要有雄心；主动合作；发挥自己独特的长处 | 读文献、选题、读博 | https://www.ruder.io/10-tips-for-research-and-a-phd/ |
 | Perez | Tips for Empirical Alignment Research，2024 | 评价做实证研究的人，七成看能不能快速跑通想法：最小的实验，第二天出结论，卡住就求助；只要学到东西的实验都算赢 | 实验、调试、读博 | https://www.alignmentforum.org/posts/dZFpEdKyb9Bf4xYn7/tips-for-empirical-alignment-research |
-| Patterson（UC Berkeley） | How to Have a Bad Career，2001 | 用反面清单讲：做有人在乎的真问题；做短项目，要失败就早点知道；方案从简；写论文按提纲、段落、草稿、朗读、找人挑刺这样循环 | 选题、实验、写作、报告 | https://people.eecs.berkeley.edu/~pattrsn/talks/BadCareer.pdf |
+| Patterson（UC Berkeley） | How to Have a Bad Career，2001 | 用反面清单讲：做有人在乎的真问题；做短项目，要失败就早点知道；方案从简；写论文按提纲、段落图、草稿、朗读、找人挑刺这样循环 | 选题、实验、写作、报告 | https://people.eecs.berkeley.edu/~pattrsn/talks/BadCareer.pdf |
 | Ousterhout（Stanford） | My Favorite Sayings | 用直觉提问，不用直觉作答；不知道问题出在哪，就不算修好；肯说「我不知道」反而让人更信你 | 调试、读博 | https://web.stanford.edu/~ouster/cgi-bin/sayings.php |
-| Blum（CMU） | Advice to a Beginning Graduate Student，2001 | 书可以跳着读，先读懂能读懂的部分；边读边写；写作要先有话说，说完就停 | 读文献、写作、读博 | https://www.cs.cmu.edu/~mblum/research/pdf/grad.html |
+| Blum（CMU） | Advice to a Beginning Graduate Student，2001 | 书可以不按顺序读，先读懂能读懂的部分；边读边写；写作要先有话说，说完就停 | 读文献、写作、读博 | https://www.cs.cmu.edu/~mblum/research/pdf/grad.html |
 | Azuma（UNC） | So long, and thanks for the Ph.D.!，1997 | 主动、韧性、灵活、与人相处、组织和沟通能力至关重要，招生时却通常不考察这些 | 读博 | https://www.cs.unc.edu/~azuma/hitch4.html |
 | Might（Utah） | The Illustrated Guide to a Ph.D. | 读博就是把人类知识的边界往外推出一个小凸起；别忘了大图景 | 读博 | https://matt.might.net/articles/phd-school-in-pictures/ |
 | 陈天奇 | 机器学习科研的十年，2019 | 诚实的反馈收益最大；文章每节都用实验验证本节的论点；选最让自己兴奋的问题 | 选题、写作、读博 | https://www.qbitai.com/2019/07/5390.html |
@@ -39,7 +39,7 @@
 | Keshav（Waterloo） | How to Read a Paper，CCR 2007 | 一篇论文分三遍读；第一遍先弄清它属于哪一类、背景是什么、假设对不对、贡献是什么、写得清不清楚 | 读文献 | http://ccr.sigcomm.org/online/files/p83-keshavA.pdf |
 | Eisner（JHU） | 建议页（读论文；Write the Paper First） | 边读边记，用自己的话重述；先把论文写出来，叙事清不清楚比实验齐不齐全更决定录用 | 读文献、写作、想 idea | https://www.cs.jhu.edu/~jason/advice/ |
 | Steinhardt | Research as a Stochastic Decision Process | 以最快的速度降低不确定性，先做信息量最大的，而不是最容易的；分清探路和执行两种模式；尽早试着证伪自己 | 实验、调试 | https://cs.stanford.edu/~jsteinhardt/ResearchasaStochasticDecisionProcess.html |
-| Freeman（MIT CSAIL） | How to do research，2013；How to write a good CVPR submission，2014 | 慢下来才能快，一次只改一个变量；把故障定位到具体哪一步再汇报；先做最简单的 toy model；平庸的论文约等于零，引言要开门见山讲清贡献 | 实验、调试、写作、审稿 | https://people.csail.mit.edu/billf/www/papers/doresearch.pdf |
+| Freeman（MIT CSAIL） | How to do research，2013；How to write a good CVPR submission，2014 | 慢下来才能快，一次只改一个变量；把故障定位到具体哪一步再汇报；先做最简单的 toy model；平庸的论文约等于零，引言要开门见山讲清贡献 | 实验、调试、写作、审稿 | https://people.csail.mit.edu/billf/www/papers/doresearch.pdf ；CVPR 一篇的镜像 https://www.cs.torontomu.ca/~wangcs/resources/How-to-write-a-good-CVPR-submission.pdf |
 | Karpathy | A Recipe for Training Neural Networks，2019 | 训练会静默地出错；先吃透数据，搭端到端骨架和傻基线，先过拟合再正则，最后调参 | 实验、调试 | http://karpathy.github.io/2019/04/25/recipe/ |
 | Lipton、Steinhardt | Troubling Trends in ML Scholarship，2018 | 四种通病：解释和猜测不分；不把提升的来源分离出来；用数学装点门面；滥用术语 | 写作、审稿、实验 | https://arxiv.org/abs/1807.03341 |
 | Godbole、Dahl、Gilmer、Shallue、Nado（Google Brain、Harvard） | Deep Learning Tuning Playbook，2023 | 一轮一轮地调，每轮先定目标；多数时间用来获得洞见，不是追分；有证据才采纳改动 | 实验、调试 | https://github.com/google-research/tuning_playbook |
@@ -96,7 +96,7 @@
 
 | 议题 | 一派 | 另一派 |
 |---|---|---|
-| 定题的节奏 | Alon：新人头三个月别急着定题 | Perez：今天讨论，明天出结果。两人的领域不同，一个是湿实验，一个是 LLM 实证 |
+| 定题的节奏 | Alon：新人头三个月内不定题 | Perez：今天讨论，明天出结果。两人的领域不同，一个是湿实验，一个是 LLM 实证 |
 | 什么时候追求雄心 | Karpathy、Schulman、Ruder：要有雄心，追求十倍的提升 | Alon：新生先做容易的题，拿到正反馈；Tao：别过早执着于大问题 |
 | 增量工作 | Karpathy：「incremental」是最坏的评价 | Schulman：服务于大目标、又足够简单的增量是有用的；Patterson：只在少数几个点上创新 |
 | 什么时候读文献 | Hamming：问题想清楚之前先别看别人的答案，读文献主要是为了找问题 | Ruder：广泛阅读；Freeman：别对大量相关文献一无所知 |

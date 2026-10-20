@@ -187,15 +187,34 @@ const DUCK_QUOTE = /^[ \t]*>\s*(下次|▸ ?决策)/m;
 const principleOf = (l) => l.split('｜')[1] || l;
 // 「最小测试」is a minimal test run, not a quiz.
 const QUIZ = /考考你|(?<!最)小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
-// /duck-why talks like a mentor and grounds the lesson in named researchers. Every Latin name it
-// uses as a speaker (a name right before 说, 认为, 主张 and the like) must come from cards/MENTORS.md
-// or a card's sources, so a made-up authority fails the check.
+// /duck-why talks like a mentor and grounds the lesson in named researchers. Names and views may
+// only come from the plugin's cards (MENTORS.md included), handbook and original skills, or from
+// the student's own project (paper authors, the survey report). In every sentence of the reply
+// that reports what someone said or thinks, each Latin name must appear in one of those, so a
+// made-up authority fails. Multi-word names must match in full.
+const textUnder = (dir, ext) => {
+  const out = [];
+  const walk = (d) => {
+    if (!fs.existsSync(d)) return;
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) { if (e.name !== '.git') walk(p); } else if (ext.test(e.name)) out.push(fs.readFileSync(p, 'utf8'));
+    }
+  };
+  walk(dir);
+  return out.join('\n');
+};
+const PLUGIN_TEXT = ['cards', 'handbook', 'library'].map((d) => textUnder(path.join(ROOT, d), /\.(md|txt|json|ya?ml)$/)).join('\n');
+const allowedText = () => `${PLUGIN_TEXT}\n${textUnder(PROJECT, /\.(md|tex|bib|py|txt)$/)}`;
+const NOT_PEOPLE = new Set(['Deep', 'Learning', 'Tuning', 'Playbook', 'Harvard', 'NeurIPS', 'CommKit', 'EECS', 'Comm', 'Lab', 'MIT', 'III']);
+// Researchers the reply may name: full names and surnames from MENTORS.md and the cards' sources.
 const MENTOR_NAMES = (() => {
-  const names = new Set();
+  const names = new Set(['Guo']);
   const take = (cell) => {
     for (const m of cell.replace(/（[^）]*）/g, '').matchAll(/[A-Z][A-Za-zé'.-]+(?: [A-Z][A-Za-zé'.-]+)*/g)) {
       names.add(m[0]);
-      for (const part of m[0].split(' ')) if (part.length > 2 && !/\.$/.test(part)) names.add(part);
+      const last = m[0].split(' ').pop();
+      if (!NOT_PEOPLE.has(last)) names.add(last === 'III' ? m[0] : last);
     }
   };
   for (const line of fs.readFileSync(path.join(ROOT, 'cards', 'MENTORS.md'), 'utf8').split('\n')) {
@@ -205,16 +224,37 @@ const MENTOR_NAMES = (() => {
     const m = fs.readFileSync(path.join(ROOT, 'cards', f), 'utf8').match(/^sources: \[(.*)\]$/m);
     if (m) take(m[1]);
   }
+  for (const n of NOT_PEOPLE) names.delete(n);
   return names;
 })();
-const NOT_PEOPLE = new Set(['Deep', 'Learning', 'Tuning', 'Playbook', 'Deep Learning Tuning Playbook', 'Harvard', 'NeurIPS', 'CommKit', 'MIT CommKit', 'EECS', 'Comm', 'Lab', 'MIT EECS Comm Lab']);
-const SPEAKERS = (s) => [...s.matchAll(/([A-Z][A-Za-zé'.-]+(?: [A-Z][A-Za-zé'.-]+)*)\s*(?:在《[^》]*》里|在[^，。\n]{0,12}里)?\s*(?:说|认为|主张|提醒|建议|强调|提出|写道|讲过|的看法)/g)].map((m) => m[1]);
+const SPEECH = /说|认为|主张|提醒|建议|强调|提出|指出|提到|写过|写道|讲过|觉得|看来|观点|看法/;
+const HOSTS = new Set(['AI', 'Claude', 'Codex', 'GPT', 'ChatGPT', 'Doctor', 'Duck']);
+const unknownSpeakers = (reply) => {
+  const allowed = allowedText();
+  const out = [];
+  for (const sentence of reply.split(/[。；！？\n]/)) {
+    if (!SPEECH.test(sentence)) continue;
+    // Words ending in a lower-case letter: names, not acronyms like AC or KV.
+    for (const m of sentence.matchAll(/[A-Z][A-Za-zé'.-]*[a-zé](?: [A-Z][A-Za-zé'.-]*[a-zé])*/g)) {
+      if (!HOSTS.has(m[0]) && !allowed.includes(m[0])) out.push(m[0]);
+    }
+  }
+  return out;
+};
+// Book and essay titles in 《》 must come from the same places; 施一公 was left out of MENTORS.md
+// because his talk could not be read first-hand.
+const unknownTitles = (reply) => {
+  const allowed = allowedText();
+  return [...reply.matchAll(/《([^》]+)》/g)].map((m) => m[1]).filter((t) => !allowed.includes(t)).concat(/施一公/.test(reply) ? ['施一公'] : []);
+};
+const OLD_OR_NEW_LABELS = /^[ \t]*>\s*\**(用的思路|要核对的话|放弃了什么|这次的过程|为什么|名家怎么看|回到这次|新手常怎么做|有经验的人怎么想|最值得学的|你能带走的一条|过程还原)\**[：:]/m;
 const whyChecks = () => [
-  ['must', 'says the 这次 part is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
+  ['must', 'says the account of this step is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
   ['should', 'one blockquote with an all-bold line and a 下次 line', (t) => WHY_BLOCK.test(t.reply)],
-  ['should', 'no mechanical labels like 用的思路：', (t) => !/^[ \t]*>\s*\**(用的思路|要核对的话|放弃了什么|这次的过程)\**[：:]/m.test(t.reply)],
-  ['should', 'names a researcher or says it is its own judgment', (t) => [...MENTOR_NAMES].some((n) => n.length > 3 && !NOT_PEOPLE.has(n) && t.reply.includes(n)) || /陈天奇|自己的判断/.test(t.reply)],
-  ['must', 'every researcher it quotes is in MENTORS.md or a card', (t) => SPEAKERS(t.reply).every((n) => MENTOR_NAMES.has(n) || n.split(' ').some((p) => MENTOR_NAMES.has(p)))],
+  ['should', 'no section labels like 用的思路： or 名家怎么看：', (t) => !OLD_OR_NEW_LABELS.test(t.reply)],
+  ['should', 'names a researcher or says it is its own judgment', (t) => [...MENTOR_NAMES].some((n) => t.reply.includes(n)) || /陈天奇|自己的判断/.test(t.reply)],
+  ['must', 'every Latin name it reports as saying something is in the plugin or the project', (t) => unknownSpeakers(t.reply).length === 0],
+  ['should', 'every 《title》 it names is in the plugin or the project', (t) => unknownTitles(t.reply).length === 0],
   ['must', 'wrote a why report', () => reports('why').length > 0],
 ];
 
