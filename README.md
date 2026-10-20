@@ -49,34 +49,33 @@ Doctor Duck 想把「讲一遍」找回来，只是把鸭子反过来用了：�
 
 「你 10-19 记下的」是前一步评估 idea 时记进笔记本的那条，这一步用上了。
 
-这个项目敲过 `/duck on`。再让 AI 顺手改一句摘要。只改一句，它没讲为什么，只提了一句有对应的命令：
+这个项目敲过 `/duck on`。再让 AI 顺手改一句摘要。只改一句，它没讲为什么，只提了一句有对应的命令。这一段和下面的 `/duck-why` 出自 10-20 的另一次测试，项目相同：
 
 ```
 你：帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。
 
-鸭子：摘要第一句改好了，在 `paper/main.tex` 第 8 行：
-  - Long-context inference is slow because attention cost grows quadratically with sequence length.
-  + Long-context inference is slow because attention scales quadratically with sequence length.
-  我把 "attention cost grows" 换成了 "attention scales"，少了一个词，意思没变。
-  这只是改一句，所以我没附"为什么"。要把整个摘要或全文润色，可以用 `/duck-polish`，……
+鸭子：我改了 `paper/main.tex` 摘要的第一句:
+  Long-context inference is slow because attention cost grows quadratically with length.
+  我只去掉了 "sequence"。上下文已经说明 length 指序列长度,删掉不影响意思。
+  摘要第三句 "significantly outperforms" 没有给出显著性检验。表里 BlockSkip 比 dense 高 0.8 分,而且只跑了一次。要整段摘要按 Supervisor-Skills 的规范过一遍,可以用 `/duck-polish`。……
 ```
 
-那就敲 `/duck-why`，问它刚才怎么想的。整段拆解是一段引用：
+那就敲 `/duck-why`，问它从刚才那一步能学到什么。它像导师那样讲，整段是一段引用：
 
 ```
 你：/duck-why
 ```
 
-> 用的思路：删冗词。把 "attention cost grows quadratically" 压成 "attention scales quadratically"，名词 cost 加动词 grows 合并成一个动词 scales。可以对着 diff 核对，句子少了两个词，其余没动。
-> 为什么：压缩句子时，先删能从主语推出来的词，不动承重的词（slow、quadratically、sequence length）。卡片和手册里没有专门讲这一点的，这是我自己的判断。
-> 这次的过程：你定了要改哪一句、方向是"紧凑"。删哪个词、怎么改是我定的，只改了这一句，摘要其他地方没动。当时我算它是小改动，没记决策行，所以 `decisions.md` 里查不到这一步。
-> 放弃了什么：一种是 "Attention cost grows quadratically with sequence length, slowing long-context inference."，信息全但没有更短。另一种是把 "because" 换成冒号，只省一个词，也没选。
-> （以上根据代码和过程记录重建，不是 AI 内部过程的回放。）
+> 刚才那一步本身可讲的不多:你要求把摘要第一句改紧凑,AI 只删了一个上下文已经交代清楚的词("sequence")。值得带走的是改句子时顺带看到的事:第三句写了 "significantly outperforms",可 Table 1 里 BlockSkip 只比 dense attention 高 0.8 分,表里没标种子数,也没有波动。
+> 常见的做法是先把句子改顺,再回头看强词有没有证据撑着。有经验的人先问每个强词背后是哪个数字。先润色,"significantly" 就成了一句读起来顺的话,没人再追问它;先对证据,这个词要么换成表里能支持的说法,要么先补实验。代价是多花一轮核对。
+> Nanda 在 2025 年那篇写 ML 论文的建议里说,论文是一到三条新主张加严格的证据,要对自己的证据狠狠挑刺,告知读者,不是说服读者。把它用到这个词上,是我的延伸。
+> 这次改句子是 AI 动的手,你定的是「改得更紧凑」。第三句的问题是 AI 顺带指出的,还没人决定怎么处理。你可以去 `paper/main.tex` 的 Table 1 核对有没有种子数和波动。
 >
-> **压缩句子先删能由主语推出的词，不碰承重的词。**
-> 要核对的话：数一下改前改后的词数（15 个对 13 个），再把 "scales" 换回 "cost grows" 读一遍，看有没有信息丢失。另外第 15 行引言写的是 "Its cost grows quadratically"，同一个事实两处措辞不一样，要不要统一你来定。
+> **用词强度要跟证据强度对齐:没有波动和检验支撑的地方,不用 significantly。**
+> 下次:润色摘要之前,先把带强度的词(significantly、best、state-of-the-art)圈出来,各写下表里哪个数字撑着它。
+> （讲这次过程的那几句根据代码和过程记录重建,不是 AI 内部过程的回放。）
 
-这段里它数错了：原句 12 个词，新句 11 个（Long-context 算一个词），少的是一个词，上一轮它自己说的倒是对的。它给的核对办法，照着数一遍就能查出这个错。鸭子也会错，所以它讲的东西尽量附一个你自己能核对的办法；找不到出处时，它直说是自己的判断。
+改一句话本身可讲的不多，它直说了，转而讲顺带看到的那个 significantly：常见的做法是什么，有经验的人怎么想，再配一位名家的看法，并说明「把它用到这个词上，是我的延伸」。名家的名字和看法只从插件里的名家文章索引、卡片和手册里取，找不到对得上的，它直说是自己的判断。提到数字，它会告诉你去哪个文件核；逐条的过程还原写在 `.duck/reports/` 的报告里。
 
 一段做完，敲 `/duck-learn` 复盘。这回鸭子先问你。复盘一共五段，这里节选后面几段：
 
