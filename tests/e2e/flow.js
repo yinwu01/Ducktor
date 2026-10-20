@@ -189,23 +189,28 @@ const principleOf = (l) => l.split('｜')[1] || l;
 const QUIZ = /考考你|(?<!最)小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 // /duck-why talks like a mentor and grounds the lesson in named researchers. Names and views may
 // only come from the plugin's cards (MENTORS.md included), handbook and original skills, or from
-// the student's own project (paper authors, the survey report). In every sentence of the reply
+// the student's own project (paper authors, the survey report), not from what the duck wrote
+// while explaining. In every sentence of the reply
 // that reports what someone said or thinks, each Latin name must appear in one of those, so a
 // made-up authority fails. Multi-word names must match in full.
-const textUnder = (dir, ext) => {
+const textUnder = (dir, ext, skip = () => false) => {
   const out = [];
   const walk = (d) => {
     if (!fs.existsSync(d)) return;
     for (const e of fs.readdirSync(d, { withFileTypes: true })) {
       const p = path.join(d, e.name);
+      if (skip(p)) continue;
       if (e.isDirectory()) { if (e.name !== '.git') walk(p); } else if (ext.test(e.name)) out.push(fs.readFileSync(p, 'utf8'));
     }
   };
   walk(dir);
   return out.join('\n');
 };
+// What the duck itself writes while explaining (why and learn reports, the notebook, decision
+// lines) holds the same names as the reply, so it cannot count as a source.
+const DUCK_OWN = (p) => /[\\/]\.duck[\\/](notebook|decisions)\.md$|[\\/]\.duck[\\/]reports[\\/][^\\/]*-(why|learn)(-\d+)?\.md$/.test(p);
 const PLUGIN_TEXT = ['cards', 'handbook', 'library'].map((d) => textUnder(path.join(ROOT, d), /\.(md|txt|json|ya?ml)$/)).join('\n');
-const allowedText = () => `${PLUGIN_TEXT}\n${textUnder(PROJECT, /\.(md|tex|bib|py|txt)$/)}`;
+const allowedText = () => `${PLUGIN_TEXT}\n${textUnder(PROJECT, /\.(md|tex|bib|py|txt)$/, DUCK_OWN)}`;
 const NOT_PEOPLE = new Set(['Deep', 'Learning', 'Tuning', 'Playbook', 'Harvard', 'NeurIPS', 'CommKit', 'EECS', 'Comm', 'Lab', 'MIT', 'III']);
 // Researchers the reply may name: full names and surnames from MENTORS.md and the cards' sources.
 const MENTOR_NAMES = (() => {
