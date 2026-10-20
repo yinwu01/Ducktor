@@ -187,6 +187,36 @@ const DUCK_QUOTE = /^[ \t]*>\s*(下次|▸ ?决策)/m;
 const principleOf = (l) => l.split('｜')[1] || l;
 // 「最小测试」is a minimal test run, not a quiz.
 const QUIZ = /考考你|(?<!最)小测|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
+// /duck-why talks like a mentor and grounds the lesson in named researchers. Every Latin name it
+// uses as a speaker (a name right before 说, 认为, 主张 and the like) must come from cards/MENTORS.md
+// or a card's sources, so a made-up authority fails the check.
+const MENTOR_NAMES = (() => {
+  const names = new Set();
+  const take = (cell) => {
+    for (const m of cell.replace(/（[^）]*）/g, '').matchAll(/[A-Z][A-Za-zé'.-]+(?: [A-Z][A-Za-zé'.-]+)*/g)) {
+      names.add(m[0]);
+      for (const part of m[0].split(' ')) if (part.length > 2 && !/\.$/.test(part)) names.add(part);
+    }
+  };
+  for (const line of fs.readFileSync(path.join(ROOT, 'cards', 'MENTORS.md'), 'utf8').split('\n')) {
+    if (/^\| [^|-]/.test(line)) take(line.split('|')[1]);
+  }
+  for (const f of fs.readdirSync(path.join(ROOT, 'cards')).filter((x) => /^[A-Z]\d{2}\.md$/.test(x))) {
+    const m = fs.readFileSync(path.join(ROOT, 'cards', f), 'utf8').match(/^sources: \[(.*)\]$/m);
+    if (m) take(m[1]);
+  }
+  return names;
+})();
+const NOT_PEOPLE = new Set(['Deep', 'Learning', 'Tuning', 'Playbook', 'Deep Learning Tuning Playbook', 'Harvard', 'NeurIPS', 'CommKit', 'MIT CommKit', 'EECS', 'Comm', 'Lab', 'MIT EECS Comm Lab']);
+const SPEAKERS = (s) => [...s.matchAll(/([A-Z][A-Za-zé'.-]+(?: [A-Z][A-Za-zé'.-]+)*)\s*(?:在《[^》]*》里|在[^，。\n]{0,12}里)?\s*(?:说|认为|主张|提醒|建议|强调|提出|写道|讲过|的看法)/g)].map((m) => m[1]);
+const whyChecks = () => [
+  ['must', 'says the 这次 part is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
+  ['should', 'one blockquote with an all-bold line and a 下次 line', (t) => WHY_BLOCK.test(t.reply)],
+  ['should', 'no mechanical labels like 用的思路：', (t) => !/^[ \t]*>\s*\**(用的思路|要核对的话|放弃了什么|这次的过程)\**[：:]/m.test(t.reply)],
+  ['should', 'names a researcher or says it is its own judgment', (t) => [...MENTOR_NAMES].some((n) => n.length > 3 && !NOT_PEOPLE.has(n) && t.reply.includes(n)) || /陈天奇|自己的判断/.test(t.reply)],
+  ['must', 'every researcher it quotes is in MENTORS.md or a card', (t) => SPEAKERS(t.reply).every((n) => MENTOR_NAMES.has(n) || n.split(' ').some((p) => MENTOR_NAMES.has(p)))],
+  ['must', 'wrote a why report', () => reports('why').length > 0],
+];
 
 // Each stage: name, prompt, resume (continue the session), optional search and timeout, and
 // checks. A check is [severity, label, fn(transcript, before)] where severity is must or should.
@@ -232,11 +262,7 @@ function mainStages() {
       ['must', 'names /duck-polish in the reply', (t) => /duck-polish/.test(t.reply)],
       ['should', 'a one-sentence edit adds no notebook line', (t, before) => text('notebook.md') === before],
     ] },
-    { name: 'why', resume: true, prompt: cmd('duck-why'), checks: [
-      ['must', 'says it is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
-      ['should', 'the breakdown is a blockquote', (t) => /^[ \t]*>[^\n]*用的思路/m.test(t.reply)],
-      ['must', 'wrote a why report', () => reports('why').length > 0],
-    ] },
+    { name: 'why', resume: true, prompt: cmd('duck-why'), checks: whyChecks() },
     { name: 'quiet', resume: true, prompt: `${cmd('duck')} quiet`, checks: [
       ['must', 'config says quiet', () => switchIs('quiet')],
     ] },
@@ -295,6 +321,8 @@ function moreStages() {
       ['must', 'not turned on: hook injected the idle note', (t) => IDLE_ONLY(t)],
       ['should', 'cites checkable sources', (t) => /arxiv\.org|doi\.org|\b\d{4}\.\d{4,5}\b/i.test(t.reply + newestReport('survey'))],
     ], { search: true, timeout: 1800000 }),
+    // The case students ask about most: what to learn from how the AI searched.
+    { name: 'survey-why', resume: true, prompt: cmd('duck-why'), checks: whyChecks() },
     wrapped('duck-outline', 'outline', 'tech-paper-template', 'paper/main.tex', [
       ['should', 'says it uses the technical-paper template', (t) => /技术论文|tech-paper-template/.test(t.reply)],
     ]),
@@ -385,11 +413,7 @@ function paperStages() {
       ['should', 'grades issues CRITICAL / MAJOR / MINOR', (t) => /CRITICAL|MAJOR|MINOR/.test(t.reply)],
       ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
     ] },
-    { name: 'why', resume: true, prompt: cmd('duck-why'), checks: [
-      ['must', 'says it is a reconstruction, not a replay', (t) => /不是 ?AI ?内部过程的回放/.test(t.reply)],
-      ['should', 'the breakdown is a blockquote', (t) => /^[ \t]*>[^\n]*用的思路/m.test(t.reply)],
-      ['must', 'wrote a why report', () => reports('why').length > 0],
-    ] },
+    { name: 'why', resume: true, prompt: cmd('duck-why'), checks: whyChecks() },
     { name: 'learn-ask', resume: true, prompt: cmd('duck-learn'), checks: [
       ['must', 'opens with the one question', (t) => /最想重来/.test(t.reply)],
     ] },

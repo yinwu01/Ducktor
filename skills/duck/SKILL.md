@@ -27,7 +27,7 @@ disable-model-invocation: true
 | /duck-figure | 设计图、出图质检 |
 | /duck-review | 投稿前审稿 |
 | /duck-vibe | 这块该让 AI 干到哪、用什么工具 |
-| /duck-why | 拆解刚才那一步，或者指定的文件、提交、段落 |
+| /duck-why | 像导师一样讲刚才那一步（或者指定的文件、提交、段落）里能学到什么 |
 | /duck-learn | 阶段复盘 |
 | /duck-notes | 看、改笔记本 |
 | /duck-skill | 管理命令和卡片 |
