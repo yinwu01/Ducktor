@@ -181,6 +181,19 @@ const duckSnapshot = () => {
 // The short why after a command: a quote line that is bold from end to end, and a quote line
 // starting with 下次. The original skills quote sentences too, so neither alone is enough.
 const WHY_BLOCK = { test: (s) => /^[ \t]*>\s*\*\*[^\n]+\*\*\s*$/m.test(s) && /^[ \t]*>\s*下次/m.test(s) };
+// The duck's closing blockquote: the last run of > lines that holds a 下次 line.
+const lastWhy = (s) => {
+  const blocks = s.split(/\n(?![ \t]*>)/).map((b) => b.split('\n').filter((l) => /^[ \t]*>/.test(l)).join('\n'));
+  return blocks.filter((b) => /^[ \t]*>\s*下次/m.test(b)).at(-1) || '';
+};
+// A step of the wrapped skill given as the reason, e.g. 这是原技能 Step 0 的要求. Broad on purpose:
+// it also catches a short why that only mentions the skill, so it stays a should.
+const PROCEDURE_REASON = /原技能[^\n。]{0,24}(要求|规定|规则|说明|标准)|[按照依]原技能|Step ?\d|SKILL\.md|references\//;
+const shortWhyChecks = () => [
+  ['should', 'the short why gives a reason, not a step of the skill', (t) => !PROCEDURE_REASON.test(lastWhy(t.reply))],
+  ['should', 'the short why has no labels like 为什么这么做：', (t) => !/^[ \t]*>\s*\**(为什么这么做|为什么|你能带走的一条|下次自己先做什么)\**[：:]/m.test(lastWhy(t.reply))],
+  ['must', 'every Latin name the short why reports as saying something is in the plugin or the project', (t) => unknownSpeakers(lastWhy(t.reply)).length === 0],
+];
 // What quiet must not show: the 下次 line or a decision line inside a quote.
 const DUCK_QUOTE = /^[ \t]*>\s*(下次|▸ ?决策)/m;
 // The principle part of a notebook line: between the first ｜ and ｜这次 (or the end).
@@ -296,12 +309,14 @@ function mainStages() {
       ['must', 'wrote an idea report', () => reports('idea').length > 0],
       ['must', 'notebook got a line', () => /评估 idea|idea/.test(text('notebook.md'))],
       ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
+      ...shortWhyChecks(),
     ] },
     { name: 'review', resume: true, prompt: `${cmd('duck-review')} paper/main.tex`, checks: [
       ['must', 'read library/pre-submission-reviewer', (t) => readOf(t, 'pre-submission-reviewer')],
       ['must', 'wrote a review report', () => reports('review').length > 0],
       ['must', 'caught the single-run claim', (t) => /seed|种子|单次|一次|方差|标准差/.test(t.reply)],
       ['should', 'caught the em-dash', (t) => /em-dash|破折号|em dash/i.test(t.reply)],
+      ...shortWhyChecks(),
     ] },
     { name: 'propose', resume: true, prompt: '帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。', before: () => text('notebook.md'), checks: [
       ['must', 'names /duck-polish in the reply', (t) => /duck-polish/.test(t.reply)],
@@ -355,6 +370,7 @@ function moreStages() {
     ['must', `read library/${skill}`, (t) => readOf(t, skill)],
     ['must', `wrote a ${short} report`, () => reports(short).length > 0],
     ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
+    ...shortWhyChecks(),
     ['should', 'shows a card reminder with a plugin card number', (t) => /卡片提醒/.test(t.reply + newestReport(short))
       && cardIds(t.reply + newestReport(short)).some((id) => PLUGIN_CARDS.has(id))],
     ...extra,
@@ -457,6 +473,7 @@ function paperStages() {
       ['must', 'wrote a review report', () => reports('review').length > 0],
       ['should', 'grades issues CRITICAL / MAJOR / MINOR', (t) => /CRITICAL|MAJOR|MINOR/.test(t.reply)],
       ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
+      ...shortWhyChecks(),
     ] },
     { name: 'why', resume: true, prompt: cmd('duck-why'), checks: whyChecks() },
     { name: 'learn-ask', resume: true, prompt: cmd('duck-learn'), checks: [
