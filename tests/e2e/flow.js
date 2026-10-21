@@ -182,17 +182,30 @@ const duckSnapshot = () => {
 // starting with 下次. The original skills quote sentences too, so neither alone is enough.
 const WHY_BLOCK = { test: (s) => /^[ \t]*>\s*\*\*[^\n]+\*\*\s*$/m.test(s) && /^[ \t]*>\s*下次/m.test(s) };
 // The duck's closing blockquote: the last run of > lines that holds a 下次 line.
+// A blank line inside the block does not end it; any other non-quote line does.
 const lastWhy = (s) => {
-  const blocks = s.split(/\n(?![ \t]*>)/).map((b) => b.split('\n').filter((l) => /^[ \t]*>/.test(l)).join('\n'));
+  const blocks = [];
+  let cur = [];
+  for (const l of s.split('\n')) {
+    if (/^[ \t]*>/.test(l)) cur.push(l);
+    else if (!l.trim() && cur.length) continue;
+    else if (cur.length) { blocks.push(cur.join('\n')); cur = []; }
+  }
+  if (cur.length) blocks.push(cur.join('\n'));
   return blocks.filter((b) => /^[ \t]*>\s*下次/m.test(b)).at(-1) || '';
 };
 // A step of the wrapped skill given as the reason, e.g. 这是原技能 Step 0 的要求. Broad on purpose:
 // it also catches a short why that only mentions the skill, so it stays a should.
-const PROCEDURE_REASON = /原技能[^\n。]{0,24}(要求|规定|规则|说明|标准)|[按照依]原技能|Step ?\d|SKILL\.md|references\//;
+const PROCEDURE_REASON = /原技能[^\n。]{0,24}(要求|规定|规则|说明|标准)|[按照依]原技能|技能(的)?要求|Step ?\d|SKILL\.md|references\/|\.md ?第 ?\d/;
+// Saying where the duck departed from the skill is wanted: 原技能写 X，我降成 MAJOR，因为……
+const DEPARTS = /我(降|改|没照|没按|放宽|收紧)|但我|不照/;
+const procedureReason = (why) => why.split(/[。；\n]/).some((c) => PROCEDURE_REASON.test(c) && !DEPARTS.test(c));
 const shortWhyChecks = () => [
-  ['should', 'the short why gives a reason, not a step of the skill', (t) => !PROCEDURE_REASON.test(lastWhy(t.reply))],
-  ['should', 'the short why has no labels like 为什么这么做：', (t) => !/^[ \t]*>\s*\**(为什么这么做|为什么|你能带走的一条|下次自己先做什么)\**[：:]/m.test(lastWhy(t.reply))],
+  ['should', 'the short why gives a reason, not a step of the skill', (t) => lastWhy(t.reply) && !procedureReason(lastWhy(t.reply))],
+  ['should', 'the short why has no labels like 为什么这么做：', (t) => lastWhy(t.reply) && !/^[ \t]*>\s*\**(为什么这么做|为什么|取舍|依据|你能带走的一条|下次自己先做什么|下次自己先做)\**[：:]/m.test(lastWhy(t.reply))],
   ['must', 'every Latin name the short why reports as saying something is in the plugin or the project', (t) => unknownSpeakers(lastWhy(t.reply)).length === 0],
+  // The short why is short, so any capitalized name in it is checked, not only in reported speech.
+  ['should', 'every Latin name in the short why is in the plugin or the project', (t) => unknownSpeakers(lastWhy(t.reply), true).length === 0],
 ];
 // What quiet must not show: the 下次 line or a decision line inside a quote.
 const DUCK_QUOTE = /^[ \t]*>\s*(下次|▸ ?决策)/m;
@@ -245,13 +258,13 @@ const MENTOR_NAMES = (() => {
   for (const n of NOT_PEOPLE) names.delete(n);
   return names;
 })();
-const SPEECH = /说|认为|主张|提醒|建议|强调|提出|指出|提到|写过|写道|讲过|觉得|看来|观点|看法/;
+const SPEECH = /说|认为|主张|提醒|建议|强调|提出|指出|提到|写过|写道|讲过|讲的是|批评|觉得|看来|观点|看法/;
 const HOSTS = new Set(['AI', 'Claude', 'Codex', 'GPT', 'ChatGPT', 'Doctor', 'Duck']);
-const unknownSpeakers = (reply) => {
+const unknownSpeakers = (reply, everySentence = false) => {
   const allowed = allowedText();
   const out = [];
   for (const sentence of reply.split(/[。；！？\n]/)) {
-    if (!SPEECH.test(sentence)) continue;
+    if (!everySentence && !SPEECH.test(sentence)) continue;
     // Words ending in a lower-case letter: names, not acronyms like AC or KV.
     for (const m of sentence.matchAll(/[A-Z][A-Za-zé'.-]*[a-zé](?: [A-Z][A-Za-zé'.-]*[a-zé])*/g)) {
       if (!HOSTS.has(m[0]) && !allowed.includes(m[0])) out.push(m[0]);
@@ -508,6 +521,15 @@ function globalChecks(transcripts) {
     ['should', 'new notebook lines say what happened this time (｜这次：)', () => { const fresh = notebook.filter((l) => !LOOP_NOTEBOOK.includes(l)); return (fresh.length > 0 || FLOW === 'loop') && fresh.every((l) => /｜这次[:：]/.test(l)); }],
     ['must', 'no bold marks in notebook lines', () => !/\*\*/.test(text('notebook.md'))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
+    // A card number in every short why is the old 原技能要求 crutch with a new name.
+    ['should', 'no card number appears in more than half of the short whys', () => {
+      const whys = transcripts.map((t) => lastWhy(t.reply)).filter(Boolean);
+      if (whys.length < 3) return true;
+      const ids = new Set(whys.flatMap(cardIds));
+      return [...ids].every((id) => whys.filter((w) => cardIds(w).includes(id)).length * 2 <= whys.length);
+    }],
+    // Most notebook lines are written by the AI; quoting one as the student's own is wrong.
+    ['should', 'does not credit a notebook line to the student (你 MM-DD 记下的)', () => transcripts.every((t) => !/你 ?\d{2}-\d{2} ?记下的/.test(t.reply))],
     ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
     ['must', 'every card number the replies cite exists', () => {
       const group = fs.existsSync(duckFile('cards')) ? fs.readdirSync(duckFile('cards')).map((f) => f.slice(0, 3)) : [];
@@ -583,6 +605,7 @@ function main() {
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
       const t2 = parse(again.stdout || '');
       t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${FOLLOWUP}\n\n${t2.reply}`, cost: t.cost + t2.cost };
+      if (HOST === 'codex') t.injected = codexInjected(session);
       checks = evaluate(t);
     }
     transcripts.push(t);
