@@ -579,6 +579,8 @@ function main() {
   setup();
   const results = [];
   const transcripts = [];
+  // Claude Code's total_cost_usd is the session's running total, so a resumed stage costs the difference.
+  const spent = {};
   let session = null;
   for (const stage of stages()) {
     if (ONLY.length && !ONLY.includes(stage.name)) continue;
@@ -610,9 +612,15 @@ function main() {
       const again = HOST === 'claude' ? runClaude(FOLLOWUP, session, opts) : runCodex(FOLLOWUP, session, opts);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
       const t2 = parse(again.stdout || '');
-      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${FOLLOWUP}\n\n${t2.reply}`, cost: t.cost + t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
+      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${FOLLOWUP}\n\n${t2.reply}`, cost: t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
       if (HOST === 'codex') t.injected = codexInjected(session);
       checks = evaluate(t);
+    }
+    if (HOST === 'claude') {
+      const key = t.session || session;
+      const prev = spent[key] || 0;
+      spent[key] = Math.max(prev, t.cost);
+      t.cost = Math.max(0, t.cost - prev);
     }
     transcripts.push(t);
     results.push({ stage: stage.name, prompt: stage.prompt, seconds: Math.round((Date.now() - started) / 1000),
