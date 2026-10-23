@@ -31,7 +31,7 @@ disable-model-invocation: true
 | **投稿前** | |
 | /duck-review | 按审稿人的眼光审自己的稿子 |
 | **学东西** | |
-| /duck-why | 刚才那一步能学到什么（也可以指定文件、提交、段落） |
+| /duck-why | 刚才那一步能学到什么（也可以指定文件、git 提交、段落） |
 | /duck-learn | 一段做完，复盘 |
 | /duck-notes | 看、改学习笔记 |
 | **设置** | |
