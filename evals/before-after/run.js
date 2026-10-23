@@ -5,6 +5,10 @@
 //   node evals/before-after/run.js off 1    plugin loaded, duck not turned on in the project
 //   node evals/before-after/run.js on 1     the project's .duck/config.md says 开关：on
 //   PROMPT="..." TAG=-delegate node evals/before-after/run.js on 1
+//   CLAUDE_MD="把实验结果或结论写进论文之前，先问我。" TAG=-claudemd node evals/before-after/run.js off 1
+//                                            no duck, one line in the project's CLAUDE.md instead
+//   STRIP="只跑了一次。" TAG=-nonote node evals/before-after/run.js on 1
+//                                            notes.md no longer says the earlier result was a single run
 //
 // Each run copies tests/fixtures/grad-project to a temp folder, runs `claude -p` once with this
 // checkout as --plugin-dir, and writes <arm>-<n><TAG>.md into OUT (default: results/ next to
@@ -28,6 +32,13 @@ const PROMPT = process.env.PROMPT
 
 const proj = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `duck-ba-${arm}-`)), 'project');
 fs.cpSync(path.join(ROOT, 'tests/fixtures/grad-project'), proj, { recursive: true });
+if (process.env.CLAUDE_MD) fs.writeFileSync(path.join(proj, 'CLAUDE.md'), `${process.env.CLAUDE_MD}\n`);
+if (process.env.STRIP) {
+  const notes = path.join(proj, 'notes.md');
+  const text = fs.readFileSync(notes, 'utf8');
+  if (!text.includes(process.env.STRIP)) throw new Error(`notes.md has no ${process.env.STRIP}`);
+  fs.writeFileSync(notes, text.split(process.env.STRIP).join(''));
+}
 spawnSync('git', ['init', '-q'], { cwd: proj });
 spawnSync('git', ['add', '-A'], { cwd: proj });
 spawnSync('git', ['-c', 'user.name=s', '-c', 'user.email=s@e.com', 'commit', '-qm', 'init'], { cwd: proj });
