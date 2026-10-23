@@ -2,6 +2,21 @@
 
 这一篇讲现在的实现，给想改插件、或者想把它接到别的 agent 上的人看。设计过程和讨论在 `docs/design/`，两边说法不一致时以这一篇为准。
 
+## 仓库里有什么
+
+```
+.claude-plugin/  .codex-plugin/  .cursor-plugin/  .agents/plugins/  gemini-extension.json   各宿主的清单
+hooks/  bin/duck.js     开场注入、读插件文件的放行（Node，不装依赖）
+rules/                  常驻规则、命令模板、命令表
+skills/                 14 条命令
+library/                Supervisor-Skills 的 10 个原技能（上游提交 aff5de9），原样存放
+handbook/               科研导师手册的文字版（zh、en）
+cards/                  经验卡片 23 张，每张写明道理和出处；MENTORS.md 是名家文章索引
+scripts/  tests/        生成、同步上游、测试
+docs/                   说明文档、设计记录、调研
+AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的）
+```
+
 ## 三层东西
 
 | 层 | 在哪 | 是什么 | 谁写的 |
