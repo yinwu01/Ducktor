@@ -44,7 +44,7 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 以 `/duck-review paper/main.tex` 为例，`skills/duck-review/SKILL.md` 让 AI：
 
 1. **先查两件事**：`.duck/config.md` 的「关掉的命令」里有没有 review；项目里有没有学生改过的副本 `.duck/skills/duck-review/SKILL.md`，有就改读副本。
-2. **读组里的卡和笔记本**：项目的 `.duck/cards/INDEX.md`，挑出相关的，当作这一次的规矩；项目的 `.duck/notebook.md`，挑至多三条和这次任务相关的旧条目照着做，收尾的「为什么」里用上了就点出来（「你 MM-DD 记下的：……」）。开关是 off 时不翻笔记本。
+2. **读组里的卡和笔记本**：项目的 `.duck/cards/INDEX.md`，挑出相关的，当作这一次的规矩；项目的 `.duck/notebook.md`，挑至多三条和这次任务相关的旧条目照着做，收尾的「为什么」里用上了就点出来（「笔记本 MM-DD 那条：……」；笔记本多半是 AI 当时概括的，不说成学生自己记的）。开关是 off 时不翻笔记本。
 3. **照原技能做**：读 `library/pre-submission-reviewer/SKILL.md`，从头做到尾。原技能里的相对路径（`references/…`）相对它自己的文件夹。
 4. **加查项**：经过评测的额外检查钉在这里，现在还是空的。
 5. **卡片提醒**：从插件的 `cards/INDEX.md` 挑至多三张共识卡对照，只提醒。插件自带的卡现在有 23 张（写作、选题、实验、作图、报告、找反馈、审稿），每张写明道理、怎么用、出处和认同程度（共识、有出处、有分歧），出处都是我们自己的话转述。
