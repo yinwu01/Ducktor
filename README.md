@@ -4,7 +4,7 @@
 
 你用 AI 做科研，鸭子在旁边讲为什么。
 
-Doctor Duck 是 Claude Code 和 Codex 的插件。AI 照常替你查文献、写论文、审稿。碰到要你拍板的事，鸭子先停下来问你；做完一步，它讲一句为什么，记进项目里的一份学习笔记。
+Doctor Duck 是 Claude Code 和 Codex 的插件。AI 照常替你查文献、写论文、审稿。在项目里敲一次 `/duck on`，碰到要你拍板的事，鸭子先停下来问你；做完一步，它讲一句为什么，记进项目里的一份学习笔记。
 
 ## 有它和没它
 
@@ -107,7 +107,7 @@ codex plugin marketplace add JoeyWu-tech/Doctor-Duck
 codex plugin add duck@doctor-duck
 ```
 
-装好后开一个新会话，敲 `/duck`，鸭子 quack 一声，把菜单列给你。Codex 里敲 `$duck:duck`。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
+装好后开一个新会话，敲 `/duck`，鸭子 quack 一声，把菜单列给你。想要上面那种先问再改，在项目里再敲一次 `/duck on`。Codex 里写成 `$duck:duck`、`$duck:duck on`。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
 
 ## 全部命令
 
