@@ -134,7 +134,8 @@ const text = (rel) => (exists(rel) ? fs.readFileSync(duckFile(rel), 'utf8') : ''
 const reports = (suffix) => (fs.existsSync(duckFile('reports'))
   ? fs.readdirSync(duckFile('reports')).filter((f) => f.endsWith(`${suffix}.md`) || f.includes(`${suffix}-`)) : []);
 const allReports = () => (fs.existsSync(duckFile('reports')) ? fs.readdirSync(duckFile('reports')) : []);
-const readOf = (t, skill) => t.reads.some((r) => r && r.includes(`library/${skill}/SKILL.md`));
+// Read the original skill in this stage, or earlier in the same host session (its text is still in context).
+const readOf = (t, skill) => [...t.reads, ...(t.earlierReads || [])].some((r) => r && r.includes(`library/${skill}/SKILL.md`));
 const switchIs = (mode) => new RegExp(`^[\\s>*#-]*开关\\s*[:：]\\s*${mode}`, 'm').test(text('config.md'));
 const FOLLOWUP = '信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行；我前面说的限制照旧。';
 const newestReport = (suffix) => {
@@ -592,6 +593,8 @@ function main() {
     if (stage.resume !== false && !session) session = t.session;
     if (stage.resume === false) session = t.session;
     if (HOST === 'codex') t.injected = codexInjected(t.session || session);
+    t.sessionId = session;
+    t.earlierReads = transcripts.filter((x) => x.sessionId && x.sessionId === session).flatMap((x) => x.reads);
     const evaluate = (tr) => stage.checks.map(([severity, label, fn]) => {
       let ok = false;
       try { ok = Boolean(fn(tr, before)); } catch (err) { ok = false; }
@@ -607,7 +610,7 @@ function main() {
       const again = HOST === 'claude' ? runClaude(FOLLOWUP, session, opts) : runCodex(FOLLOWUP, session, opts);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
       const t2 = parse(again.stdout || '');
-      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${FOLLOWUP}\n\n${t2.reply}`, cost: t.cost + t2.cost };
+      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${FOLLOWUP}\n\n${t2.reply}`, cost: t.cost + t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
       if (HOST === 'codex') t.injected = codexInjected(session);
       checks = evaluate(t);
     }
