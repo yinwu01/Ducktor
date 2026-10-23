@@ -23,7 +23,7 @@ disable-model-invocation: true
 | /duck-idea | 评估 idea 值不值得做 |
 | /duck-vibe | 这块活该让 AI 干到哪、你自己把关哪些 |
 | **写论文** | |
-| /duck-outline | 理论文逻辑 |
+| /duck-outline | 理清论文逻辑 |
 | /duck-intro | 写引言 |
 | /duck-write | 写正文 |
 | /duck-figure | 设计图、出图质检 |
@@ -33,16 +33,16 @@ disable-model-invocation: true
 | **学东西** | |
 | /duck-why | 刚才那一步能学到什么（也可以指定文件、提交、段落） |
 | /duck-learn | 一段做完，复盘 |
-| /duck-notes | 看、改笔记本 |
+| /duck-notes | 看、改学习笔记 |
 | **设置** | |
 | /duck-skill | 关掉命令、加你们组的卡 |
 
 在 Codex 里，命令写成 $duck:duck-review 这样，最省事的用法写成 $duck:duck 帮我审一下 paper/main.tex。
 
 列完再做三件事：
-- 读项目的 .duck/config.md，说一句鸭子在这个项目开没开、开在哪一档。没有这个文件，文件里没有「开关：」那一行，或者写的不是 on、quiet、off，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」。
-- 项目的 .claude/skills/ 和 .agents/skills/ 下，名字以 duck- 开头的文件夹是学生自己加的命令，接在表后面列出来。
-- 最后一句：「想让我平时也跟着，在这个项目敲 /duck on（/duck quiet 只记不说，/duck off 连命令收尾的讲解也关掉）。」
+- 读项目的 .duck/config.md，用一句话说鸭子在这个项目开没开、开在哪一档，不用提文件名。没有这个文件，文件里没有「开关：」那一行，或者写的不是 on、quiet、off，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」；一条都没关，就不提。
+- 项目的 .claude/skills/ 和 .agents/skills/ 下，名字以 duck- 开头的文件夹是学生自己加的命令，接在表后面列出来；一个都没有，就不提。
+- 最后照写这两句：「想让我平时也跟着（要紧的决定先问你，做完一步讲一句为什么），在这个项目敲 /duck on。/duck quiet 只记不说，/duck off 连命令收尾的讲解也关掉。」已经是 on 或 quiet 的，这两句换成一句怎么换档或关掉。
 
 ## 二、后面是 on、quiet 或 off：切开关
 

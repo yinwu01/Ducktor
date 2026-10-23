@@ -4,7 +4,7 @@ description: 理清论文逻辑，技术论文和 benchmark 论文各用一个�
 disable-model-invocation: true
 ---
 
-# /duck-outline：理论文逻辑
+# /duck-outline：理清论文逻辑
 
 学生敲了 /duck-outline（Codex 里是 $duck:duck-outline），后面接的文件、段落或一句话就是这次的输入。什么都没接，就问一句要处理什么。
 
