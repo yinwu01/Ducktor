@@ -6,7 +6,7 @@
 //   node evals/before-after/run.js on 1     the project's .duck/config.md says 开关：on
 //   PROMPT="..." TAG=-delegate node evals/before-after/run.js on 1
 //   CLAUDE_MD="把实验结果或结论写进论文之前，先问我。" TAG=-claudemd node evals/before-after/run.js off 1
-//                                            no duck, one line in the project's CLAUDE.md instead
+//                                            duck not turned on, plus one line in the project's CLAUDE.md
 //   STRIP="只跑了一次。" TAG=-nonote node evals/before-after/run.js on 1
 //                                            notes.md no longer says the earlier result was a single run
 //

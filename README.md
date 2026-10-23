@@ -4,7 +4,7 @@
 
 你用 AI 做科研，鸭子在旁边盯着：结论写进论文之前，先问你证据够不够。
 
-Doctor Duck 是 Claude Code 和 Codex 的插件。AI 照常替你查文献、写论文，投稿前帮你先审一遍。在项目里敲一次 `/duck on`，碰到要你拍板的事（补不补种子、结论写多强），鸭子先停下来问你。做完一步，它讲一句 AI 为什么这么做，记进项目里的学习笔记。
+Doctor Duck 是 Claude Code 和 Codex 的插件。AI 照常替你查文献、写论文，投稿前帮你先审一遍。在项目里敲一次 `/duck on`，碰到要你拍板的事（补不补种子、结论写多强），鸭子先停下来问你。做完一步，它讲一句 AI 为什么这么做；值得带走的道理，记进项目里的学习笔记。
 
 ## 有它和没它
 
@@ -21,25 +21,25 @@ Doctor Duck 是 Claude Code 和 Codex 的插件。AI 照常替你查文献、写
 At 32k context length, BlockSkip also scores higher than dense attention (70.9 vs. 70.6).
 ```
 
-改完它才补一句：只高 0.3 分，没有多个 seed 的话，审稿人可能会追问。
+改完它才补一句：只高 0.3 分，如果只跑了一次，「更好」可能撑不住。
 
-开了鸭子，6 次都没动文件，先问你（notes.md 是测试项目里的实验记录）：
+开了鸭子，6 次都没改论文，先问你。比如这一次：
 
 ```
-我先没改文件。写进去之前有两处要和你确认。
+先不改文件。这一行 0.3 分的差距，我想先和你确认两件事。
 
-1. 0.3 分的差距能不能当结论。notes.md 10-06 那条写着"只跑了一次"……
-   如果同一方法换个种子就能差零点几分，这一行说明不了"更好"。
-2. 摘要那句怎么写。"在 32k 上更好"比证据强。更稳妥的写法是
-   "在 32k 上与稠密注意力精度相当（70.9 对 70.6），同时更快"。
-……
-- A（推荐）：先把 32k 的 BlockSkip 和 dense 各补跑 3 个种子，表里报均值±标准差……
-- B：现在就按单次结果写进去，摘要用"相当"的措辞，表注里写明"单次运行"。
+1. 32k 的 70.9 和 70.6 各跑了几次？ 现在论文里没有任何 seed 或标准差的信息，
+   这两个数大概率是单次结果。0.3 分很可能落在 seed 之间的波动范围内。
+   如果有多个 seed，请给我均值±标准差。如果只有一次，建议先补 3 个 seed 再写进去。
+2. 表怎么放？……
+
+摘要这句我建议写成“在 32k 上与稠密注意力相当（70.9 vs 70.6）”，不写“更好”。
+只有在多 seed 下差距明显超出标准差时，才改成“更好”。
 ```
 
-普通 Claude 也看得出问题，只是先改了再说。开了鸭子，结论进论文之前，先过你这一关。它会先看三件事：只跑了一次吗？提升来自哪一块，拆清楚了吗？结论说得比证据强吗？
+没开鸭子的 Claude 也看得出问题，只是先改了再说。开了鸭子，结论进论文之前，先过你这一关。它会先看三件事：只跑了一次吗？提升来自哪一块，拆清楚了吗？结论说得比证据强吗？
 
-不装鸭子，在项目的 CLAUDE.md 里写一句「把实验结果或结论写进论文之前，先问我。」也有用，但不稳：同一句话跑 6 次，3 次先问，3 次照样改了，摘要写的是 higher accuracy 或 outperforms。
+不开鸭子，只在项目的 CLAUDE.md 里写一句「把实验结果或结论写进论文之前，先问我。」也有用，但不稳：同一句话跑 6 次，3 次先问，3 次照样改了，摘要写的是 higher accuracy 或 outperforms。
 
 AI 平时也会在末尾总结几句，那是改完以后的事。鸭子在动手之前问，事后把谁定了什么记进 `.duck/decisions.md`，一条一行。组会上导师问「这个为什么这么定」，你翻得出来。
 
@@ -76,7 +76,7 @@ Codex 里写成 `$duck:duck 帮我审一下 paper/main.tex`。
 
 想知道刚才那一步能学到什么，敲 `/duck-why`。它挑出一个判断，讲新手常怎么做、有经验的人怎么想、哪位研究者写过这个道理。一段做完，敲 `/duck-learn` 复盘，它先问你一句：哪一步是你定的，哪一步最想重来。
 
-一轮完整的演示（审稿、问为什么、复盘，都是测试时的原话）见 [docs/walkthrough.md](docs/walkthrough.md)。
+更完整的演示（审稿、问为什么、复盘，原话出自几次测试）见 [docs/walkthrough.md](docs/walkthrough.md)。
 
 ## 开关
 
@@ -87,24 +87,24 @@ Codex 里写成 `$duck:duck 帮我审一下 paper/main.tex`。
 - 定了方法、改了实验、写完一段，讲一句为什么。改错别字这种小事不讲。
 - 你说「这类我懂了」，这一类以后只记不讲。
 
-开关只管当前这个项目（放论文和代码的那个文件夹）：
+开关只管当前这个项目。会话要在项目最外层的文件夹里开，在 paper/ 这种子文件夹里开，读不到开关：
 
 | | 平时让 AI 干活 | 敲 `/duck` 开头的命令 |
 |---|---|---|
-| 刚装好 | 不出声 | 做完讲为什么，记下来 |
+| 刚装好 | 不出声，也不记 | 做完讲为什么，记下来 |
 | `/duck on` | 先问你，做完讲为什么，记下来 | 做完讲为什么，记下来 |
 | `/duck quiet` | 照样先问；讲解不说，照样记下来 | 讲解不说，存进 `.duck/reports/` |
-| `/duck off` | 不出声 | 照样干活，不讲也不记 |
+| `/duck off` | 不出声，也不记 | 照样干活，不讲也不记 |
 
-`/duck-why`、`/duck-learn` 是你专门要它讲，哪一档都照常讲。
+记下来的都在项目的 `.duck/` 里：决策在 decisions.md，道理在 notebook.md，完整报告在 reports/。`/duck-why`、`/duck-learn` 是你专门要它讲，哪一档都照常讲。想回到刚装好的样子，删掉 `.duck/config.md` 里「开关：」那一行。
 
 ## 它讲的道理从哪来
 
 - 干活的是 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的 10 个科研技能，从文献综述、评估 idea 到投稿前审稿。已经装在插件里，不用另装。
 - 插件带了 23 张经验卡，一张写一条做法、道理和出处。
-- 还有一份名家文章索引 [cards/MENTORS.md](cards/MENTORS.md)，收了 Hamming、Schulman、Karpathy 等人讲科研的 45 篇文章。每篇用我们自己的话转述，附原文链接。
+- 还有一份名家文章索引 [cards/MENTORS.md](cards/MENTORS.md)，收了 Hamming、Schulman、Karpathy 等人讲科研的文章和演讲，共 45 条。每条用我们自己的话转述，附原文链接。
 
-鸭子提到哪位研究者，只从这些地方取，对不上就直说是它自己的判断。它不给你出题，也不给你打分，研究往哪走你说了算。
+鸭子提到哪位研究者，只从卡片、名家索引和插件带的科研手册里取，对不上就直说是它自己的判断。它不给你出题，也不给你打分，研究往哪走你说了算。
 
 ## 安装
 
@@ -120,7 +120,7 @@ codex plugin marketplace add JoeyWu-tech/Doctor-Duck
 codex plugin add duck@doctor-duck
 ```
 
-装好后开一个新会话，敲 `/duck`，鸭子 quack 一声，把菜单列给你。想要上面那种先问再改，在项目里再敲一次 `/duck on`。Codex 里写成 `$duck:duck`、`$duck:duck on`。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
+装好后，在放论文和代码的那个文件夹里打开终端，敲 `claude`（或 `codex`）开一个新会话。在对话框里敲 `/duck`，鸭子 quack 一声，把菜单列给你。想要上面那种先问再改，在项目里再敲一次 `/duck on`。Codex 里写成 `$duck:duck`、`$duck:duck on`。从 GitHub 装我们只验证了能装上，完整的流程是在本地装好后跑的。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
 
 ## 全部命令
 
@@ -154,16 +154,16 @@ codex plugin add duck@doctor-duck
 你让 AI 改，它才改。开了鸭子，结果要写进论文时，它先问你。
 
 **夜里跑长任务，它会停下来等我吗？**
-交代一句「这次不用问我，你直接定」，它就照常做完。决策行里会记下「AI 定，你授权」，第二天你翻 `.duck/decisions.md` 能看到它替你定了什么。上面那个例子加了这句以后，3 次都直接改完，摘要里写的是 matches 或 slightly higher，不是 outperforms。这句话也能用来跳过它，跳过了会留下记录。
+交代一句「这次不用问我，你直接定」，它就不停下来问。上面那个例子加了这句以后，3 次都直接改完，摘要里写的是 matches 或 slightly higher，不是 outperforms。决策行写的是「AI 定」或「AI 定，你授权」。翻 `.duck/decisions.md`，能看到它替你定了什么。真正跑一整夜的长任务我们还没测过。这句话也能用来跳过它。
 
 **回复会变长吗？多花钱吗？**
-命令收尾多三到五行，嫌多就 `/duck quiet`。上面那个例子用 Sonnet 跑，没开鸭子每次约 0.13 美元；开着鸭子、让它直接改完，每次约 0.15 美元（各 3 次）。
+命令收尾多一小段：几行为什么、一行决策，有时再加一两句卡片提醒。嫌多就 `/duck quiet`。上面那个例子用 Sonnet 跑，没开鸭子每次约 0.13 美元（6 次）；开着鸭子、让它直接改完，每次约 0.15 美元（3 次）。
 
 **名家的那些话可信吗？**
 都是转述，不是原话，附了原文链接。鸭子把一条道理用到你这件事上时，会说明这是它的延伸。
 
 **不是做机器学习的能用吗？**
-能用，只是背后的技能照计算机方向的会议论文写，审稿时会问 baseline、消融（去掉一部分看效果）这类事，卡片和名家文章也偏计算机。综述、润色、作图这几条最不挑方向。
+能用，只是背后的技能照计算机方向的会议论文写，审稿时会问 baseline、消融（去掉一部分看效果）这类事。卡片和名家文章也偏计算机。综述、润色、作图这几条最不挑方向。
 
 **还没到写论文的阶段呢？**
 `/duck-survey` 帮你摸方向。`/duck-why` 后面接你的分析脚本或某次 git 提交，它也能讲。别的命令多半是写论文和投稿用的。
@@ -172,7 +172,7 @@ codex plugin add duck@doctor-duck
 要先装 Claude Code 或 Codex。它们在终端里跑，能直接读写你文件夹里的文件，要付费账号或 API key。鸭子管的正是这种 AI 直接改你文件的情况。
 
 **我的东西存在哪？**
-项目里只多一个 `.duck/` 文件夹，放开关设定、学习笔记、决策记录和报告，全是普通的 markdown，可以进 git。插件不往项目以外写东西，自己也不联网；AI 读到的内容照常发给 Claude 或 Codex 的模型，和不装插件一样。
+鸭子自己的记录都在项目的 `.duck/` 文件夹里：开关设定、学习笔记、决策记录和报告，全是普通的 markdown，可以进 git。命令干的活（比如综述）照常写在项目里。插件的代码不联网，也不往项目以外写东西。AI 读到的内容照常发给 Claude 或 Codex 的模型，`/duck-survey` 这类命令还会让 AI 上网查文献。
 
 **和 Supervisor-Skills 是什么关系？**
 10 个技能原样放在 `library/` 里，一个字没改。鸭子在外面包一层：先查你的设定和组里的卡，再照原技能做，最后讲为什么。
@@ -188,7 +188,7 @@ codex plugin add duck@doctor-duck
 ## 来源和致谢
 
 - 名字和点子来自小黄鸭调试法（[Rubber duck debugging](https://en.wikipedia.org/wiki/Rubber_duck_debugging)），出自《程序员修炼之道》（The Pragmatic Programmer）。
-- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库从它的提交 c243997（2026-07-01）分出来，上游到那时为止的提交历史和作者都保留在本仓库的历史里。
+- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库的提交历史从上游 c243997（2026-07-01）分出来，上游到那时为止的提交和作者都保留着。`library/` 和 `handbook/` 的内容取自上游 aff5de9（2026-07-16）。
 - 多宿主的做法参考了 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
 ## 许可
