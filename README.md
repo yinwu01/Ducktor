@@ -96,7 +96,7 @@ Codex 里写成 `$duck:duck 帮我审一下 paper/main.tex`。
 | `/duck quiet` | 照样先问；讲解不说，照样记下来 | 讲解不说，存进 `.duck/reports/` |
 | `/duck off` | 不出声，也不记 | 照样干活，不讲也不记 |
 
-记下来的都在项目的 `.duck/` 里：决策在 decisions.md，道理在 notebook.md，完整报告在 reports/。`/duck-why`、`/duck-learn` 是你专门要它讲，哪一档都照常讲。想回到刚装好的样子，删掉 `.duck/config.md` 里「开关：」那一行。
+记下来的都在项目的 `.duck/` 里：决策在 decisions.md，道理在 notebook.md，完整报告在 reports/。`/duck-why`、`/duck-learn` 是你专门要它讲，哪一档都照常讲。删掉 `.duck/config.md` 里「开关：」那一行，平时就和刚装好时一样不出声；这个文件里关掉的命令和静音的设定照样算数。
 
 ## 它讲的道理从哪来
 
