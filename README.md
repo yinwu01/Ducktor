@@ -1,196 +1,142 @@
-# Doctor Duck
+<h1 align="center">Doctor Duck</h1>
 
-> Trust me, I'm a Ducktor.
+<p align="center">
+  <em>AI 干活。鸭子先问你。你知道为什么。</em>
+</p>
 
-你用 AI 做科研，鸭子在旁边盯着：结论写进论文之前，先问你证据够不够。
+<p align="center">
+  <sub>Trust me, I'm a Ducktor.</sub>
+</p>
 
-Doctor Duck 是 Claude Code 和 Codex 的插件。AI 照常替你查文献、写论文，投稿前帮你先审一遍。在项目里敲一次 `/duck on`，碰到要你拍板的事（补不补种子、结论写多强），鸭子先停下来问你。做完一步，它讲一句 AI 为什么这么做；值得带走的道理，记进项目里的学习笔记。
+<p align="center">
+  <img src="https://img.shields.io/badge/works%20with-Claude%20Code%20%C2%B7%20Codex-111111?style=flat-square" alt="Works with Claude Code and Codex">
+  <img src="https://img.shields.io/badge/license-MIT%20%2B%20CC%20BY--NC--SA%204.0-111111?style=flat-square" alt="License: MIT and CC BY-NC-SA 4.0">
+</p>
 
-## 有它和没它
+<p align="center">
+  <sub>简体中文 &middot; <a href="i18n/README.en.md">English</a></sub>
+</p>
 
-同一句话，在一个测试项目里各跑 6 次（Claude Code，Sonnet）：
+---
 
-```
-你：新结果出来了：32k 长度上 BlockSkip 70.9，稠密注意力 70.6。
-    帮我把这一行加进 paper/main.tex 的表里，摘要里也补一句我们在 32k 上更好。
-```
+你认识它。它是一只黄色的橡皮鸭。它坐在程序员的桌上。程序出了 bug，你把代码一行一行讲给它听；它一言不发，你自己找到了 bug。
 
-没开鸭子，6 次都直接改了论文。摘要里多了这样一句：
+Doctor Duck 把它放进你的 AI 里，再反过来用：AI 做研究，鸭子把每一步讲给你听，要紧的决定先问你。
 
-```
-At 32k context length, BlockSkip also scores higher than dense attention (70.9 vs. 70.6).
-```
+## 之前 / 之后
 
-改完它才补一句：只高 0.3 分，如果只跑了一次，「更好」可能撑不住。
+你让 AI 把一个新结果写进论文：32k 长度上 70.9 对 70.6，摘要里写「更好」。没有鸭子，AI 直接改表，在摘要里写上 scores higher 这类句子；改完它才提一句，差距只有 0.3 分。有鸭子，AI 先查证据够不够。它不改文件，先问你：这两个数各跑了几次？摘要该怎么写？论文一行没改。
 
-开了鸭子，6 次都没改论文，先问你。比如这一次：
+每次的原话和改动见 [evals/before-after/](evals/before-after/)。
 
-```
-先不改文件。这一行 0.3 分的差距，我想先和你确认两件事。
+## 先问，再动手
 
-1. 32k 的 70.9 和 70.6 各跑了几次？ 现在论文里没有任何 seed 或标准差的信息，
-   这两个数大概率是单次结果。0.3 分很可能落在 seed 之间的波动范围内。
-   如果有多个 seed，请给我均值±标准差。如果只有一次，建议先补 3 个 seed 再写进去。
-2. 表怎么放？……
+`/duck on` 在一个项目里打开鸭子。打开以后，你照常让 AI 干活，鸭子在两个地方出声：动手之前，和做完之后。会改变做法的决定，它先问你，一次最多问三件。定了方法、改了实验、写完一段，它在回复末尾讲一句为什么；有取舍时，再记一行决策：选了什么，放弃了什么，是你定的还是 AI 定的。
 
-摘要这句我建议写成“在 32k 上与稠密注意力相当（70.9 vs 70.6）”，不写“更好”。
-只有在多 seed 下差距明显超出标准差时，才改成“更好”。
-```
+## 问为什么
 
-没开鸭子的 Claude 也看得出问题，只是先改了再说。开了鸭子，结论进论文之前，先过你这一关。它会先看三件事：只跑了一次吗？提升来自哪一块，拆清楚了吗？结论说得比证据强吗？
+`/duck-why` 拆开 AI 刚才做的那一步。它挑出最值得学的一个判断：新手常怎么做，有经验的研究者怎么想，哪位名家写过这个道理。你也可以指定一个文件、一次 git 提交或一个段落。卡片、名家索引和手册里找不到出处时，它直说这是它自己的判断。
 
-不开鸭子，只在项目的 CLAUDE.md 里写一句「把实验结果或结论写进论文之前，先问我。」也有用，但不稳：同一句话跑 6 次，3 次先问，3 次照样改了，摘要写的是 higher accuracy 或 outperforms。
+## 复盘
 
-AI 平时也会在末尾总结几句，那是改完以后的事。鸭子在动手之前问，事后把谁定了什么记进 `.duck/decisions.md`，一条一行。组会上导师问「这个为什么这么定」，你翻得出来。
+`/duck-learn` 在一段工作做完时复盘。它先问你一句：哪一步是你定的，哪一步最想重来。然后它把这一段的决策、报告和笔记串起来：本来想做什么，实际怎样，有经验的导师会盯哪里，哪些判断交给了 AI，下一步做什么。你的回答决定它给的下一步。
 
-测试项目是虚构的，每次的原话和改动都在 [evals/before-after/](evals/before-after/)。
+## 笔记本和决策记录
 
-## 为什么是鸭子
+开着鸭子时，每一步值得带走的道理记进 `.duck/notebook.md`。有取舍的决定一条一行记进 `.duck/decisions.md`，写明是你定的还是 AI 定的。下次做同类的工作，鸭子先读笔记本，用得上就提出来。你说「这类我懂了」，这一类以后只记不讲。不想在对话里看讲解？`/duck quiet` 不显示讲解，记录照样写。`/duck on` 让讲解回来。
 
-写代码的人多半听过小黄鸭调试法。程序出了 bug，就把代码一行一行讲给桌上的橡皮鸭听。讲着讲着，你会在某一行卡住：这里我当初为什么这么写？bug 常常就藏在那儿。
+这些记录都是项目里的普通 markdown 文件，可以和论文一起提交进 git。组会上导师问「这个为什么这么定」，你翻得出来。插件的代码不联网，也不往项目以外写东西。
 
-现在 AI 替你干活，「讲一遍」这一步没了。组会上有人问「为什么只比这两个 baseline」，你答不上来：这不是你定的，当时也没人记下来。
+## 工作原理
 
-Doctor Duck 把这一步找回来。要紧的决定，鸭子先停下来问你，你得自己拿主意；AI 做完一步，它讲给你听为什么这么做。
+把实验结果写进表或结论之前，鸭子按顺序查三件事，查到问题就先停下来问你：
 
-## 只记一个 /duck
+1. 只跑了一次吗？差距和种子之间的波动比过吗？
+2. 提升很大时，来源拆清楚了吗？
+3. 结论比证据说得更强吗？
 
-第一次在项目里用，先敲 `/duck on`。之后 `/duck` 后面接一句话就行，它替你挑一条命令来做：
+鸭子不替 AI 干活。干活的是 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的 10 个科研技能，从文献综述、评估 idea 到投稿前审稿。鸭子只管两件事：动手之前问你，做完以后讲给你听。
 
-```
-/duck 帮我审一下 paper/main.tex
-/duck 这个 idea 值不值得做：用块均值估计注意力，贡献小的整块跳过
-/duck 刚才那一步为什么这么改
-```
+它问你，但不考你：它不出题，不打分，研究往哪走由你决定。
 
-Codex 里写成 `$duck:duck 帮我审一下 paper/main.tex`。
+鸭子讲的道理只从三个地方取：插件带的 23 张经验卡、名家文章索引和科研手册。对不上出处时，它直说这是它自己的判断。
 
-做完，回复末尾多一小段，讲这一步为什么这么做。比如审完稿：
+## 规则
 
-> 这次把"表里没有现有稀疏注意力方法"定成 CRITICAL，把"0.8 个点没有波动"定成 MAJOR：前者让摘要里的一句话变成假话，后者只是证据弱。……
-> **论文里每个强词（significantly、best、general、demonstrates）都要能指到表里一个具体数字，指不到就降级成 suggests 或直接删掉。**
-> 下次写完摘要，先把里面的比较对象和强词各列一行，逐个在表里找对应的行和数字，找不到再动笔改。
-> ▸ 决策：审稿结论为需要大改后再投，先补真实对手、多 seed 和消融，再改措辞（AI 定，改不改、投不投你定）
-
-加粗那句是这一步最值得带走的，它会记进项目里的学习笔记 `.duck/notebook.md`，一个普通的 markdown 文件。最后一行记下这一步谁定了什么。下回干同类的活，鸭子先翻一翻，用得上就点出来。
-
-想知道刚才那一步能学到什么，敲 `/duck-why`。它挑出一个判断，讲新手常怎么做、有经验的人怎么想、哪位研究者写过这个道理。一段做完，敲 `/duck-learn` 复盘，它先问你一句：哪一步是你定的，哪一步最想重来。
-
-更完整的演示（审稿、问为什么、复盘，原话出自几次测试）见 [docs/walkthrough.md](docs/walkthrough.md)。
-
-## 开关
-
-`/duck on` 以后，你不敲命令、照常让 AI 干活，它也会：
-
-- 碰到会改变做法的决定，先问你，一次最多三件。
-- 要把结果写进表、写成结论时，先看上面那三件事。
-- 定了方法、改了实验、写完一段，讲一句为什么。改错别字这种小事不讲。
-- 你说「这类我懂了」，这一类以后只记不讲。
-
-开关只管当前这个项目。会话要在项目最外层的文件夹里开，在 paper/ 这种子文件夹里开，读不到开关：
-
-| | 平时让 AI 干活 | 敲 `/duck` 开头的命令 |
-|---|---|---|
-| 刚装好 | 不出声，也不记 | 做完讲为什么，记下来 |
-| `/duck on` | 先问你，做完讲为什么，记下来 | 做完讲为什么，记下来 |
-| `/duck quiet` | 照样先问；讲解不说，照样记下来 | 讲解不说，存进 `.duck/reports/` |
-| `/duck off` | 不出声，也不记 | 照样干活，不讲也不记 |
-
-记下来的都在项目的 `.duck/` 里：决策在 decisions.md，道理在 notebook.md，完整报告在 reports/。`/duck-why`、`/duck-learn` 是你专门要它讲，哪一档都照常讲。删掉 `.duck/config.md` 里「开关：」那一行，平时就和刚装好时一样不出声；这个文件里关掉的命令和静音的设定照样算数。
-
-## 它讲的道理从哪来
-
-- 干活的是 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的 10 个科研技能，从文献综述、评估 idea 到投稿前审稿。已经装在插件里，不用另装。
-- 插件带了 23 张经验卡，一张写一条做法、道理和出处。
-- 还有一份名家文章索引 [cards/MENTORS.md](cards/MENTORS.md)，收了 Hamming、Schulman、Karpathy 等人讲科研的文章和演讲，共 45 条。每条用我们自己的话转述，附原文链接。
-
-鸭子提到哪位研究者，只从卡片、名家索引和插件带的科研手册里取，对不上就直说是它自己的判断。它不给你出题，也不给你打分，研究往哪走你说了算。
+Doctor Duck 的常驻规则是一个文件：[`rules/core.md`](rules/core.md)。给只读规则文件的宿主用的版本是 [`AGENTS.md`](AGENTS.md)。14 条命令在 [`skills/`](skills/)，10 个原技能原样放在 [`library/`](library/)。仓库里的其他文件，都是为了把它们装进不同的宿主。
 
 ## 安装
 
-需要 Claude Code 或 Codex，再加 Node.js 18 以上。仓库现在是私有的，你的 GitHub 账号要有访问权限。
+需要 Node.js 18 或更高版本。仓库现在是私有的：你的 GitHub 账号要有访问权限。
 
-```
-# Claude Code
+**Claude Code**，在终端里敲两条命令：
+
+```bash
 claude plugin marketplace add JoeyWu-tech/Doctor-Duck
 claude plugin install duck@doctor-duck
+```
 
-# Codex（装好后在 /hooks 里信任 Doctor Duck 的 hook）
+**Codex：**
+
+```bash
 codex plugin marketplace add JoeyWu-tech/Doctor-Duck
 codex plugin add duck@doctor-duck
 ```
 
-装好后，在放论文和代码的那个文件夹里打开终端，敲 `claude`（或 `codex`）开一个新会话。在对话框里敲 `/duck`，鸭子 quack 一声，把菜单列给你。想要上面那种先问再改，在项目里再敲一次 `/duck on`。Codex 里写成 `$duck:duck`、`$duck:duck on`。从 GitHub 装我们只验证了能装上，完整的流程是在本地装好后跑的。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
+然后在 Codex 里打开 `/hooks`，信任 Doctor Duck 的 hook，再开一个新会话。
 
-## 全部命令
+**其他宿主：**把 [`AGENTS.md`](AGENTS.md) 复制到你的项目里。这样只有常驻规则，没有命令。Cursor、Gemini CLI、Qwen Code 有适配文件，还没有实测：**[docs/agent-portability.md](docs/agent-portability.md)**。
 
-不想记，就只用 `/duck` 加一句话。Codex 里把 `/duck-review` 写成 `$duck:duck-review`。
+就这些。在放论文和代码的文件夹里开一个新会话，敲 `/duck`。鸭子 quack 一声，列出菜单。
 
-| 命令 | 做什么 | 背后的技能 |
-|---|---|---|
-| **动笔前** | | |
-| `/duck-survey` | 摸方向、文献综述 | deep-research |
-| `/duck-idea` | 评估 idea 值不值得做 | idea-evaluator |
-| `/duck-vibe` | 这块活该让 AI 干到哪、你自己把关哪些 | vibe-research-workflow |
-| **写论文** | | |
-| `/duck-outline` | 理清论文逻辑 | tech-paper-template、benchmark-paper-template |
-| `/duck-intro` | 写引言 | intro-drafter |
-| `/duck-write` | 写正文 | paper-writer |
-| `/duck-figure` | 设计图、出图质检 | figure-designer |
-| `/duck-polish` | 润色 | paper-polish |
-| **投稿前** | | |
-| `/duck-review` | 按审稿人的眼光审你自己的稿子 | pre-submission-reviewer |
-| **学东西** | | |
-| `/duck-why` | 刚才那一步能学到什么，也可以指定文件、git 提交、段落 | |
-| `/duck-learn` | 一段做完，复盘 | |
-| `/duck-notes` | 看、改学习笔记 | |
-| **设置** | | |
-| `/duck` | 菜单；`/duck on`、`quiet`、`off` 切开关；后面接一句话，它替你挑命令 | |
-| `/duck-skill` | 关掉命令、加你们组自己的经验卡 | |
+刚装好时，鸭子在每个项目里都不出声，只在你敲 `/duck-*` 命令时干活。在一个项目里敲一次 `/duck on`，鸭子就在这个项目里先问再动手。开关记在这个项目的 `.duck/config.md` 里，别的项目不受影响。会话要在项目最外层的文件夹里开；在 `paper/` 这样的子文件夹里开，鸭子读不到开关。
+
+只从 GitHub 上的 `JoeyWu-tech/Doctor-Duck` 安装 Doctor Duck。从 GitHub 安装，我们只验证了能装上；完整的流程是在本地装好以后测的。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
+
+## 命令
+
+| 命令 | 作用 |
+|------|------|
+| `/duck [on \| quiet \| off]` | 不带参数时列出菜单。`on` 在这个项目里打开鸭子，`quiet` 只记不讲，`off` 关掉。后面接一句话时，它替你挑一条命令，先说挑了哪条，再动手。 |
+| `/duck-survey` | 摸方向，做文献综述。 |
+| `/duck-idea` | 评估一个 idea 值不值得做。 |
+| `/duck-vibe` | 判断这块活让 AI 干到哪一步，哪些由你自己把关。 |
+| `/duck-outline` | 理清论文的逻辑。技术论文和 benchmark 论文各有一个模板。 |
+| `/duck-intro` | 写引言。 |
+| `/duck-write` | 写正文。 |
+| `/duck-figure` | 设计图，检查出图质量。 |
+| `/duck-polish` | 润色。 |
+| `/duck-review` | 投稿前，用审稿人的标准审你自己的稿子。 |
+| `/duck-why` | 拆开刚才那一步。也可以指定文件、git 提交或段落。 |
+| `/duck-learn` | 一段工作做完时复盘。 |
+| `/duck-notes` | 看、改笔记本。 |
+| `/duck-skill` | 关掉或打开命令，改命令和规则的副本，加你们组自己的经验卡。 |
+
+命令要装整个插件才能用，因为命令要读 `library/` 里的原技能。Claude Code 和 Codex 实测过。在 Codex 里，命令写成 `$duck:duck-review`。只读 `AGENTS.md` 的宿主只加载常驻规则，没有这些命令。
 
 ## 常见问题
 
+**要配置文件吗？**
+不要。`/duck on` 会在项目里建 `.duck/config.md`。你可以用 `/duck-skill` 关掉命令或加卡，但什么都不是必需的。
+
 **它会改我的论文吗？**
-你让 AI 改，它才改。开了鸭子，结果要写进论文时，它先问你。
+你让 AI 改，它才改。开着鸭子，结果要写进论文时，它先问你。
 
-**夜里跑长任务，它会停下来等我吗？**
-交代一句「这次不用问我，你直接定」，它就不停下来问。上面那个例子加了这句以后，3 次都直接改完，摘要里写的是 matches 或 slightly higher，不是 outperforms。决策行写的是「AI 定」或「AI 定，你授权」。翻 `.duck/decisions.md`，能看到它替你定了什么。真正跑一整夜的长任务我们还没测过。这句话也能用来跳过它。
+**我就想让它直接改呢？**
+说一句「这次不用问我，你直接定。」它就直接改。它把替你定的事记进 `.duck/decisions.md`，标成「AI 定」或「AI 定，你授权」。
 
-**回复会变长吗？多花钱吗？**
-命令收尾多一小段：几行为什么、一行决策，有时再加一两句卡片提醒。嫌多就 `/duck quiet`。上面那个例子用 Sonnet 跑，没开鸭子每次约 0.13 美元（6 次）；开着鸭子、让它直接改完，每次约 0.15 美元（3 次）。
+**它给我打分吗？**
+不给。`/duck-idea` 和 `/duck-review` 会给 idea 和稿子打分。那是评东西，不评人。
 
-**名家的那些话可信吗？**
-都是转述，不是原话，附了原文链接。鸭子把一条道理用到你这件事上时，会说明这是它的延伸。
-
-**不是做机器学习的能用吗？**
-能用，只是背后的技能照计算机方向的会议论文写，审稿时会问 baseline、消融（去掉一部分看效果）这类事。卡片和名家文章也偏计算机。综述、润色、作图这几条最不挑方向。
-
-**还没到写论文的阶段呢？**
-`/duck-survey` 帮你摸方向。`/duck-why` 后面接你的分析脚本或某次 git 提交，它也能讲。别的命令多半是写论文和投稿用的。
-
-**只用过 ChatGPT 网页版，能用吗？**
-要先装 Claude Code 或 Codex。它们在终端里跑，能直接读写你文件夹里的文件，要付费账号或 API key。鸭子管的正是这种 AI 直接改你文件的情况。
-
-**我的东西存在哪？**
-鸭子自己的记录都在项目的 `.duck/` 文件夹里：开关设定、学习笔记、决策记录和报告，全是普通的 markdown，可以进 git。命令干的活（比如综述）照常写在项目里。插件的代码不联网，也不往项目以外写东西。AI 读到的内容照常发给 Claude 或 Codex 的模型，`/duck-survey` 这类命令还会让 AI 上网查文献。
-
-**和 Supervisor-Skills 是什么关系？**
-10 个技能原样放在 `library/` 里，一个字没改。鸭子在外面包一层：先查你的设定和组里的卡，再照原技能做，最后讲为什么。
-
-**导师能看到什么？**
-开着鸭子时，有取舍的决定一条一行记进 `.duck/decisions.md`，写明是你定的还是 AI 定的。学习笔记里是这一路用到的道理。都是项目里的普通文件，可以和论文一起提交进 git。这是帮学生回忆的记录，学生自己能改，不是审计日志。
-
-## 更多
-
-- [怎么运行的](docs/how-it-works.md)、[在哪些 agent 上能用](docs/agent-portability.md)（Claude Code、Codex 实测过；Cursor、Gemini CLI、Qwen Code 有适配，未实测）、[测试和结果](docs/testing.md)
-- 开发：`npm test` 不调模型；改了 `rules/` 以后 `npm run build` 重新生成命令；`node tests/e2e/flow.js claude` 用真模型走一遍（要花钱）。
+**为什么叫「鸭子」？**
+小黄鸭调试法：把代码讲给桌上的橡皮鸭听，讲着讲着就找到了 bug。Doctor Duck 反过来用：AI 做事，鸭子讲给你听。
 
 ## 来源和致谢
 
-- 名字和点子来自小黄鸭调试法（[Rubber duck debugging](https://en.wikipedia.org/wiki/Rubber_duck_debugging)），出自《程序员修炼之道》（The Pragmatic Programmer）。
-- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)，Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库的提交历史从上游 c243997（2026-07-01）分出来，上游到那时为止的提交和作者都保留着。`library/` 和 `handbook/` 的内容取自上游 aff5de9（2026-07-16）。
-- 多宿主的做法参考了 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
+- 名字来自小黄鸭调试法（[Rubber duck debugging](https://en.wikipedia.org/wiki/Rubber_duck_debugging)），出自《程序员修炼之道》（The Pragmatic Programmer）。
+- 方法论、手册和 10 个技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)。版权：Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库的提交历史从上游 c243997（2026-07-01）分出来。上游到那时为止的提交和作者都保留着。`library/` 和 `handbook/` 的内容取自上游 aff5de9（2026-07-16）。
+- README 的结构和写法参考了 [ponytail](https://github.com/DietrichGebert/ponytail)（MIT）。多宿主的做法参考了 ponytail 和 [superpowers](https://github.com/obra/superpowers)。
 
-## 许可
+## 许可证
 
-我们写的文字（`skills/`、`rules/`、`cards/`）用 CC BY-NC-SA 4.0，不可商用。代码（`bin/`、`hooks/`、`scripts/`、`tests/`）用 MIT。`library/` 里的原技能保留原来的许可，`handbook/` 是 CC BY-NC-SA 4.0。详见 [LICENSE](LICENSE) 和 [LICENSES/README.md](LICENSES/README.md)。
+按目录分。我们写的文字（`skills/`、`rules/`、`cards/`）和 `handbook/` 用 CC BY-NC-SA 4.0，不可商用。代码（`bin/`、`hooks/`、`scripts/`、`tests/`）用 MIT。`library/` 里的原技能保留原来的许可。详见 [LICENSE](LICENSE) 和 [LICENSES/README.md](LICENSES/README.md)。
