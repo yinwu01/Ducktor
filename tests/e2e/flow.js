@@ -259,7 +259,8 @@ const MENTOR_NAMES = (() => {
   return names;
 })();
 const SPEECH = /说|认为|主张|提醒|建议|强调|提出|指出|提到|写过|写道|讲过|讲的是|批评|觉得|看来|观点|看法/;
-const HOSTS = new Set(['AI', 'Claude', 'Codex', 'GPT', 'ChatGPT', 'Doctor', 'Duck']);
+// The host and the plugin's own names are not authorities.
+const HOSTS = new Set(['AI', 'Claude', 'Codex', 'GPT', 'ChatGPT', 'Doctor', 'Duck', 'Ducktor']);
 const unknownSpeakers = (reply, everySentence = false) => {
   const allowed = allowedText();
   const out = [];
@@ -303,7 +304,7 @@ function mainStages() {
       ['must', 'hook injected the idle note, not the resident rules', (t) => IDLE_ONLY(t)],
       ['must', 'no .duck/ folder', () => !fs.existsSync(path.join(PROJECT, '.duck'))],
       ['must', 'no decision line', (t) => !/▸ ?决策/.test(t.reply)],
-      ['should', 'does not bring up the duck', (t) => !/duck-|Ducktor|Ducktor|鸭子/i.test(t.reply)],
+      ['should', 'does not bring up the duck', (t) => !/duck-|Ducktor|鸭子/i.test(t.reply)],
       ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
     ] },
     { name: 'menu', resume: false, prompt: cmd('duck'), checks: [

@@ -66,7 +66,7 @@ You can also ask after the AI completes the work. Type `/duck` and your question
 
 The principles that Ducktor records go into `.duck/notebook.md`, one on each line. It records each decision between options on one line in `.duck/decisions.md`. Each line shows who made the decision: you or the AI. When you use a command for similar work later, Ducktor reads the notebook first. If an old line applies, Ducktor tells you. If you say 「这类我懂了」 ("I understand this type now"), Ducktor records that type of principle, but it does not explain it again.
 
-When Ducktor records: after you turn on Ducktor in a project (`/duck on`, or `/duck quiet`, which records but does not explain in the chat), each command records one principle. During normal work, a step of real work can also give a principle, and Ducktor records it. It does not record the same principle two times. If Ducktor is not on, only the commands record. After `/duck off`, Ducktor records nothing, and `/duck-why` and `/duck-learn` explain only in the chat.
+When Ducktor records: after you turn it on in a project (`/duck on`, or `/duck quiet`, which records but does not explain in the chat), each command records one principle. During normal work, a step of real work can also give a principle, and Ducktor records it. It does not record the same principle two times. If Ducktor is not on, only the commands record. After `/duck off`, Ducktor records nothing, and `/duck-why` and `/duck-learn` explain only in the chat.
 
 These records are plain Markdown files in your project. You can commit them to git with your paper. When your advisor asks about the reason for a decision, you can find the answer.
 
@@ -113,7 +113,7 @@ In a project where Ducktor is on, each session loads the always-on rules at the 
 
 ## Install
 
-You must have Node.js 18 or a later version. At this time, the repository is private. Your GitHub account must have access to it.
+You must have Node.js 18 or a later version. At this time, the repository is private. Your GitHub account must have access to it. If you installed Doctor Duck (the old name of Ducktor), remove it first. The steps are in the section 「以前装的是 Doctor Duck」 of [INSTALL.md](../INSTALL.md) (in Chinese).
 
 **Claude Code**, in a terminal:
 

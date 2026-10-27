@@ -112,7 +112,7 @@ Ducktor 不出题，也不给你这个人打分。
 
 ## 安装
 
-需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限。
+需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限。以前装过 Doctor Duck（Ducktor 的旧名字），先照 [INSTALL.md](INSTALL.md) 里「以前装的是 Doctor Duck」一节卸掉旧的，再往下装。
 
 **Claude Code**，在终端里：
 
