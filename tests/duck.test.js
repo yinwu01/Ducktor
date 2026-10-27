@@ -61,7 +61,8 @@ test('no config: only the idle note, no resident rules', () => {
   assert.ok(text.startsWith(`Ducktor 插件根目录：${ROOT}`));
   assert.doesNotMatch(text, /# Ducktor 常驻规则/);
   assert.match(text, /没在这个项目开启/);
-  assert.ok(text.length < 2500, `${text.length} characters`);
+  // idle note + 东西在哪 + 每次都照做 (2,622 on 2026-10-27); every project with the plugin pays this.
+  assert.ok(text.length < 2800, `${text.length} characters`);
 });
 
 test('not turned on and off: commands still get the basics from core.md', () => {
