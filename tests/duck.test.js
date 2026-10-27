@@ -61,7 +61,7 @@ test('no config: only the idle note, no resident rules', () => {
   assert.ok(text.startsWith(`Ducktor 插件根目录：${ROOT}`));
   assert.doesNotMatch(text, /# Ducktor 常驻规则/);
   assert.match(text, /没在这个项目开启/);
-  // idle note + 东西在哪 + 每次都照做 (2,675 on 2026-10-27); every project with the plugin pays this.
+  // idle note + 东西在哪 + 每次都照做 (2,509 on 2026-10-27); every project with the plugin pays this.
   assert.ok(text.length < 2800, `${text.length} characters`);
 });
 
