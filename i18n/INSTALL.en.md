@@ -1,6 +1,6 @@
 # Install
 
-You must have Claude Code or Codex, and [Node.js](https://nodejs.org/) 18 or a later version. The session-start hook uses Node.js. It installs no packages.
+You must have Claude Code or Codex, and [Node.js](https://nodejs.org/) 18 or a later version. Both hooks use Node.js. It installs no packages.
 
 > At this time, the repository is private. Before you install, your GitHub account must have access to the repository, and git must be able to use that account (for example, with `gh` installed and logged in). If `gh repo view JoeyWu-tech/Ducktor` opens the repository, you have access. If it does not open, `marketplace add` also fails. Ask the owner of the repository for access first.
 
@@ -33,7 +33,7 @@ codex plugin add duck@ducktor
 
 Then open Codex. In `/hooks`, trust the two Ducktor hooks. The first hook loads the rules when a session starts. The second hook is for Claude Code only: it lets Claude Code read the files of the plugin and write the notebook. It does not run in Codex. Then type `$duck:duck` to see the menu.
 
-- **Update**: `codex plugin marketplace upgrade ducktor`, then `codex plugin add duck@ducktor`. If a hook changed, trust it again.
+- **Update**: `codex plugin marketplace upgrade ducktor`, then `codex plugin add duck@ducktor`. If a hook changed, trust it again. (The update of 2026-10-27 changed the command of the second hook, so trust the hooks again in `/hooks`.)
 - **Remove**: `codex plugin remove duck@ducktor` and `codex plugin marketplace remove ducktor`.
 - **Try a local copy that you changed**: `codex plugin marketplace add <path to this repository>`, then `codex plugin add duck@ducktor`. Codex copies the full folder into its cache. After each change, run `add` again.
 
@@ -59,9 +59,9 @@ In Codex, use `codex plugin remove duck@doctor-duck` and `codex plugin marketpla
 
 ## Common problems
 
-- **A hook error shows each time that you start a session**: usually Node.js is not installed (`node: command not found`). The commands still work, but a project that has Ducktor on does not get the always-on rules. In Claude Code, you also see more prompts when the AI reads the files of the plugin. Install Node.js.
+- **A hook error shows each time that you start a session (in Claude Code, also each time that the AI reads or writes a file)**: usually Node.js is not installed (`node: command not found`). The commands still work, but a project that has Ducktor on does not get the always-on rules. In Claude Code, you also see more prompts when the AI reads the files of the plugin. Install Node.js.
 - **In Claude Code, a command asks again and again if it can read a file in `library/`**: the hook that allows these reads did not run. Make sure that you did not turn off all hooks (`disableAllHooks` in the settings), and that Node.js is installed.
-- **In Codex, the AI cannot write the files in `.duck/`, or every shell command fails**: look for `bwrap: Unexpected capabilities` in the error. This is a problem with the computer, not with the plugin: the Codex process has ambient capabilities, and bubblewrap 0.6.1 does not start with them. Start Codex with `setpriv --inh-caps=-all --ambient-caps=-all codex`.
+- **In Codex, the AI cannot write the files in `.duck/`, or every shell command fails**: look for `bwrap: Unexpected capabilities` in the error. This is a problem with the computer, not with the plugin: the Codex process has ambient capabilities, and some versions of bubblewrap (for example 0.6.1) do not start with them. Start Codex with `setpriv --inh-caps=-all --ambient-caps=-all codex`.
 - **`/duck-review` does not start, or it starts a different command**: use the full name of the plugin command, `/duck:duck-review`.
 - **The first `/duck-survey` asks for permission many times**: Claude Code asks the first time that the AI uses WebSearch or WebFetch to search for papers. Allow it. If you select the option to not ask again, it does not ask again.
-- **In Claude Code, a change of the switch asks if it can edit `.duck/config.md`**: this is correct. The plugin lets the notebook, the decision log, and the reports go through without a prompt. A change to the switch or to the rules needs your approval.
+- **In Claude Code, a change of the switch asks if it can edit `.duck/config.md`**: this is correct. After `.duck/` exists, the plugin lets new lines in the notebook and the decision log, and the reports, go through without a prompt. A change to a line that is already there, to the switch, or to the rules needs your approval.
