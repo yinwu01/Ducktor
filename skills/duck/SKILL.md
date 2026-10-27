@@ -40,7 +40,7 @@ disable-model-invocation: true
 
 在 Codex 里，命令写成 $duck:duck-review 这样，最省事的用法写成 $duck:duck 帮我审一下 paper/main.tex。
 
-学生只敲了 /duck，这次会话里也没有学生写的别的话，看不出用哪种语言时，用中文列，最后加一行英文：「Prefer English? Write to me in English and I will answer in English.」
+学生只敲了 /duck，这次会话里也没有学生写的别的话时，.duck/config.md 是英文写的就用英文列；也看不出来，用中文列，最后加一行英文：「Prefer English? Write to me in English and I will answer in English.」
 
 列完再做三件事：
 - 读项目的 .duck/config.md，用一句话说 Ducktor 在这个项目开没开、开在哪一档，不用提文件名。没有这个文件，文件里没有「开关：」那一行，或者写的不是 on、quiet、off，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」；一条都没关，就不提。
