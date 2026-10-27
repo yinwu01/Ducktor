@@ -1,6 +1,6 @@
 ---
 name: duck
-description: Doctor Duck 总入口。列出全部 /duck-* 命令；/duck on、quiet、off 切换报告开关；后面接一句话时，替学生挑一条命令照做。
+description: Ducktor 总入口。列出全部 /duck-* 命令；/duck on、quiet、off 切换报告开关；后面接一句话时，替学生挑一条命令照做。
 disable-model-invocation: true
 ---
 
@@ -40,7 +40,7 @@ disable-model-invocation: true
 在 Codex 里，命令写成 $duck:duck-review 这样，最省事的用法写成 $duck:duck 帮我审一下 paper/main.tex。
 
 列完再做三件事：
-- 读项目的 .duck/config.md，用一句话说 Doctor Duck 在这个项目开没开、开在哪一档，不用提文件名。没有这个文件，文件里没有「开关：」那一行，或者写的不是 on、quiet、off，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」；一条都没关，就不提。
+- 读项目的 .duck/config.md，用一句话说 Ducktor 在这个项目开没开、开在哪一档，不用提文件名。没有这个文件，文件里没有「开关：」那一行，或者写的不是 on、quiet、off，就是没开启：平时不出声，只有敲命令时才动。config.md 里关掉的命令，在表里标「已关」；一条都没关，就不提。
 - 项目的 .claude/skills/ 和 .agents/skills/ 下，名字以 duck- 开头的文件夹是学生自己加的命令，接在表后面列出来；一个都没有，就不提。
 - 最后照写这两句：「想让我平时也跟着（要紧的决定先问你，做完一步讲一句为什么），在这个项目敲 /duck on。/duck quiet 照样先问，讲解只记不说；/duck off 连命令收尾的讲解也关掉。」已经是 on 或 quiet 的，这两句换成一句怎么换档或关掉。
 
@@ -56,7 +56,7 @@ disable-model-invocation: true
 新建 config.md 用这个格式：
 
 ```
-# Doctor Duck 设定
+# Ducktor 设定
 
 开关：on
 
@@ -75,4 +75,4 @@ disable-model-invocation: true
 3. 然后读那条命令的说明文件「插件根目录/skills/duck-xxx/SKILL.md」，把学生这句话当作敲在命令后面的内容，照说明从头做到尾，开头和收尾的步骤一步都不跳。
 4. 学生自己加的命令（.claude/skills/duck-xxx/ 或 .agents/skills/duck-xxx/）也在挑选范围里，挑中了就读那一份。
 5. 说明文件不存在，就告诉学生这条命令还没装好，照常帮学生做这件事。
-6. 表里没有合适的命令，就直说没有，照常帮学生做；Doctor Duck 在这个项目开着时，按常驻规则附「为什么」。
+6. 表里没有合适的命令，就直说没有，照常帮学生做；Ducktor 在这个项目开着时，按常驻规则附「为什么」。

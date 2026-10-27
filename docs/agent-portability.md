@@ -1,18 +1,18 @@
 # 在哪些 agent 上能用
 
-Doctor Duck 的内容只有一份：`skills/`、`rules/`、`library/`、`cards/`、`handbook/`。每个 agent 只加一层薄的适配：一份清单，或者一份说明文件。这个做法照 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
+Ducktor 的内容只有一份：`skills/`、`rules/`、`library/`、`cards/`、`handbook/`。每个 agent 只加一层薄的适配：一份清单，或者一份说明文件。这个做法照 [ponytail](https://github.com/DietrichGebert/ponytail) 和 [superpowers](https://github.com/obra/superpowers)。
 
 **规矩：在本机真跑过一遍，才算支持。** 端到端测试有两套流程（见 `docs/testing.md`），合起来把 14 条命令都用真模型跑过。下表「实测」一列写的是哪个版本跑过、跑了什么；没写的就是还没跑过，适配文件照别的项目已经跑通的格式写，可能要改。
 
 ## 三档
 
-| 档 | 宿主能做什么 | Doctor Duck 能做到什么 |
+| 档 | 宿主能做什么 | Ducktor 能做到什么 |
 |---|---|---|
 | 一 | 装整个插件，开会话时跑 hook | 全部：常驻规则、开关、14 条命令 |
 | 二 | 装整个插件，命令能用；常驻说明是一份固定文件，不跑 hook | 命令能用；常驻规则是固定的 `AGENTS.md`，开关要 AI 自己去读 `.duck/config.md` |
-| 三 | 只读项目里的说明文件 | 只有常驻规则；要先把 Doctor Duck 放到本机某处，在说明里写上路径 |
+| 三 | 只读项目里的说明文件 | 只有常驻规则；要先把 Ducktor 放到本机某处，在说明里写上路径 |
 
-Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技能，所以宿主得装整个插件。只拷单个技能文件夹的装法（比如某些 `skill add` 命令）跑不了这些命令。
+Ducktor 比 ponytail 多一个约束：命令要读 `library/` 里的原技能，所以宿主得装整个插件。只拷单个技能文件夹的装法（比如某些 `skill add` 命令）跑不了这些命令。
 
 ## 宿主一览
 
@@ -34,8 +34,8 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 
 **Codex**
 - 命令写成 `$duck:duck-review`。
-- 第一次用要在 `/hooks` 里信任 Doctor Duck 的 hook；hook 定义改了要重新信任。`codex exec` 测试时可以加 `--dangerously-bypass-hook-trust`，只对这一次生效。
-- 安装会把整个目录拷进 `~/.codex/plugins/cache/`：本地路径安装连 `.git` 一起拷，`.git` 里有完整历史，有几十 MB；从 GitHub 安装是浅克隆，另有一份 marketplace 副本。10-17 量的是约 77 MB，大头是当时 `docs/supervisor-skills/` 下的上游存档；10-19 删掉存档后，仓库里的文件约 1.7 MB，安装体积还没重新量。改了插件要重新 `codex plugin add duck@doctor-duck`。
+- 第一次用要在 `/hooks` 里信任 Ducktor 的 hook；hook 定义改了要重新信任。`codex exec` 测试时可以加 `--dangerously-bypass-hook-trust`，只对这一次生效。
+- 安装会把整个目录拷进 `~/.codex/plugins/cache/`：本地路径安装连 `.git` 一起拷，`.git` 里有完整历史，有几十 MB；从 GitHub 安装是浅克隆，另有一份 marketplace 副本。10-17 量的是约 77 MB，大头是当时 `docs/supervisor-skills/` 下的上游存档；10-19 删掉存档后，仓库里的文件约 1.7 MB，安装体积还没重新量。改了插件要重新 `codex plugin add duck@ducktor`。
 - 沙箱用 bubblewrap。进程带着 ambient capabilities 时（比如继承了 CAP_NET_ADMIN），bwrap 0.6.1 会拒绝启动，表现为 AI 写不了文件。先用 `setpriv --inh-caps=-all --ambient-caps=-all` 去掉再启动 Codex 就好，这是机器环境的问题，和插件无关。
 
 **Cursor**
@@ -47,7 +47,7 @@ Doctor Duck 比 ponytail 多一个约束：命令要读 `library/` 里的原技�
 - 没有开场注入，`AGENTS.md` 里写了插件根目录怎么找、开关要自己读 `.duck/config.md`。「没开启就不用常驻规则」在这里靠 AI 自己读完 config.md 再照做，不像 hook 那样根本不加载，没实测过它守不守。
 
 **只读 `AGENTS.md` 的宿主**
-- 把仓库放到本机某处，把 `AGENTS.md` 的内容复制进项目的 `AGENTS.md`（或这个宿主自己的规则文件），告诉 AI Doctor Duck 放在哪。命令要靠学生说「照 Doctor Duck 的 /duck-review 做」，AI 再去读 `skills/duck-review/SKILL.md`。
+- 把仓库放到本机某处，把 `AGENTS.md` 的内容复制进项目的 `AGENTS.md`（或这个宿主自己的规则文件），告诉 AI Ducktor 放在哪。命令要靠学生说「照 Ducktor 的 /duck-review 做」，AI 再去读 `skills/duck-review/SKILL.md`。
 
 ## 加一个新宿主
 

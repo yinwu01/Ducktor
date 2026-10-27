@@ -45,7 +45,7 @@ spawnSync('git', ['-c', 'user.name=s', '-c', 'user.email=s@e.com', 'commit', '-q
 if (arm === 'on') {
   fs.mkdirSync(path.join(proj, '.duck'));
   fs.writeFileSync(path.join(proj, '.duck/config.md'),
-    '# Doctor Duck 设定\n\n开关：on\n\n## 按类静音\n\n## 静音的卡\n\n## 关掉的命令\n');
+    '# Ducktor 设定\n\n开关：on\n\n## 按类静音\n\n## 静音的卡\n\n## 关掉的命令\n');
 }
 
 const r = spawnSync('claude', ['-p', PROMPT, '--plugin-dir', ROOT, '--output-format', 'stream-json', '--verbose',

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// End-to-end run of a grad student's session with Doctor Duck, on a real model.
+// End-to-end run of a grad student's session with Ducktor, on a real model.
 // Code here is MIT. It costs real tokens (a few US dollars per run on Sonnet).
 //
 //   node tests/e2e/flow.js claude    Claude Code, loads this checkout with --plugin-dir
-//   node tests/e2e/flow.js codex     Codex, uses the installed duck@doctor-duck plugin
+//   node tests/e2e/flow.js codex     Codex, uses the installed duck@ducktor plugin
 //   node tests/e2e/flow.js claude more   the second flow: survey, outline, intro, write,
 //                                        figure, vibe and notes (main is the default)
 //   node tests/e2e/flow.js claude loop   the third flow: /duck picking a command, old notebook
@@ -42,7 +42,7 @@ const WRAP = (process.env.DUCK_E2E_WRAP || '').split(' ').filter(Boolean);
 const ONLY = (process.env.DUCK_E2E_ONLY || '').split(',').filter(Boolean);
 const STAMP = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 const OUT = path.join(ROOT, 'evals', 'results', `e2e-${HOST}${FLOW === 'main' ? '' : `-${FLOW}`}-${STAMP}`);
-const PROJECT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `doctor-duck-e2e-${HOST}-`)), 'project');
+const PROJECT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `ducktor-e2e-${HOST}-`)), 'project');
 
 // /duck-review in Claude Code is $duck:duck-review in Codex.
 const cmd = (name) => (HOST === 'claude' ? `/${name}` : `$duck:${name}`);
@@ -164,7 +164,7 @@ const cardIds = (s) => {
 };
 // The hook injected the not-turned-on note and not the resident rules. Matches idle.md's first
 // words, which no command file contains (Codex's rollout also holds the command files it read).
-const IDLE_ONLY = (t) => /Doctor Duck 没在这个项目开启：/.test(t.injected) && !/# Doctor Duck 常驻规则/.test(t.injected);
+const IDLE_ONLY = (t) => /Ducktor 没在这个项目开启：/.test(t.injected) && !/# Ducktor 常驻规则/.test(t.injected);
 // Every file under .duck/ with its size, to see whether a turn wrote anything there.
 const duckSnapshot = () => {
   const out = [];
@@ -303,7 +303,7 @@ function mainStages() {
       ['must', 'hook injected the idle note, not the resident rules', (t) => IDLE_ONLY(t)],
       ['must', 'no .duck/ folder', () => !fs.existsSync(path.join(PROJECT, '.duck'))],
       ['must', 'no decision line', (t) => !/▸ ?决策/.test(t.reply)],
-      ['should', 'does not bring up the duck', (t) => !/duck-|Doctor Duck|Ducktor|鸭子/i.test(t.reply)],
+      ['should', 'does not bring up the duck', (t) => !/duck-|Ducktor|Ducktor|鸭子/i.test(t.reply)],
       ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
     ] },
     { name: 'menu', resume: false, prompt: cmd('duck'), checks: [
@@ -372,7 +372,7 @@ function mainStages() {
     ] },
     { name: 'off-new-session', resume: false, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的结论一节`,
       before: () => ({ reports: allReports().length, notebook: text('notebook.md') }), checks: [
-        ['must', 'hook injected the off note', (t) => /Doctor Duck 现在是 off/.test(t.injected)],
+        ['must', 'hook injected the off note', (t) => /Ducktor 现在是 off/.test(t.injected)],
         ['must', 'no new report', (t, before) => allReports().length === before.reports],
         ['must', 'notebook untouched', (t, before) => text('notebook.md') === before.notebook],
       ] },
@@ -440,7 +440,7 @@ const LOOP_NOTEBOOK = [
 ];
 
 // The loop flow's .duck/config.md: the format /duck on writes (skills/duck/SKILL.md, section 二).
-const LOOP_CONFIG = '# Doctor Duck 设定\n\n开关：on\n\n## 按类静音\n学生说「这类我懂了」时，在这里记一行。\n\n## 静音的卡\n\n## 关掉的命令\n';
+const LOOP_CONFIG = '# Ducktor 设定\n\n开关：on\n\n## 按类静音\n学生说「这类我懂了」时，在这里记一行。\n\n## 静音的卡\n\n## 关掉的命令\n';
 
 // The knowledge loop and the resident rules: /duck picks a command, old notebook entries come
 // back in later commands, a free conversation about a single-run result, and 「这类我懂了」.
@@ -562,13 +562,13 @@ function setup() {
     fs.writeFileSync(path.join(PROJECT, '.duck', 'config.md'), LOOP_CONFIG);
   }
   if (HOST === 'codex') {
-    const cache = path.join(process.env.HOME, '.codex', 'plugins', 'cache', 'doctor-duck', 'duck');
+    const cache = path.join(process.env.HOME, '.codex', 'plugins', 'cache', 'ducktor', 'duck');
     const head = spawnSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
     const versions = fs.existsSync(cache) ? fs.readdirSync(cache) : [];
     const installed = versions.map((v) => spawnSync('git', ['-C', path.join(cache, v), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim());
     const pluginDiffers = (rev) => spawnSync('git', ['-C', ROOT, 'diff', '--quiet', rev, 'HEAD', '--', '.', ':!tests', ':!docs', ':!README.md', ':!INSTALL.md']).status !== 0;
     if (!installed.includes(head) && installed.every(pluginDiffers)) {
-      console.warn(`warning: the Codex plugin cache is not at ${head.slice(0, 7)}; run: codex plugin add duck@doctor-duck`);
+      console.warn(`warning: the Codex plugin cache is not at ${head.slice(0, 7)}; run: codex plugin add duck@ducktor`);
     }
   }
 }

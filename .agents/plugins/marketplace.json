@@ -1,7 +1,7 @@
 {
-  "name": "doctor-duck",
+  "name": "ducktor",
   "interface": {
-    "displayName": "Doctor Duck"
+    "displayName": "Ducktor"
   },
   "plugins": [
     {

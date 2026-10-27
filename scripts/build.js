@@ -47,7 +47,7 @@ function wrappers() {
     files[`skills/${c.name}/SKILL.md`] = body;
     files[`skills/${c.name}/agents/openai.yaml`] = [
       'interface:',
-      `  display_name: "Doctor Duck: ${c.short}"`,
+      `  display_name: "Ducktor: ${c.short}"`,
       `  short_description: "${c.title}"`,
       'policy:',
       '  allow_implicit_invocation: false',

@@ -7,35 +7,35 @@
 ## Claude Code
 
 ```
-/plugin marketplace add JoeyWu-tech/Doctor-Duck
-/plugin install duck@doctor-duck
+/plugin marketplace add JoeyWu-tech/Ducktor
+/plugin install duck@ducktor
 ```
 
 命令行里也可以：
 
 ```
-claude plugin marketplace add JoeyWu-tech/Doctor-Duck
-claude plugin install duck@doctor-duck
+claude plugin marketplace add JoeyWu-tech/Ducktor
+claude plugin install duck@ducktor
 ```
 
 装好后开一个新会话，敲 `/duck` 看菜单。
 
-- **更新**：`claude plugin marketplace update doctor-duck`，再 `claude plugin update duck@doctor-duck`，然后开新会话。
-- **卸载**：`claude plugin uninstall duck@doctor-duck`。项目里的 `.duck/` 文件夹不会被删，是你自己的东西。
+- **更新**：`claude plugin marketplace update ducktor`，再 `claude plugin update duck@ducktor`，然后开新会话。
+- **卸载**：`claude plugin uninstall duck@ducktor`。项目里的 `.duck/` 文件夹不会被删，是你自己的东西。
 - **本地试改过的版本**：`claude --plugin-dir <本仓库路径>`，就地加载，不复制。
 
 ## Codex
 
 ```
-codex plugin marketplace add JoeyWu-tech/Doctor-Duck
-codex plugin add duck@doctor-duck
+codex plugin marketplace add JoeyWu-tech/Ducktor
+codex plugin add duck@ducktor
 ```
 
-然后开 Codex，在 `/hooks` 里信任 Doctor Duck 的两条 hook（第二条是给 Claude Code 放行读文件用的，在 Codex 里不会触发），敲 `$duck:duck` 看菜单。
+然后开 Codex，在 `/hooks` 里信任 Ducktor 的两条 hook（第二条是给 Claude Code 放行读文件用的，在 Codex 里不会触发），敲 `$duck:duck` 看菜单。
 
-- **更新**：`codex plugin marketplace upgrade doctor-duck`，再 `codex plugin add duck@doctor-duck`；hook 有改动时要重新信任。
-- **卸载**：`codex plugin remove duck@doctor-duck`，`codex plugin marketplace remove doctor-duck`。
-- **本地试改过的版本**：`codex plugin marketplace add <本仓库路径>`，再 `codex plugin add duck@doctor-duck`。Codex 会把整个目录拷进缓存，改了要重新 add。
+- **更新**：`codex plugin marketplace upgrade ducktor`，再 `codex plugin add duck@ducktor`；hook 有改动时要重新信任。
+- **卸载**：`codex plugin remove duck@ducktor`，`codex plugin marketplace remove ducktor`。
+- **本地试改过的版本**：`codex plugin marketplace add <本仓库路径>`，再 `codex plugin add duck@ducktor`。Codex 会把整个目录拷进缓存，改了要重新 add。
 
 ## 其他 agent
 
@@ -43,8 +43,19 @@ Cursor、Gemini CLI、Qwen Code 有适配文件，但还没在本机实测过；
 
 ## 装好了，怎么确认
 
-1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。它先说一句最省事的用法，再列出 13 条命令，说 Doctor Duck 在这个项目里还没开启。
+1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。它先说一句最省事的用法，再列出 13 条命令，说 Ducktor 在这个项目里还没开启。
 2. 在一个项目里敲 `/duck on`，项目里会出现 `.duck/config.md`，开关那一行是 on。从这一轮起它平时也跟着。删掉那一行就回到默认：平时不出声，敲命令时照常讲。`/duck off` 更彻底，连命令收尾的「为什么」也不给。
+
+## 以前装的是 Doctor Duck
+
+Ducktor 以前叫 Doctor Duck，marketplace 名字是 `doctor-duck`。改名以后要先删掉旧的，再照上面重新装：
+
+```
+claude plugin uninstall duck@doctor-duck
+claude plugin marketplace remove doctor-duck
+```
+
+Codex 里是 `codex plugin remove duck@doctor-duck` 和 `codex plugin marketplace remove doctor-duck`。项目里的 `.duck/` 不用动：开关、笔记本和决策记录照常能读。
 
 ## 常见问题
 

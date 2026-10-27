@@ -1,4 +1,4 @@
-# Doctor Duck 是怎么运行的
+# Ducktor 是怎么运行的
 
 这一篇讲现在的实现，给想改插件、或者想把它接到别的 agent 上的人看。设计过程和讨论在 `docs/design/`，两边说法不一致时以这一篇为准。
 
@@ -32,7 +32,7 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 开会话时，宿主跑 `hooks/claude-codex-hooks.json` 里的 SessionStart hook，它调 `bin/duck.js session-start`，往上下文里放：
 
 1. 插件根目录的绝对路径。每台机器、每次升级路径都不一样，所以每次都告诉 AI。
-2. 按开关放一段规则。Doctor Duck 要在项目里开启才主动：开关是 on 或 quiet，放常驻规则（项目里有学生改过的 `.duck/skills/core.md` 就用它，否则用插件的 `rules/core.md`）；开关是 off，放 `rules/off.md` 那一小段；没开启，放 `rules/idle.md` 那一小段，说平时照常干活，只有学生敲命令时才照命令做。
+2. 按开关放一段规则。Ducktor 要在项目里开启才主动：开关是 on 或 quiet，放常驻规则（项目里有学生改过的 `.duck/skills/core.md` 就用它，否则用插件的 `rules/core.md`）；开关是 off，放 `rules/off.md` 那一小段；没开启，放 `rules/idle.md` 那一小段，说平时照常干活，只有学生敲命令时才照命令做。
 3. 项目 `.duck/config.md` 的内容（最多 1,200 字），以及从中读出的开关。没有这个文件就不放。
 
 没开启的项目注入约 1,500 字符：`rules/idle.md` 那一小段，加上常驻规则里「东西在哪」一节（插件文件在哪、在 Claude Code 里用 Read 读、原技能名和命令的对照、`.duck/` 里不用破折号），命令要用这些。开关是 off 时同样带上这一节。开启了约 3,000 字符（10-19 实测：`开关：on` 一行的 config.md 时 3,012 字符，加上 config.md 的上限 1,200 字也在 4,300 以内）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
