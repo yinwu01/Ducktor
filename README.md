@@ -26,7 +26,7 @@
 
 <p align="center">
   <strong>贡献怎么定、话说多满、跟谁比，AI 替你定了。</strong><br>
-  <strong>Doctor Duck 把这些判断拆开，一条一条讲给你。</strong><br>
+  <strong>Ducktor 把这些判断拆开，一条一条讲给你。</strong><br>
   <strong>讲到的原则，记进你的笔记本。</strong><br>
   <sub>用在 Claude Code 和 Codex 里。道理标明出处，找不到出处，Ducktor 就直说是它自己的判断。</sub>
 </p>
@@ -39,7 +39,7 @@
 
 你认识它：程序员桌上那只黄色的橡皮鸭。程序出了 bug，你把代码一行一行讲给它听，讲着讲着，自己就找到了 bug。
 
-现在 AI 替你做研究，轮不到你讲了。Doctor Duck 反过来：Ducktor 把 AI 做过的判断讲给你听。
+现在 AI 替你做研究，轮不到你讲了。Doctor Duck 反过来：导师 Ducktor 把 AI 做过的判断讲给你听。
 
 ## 之前 / 之后
 
@@ -132,7 +132,7 @@ codex plugin add duck@doctor-duck
 
 **其他 AI 工具：**把仓库放到本机。把 [`AGENTS.md`](AGENTS.md) 复制到你的项目里。告诉 AI 仓库放在哪。这样有常驻规则，没有斜杠命令；要用某条命令，就说「照 Doctor Duck 的 /duck-review 做」。Cursor、Gemini CLI、Qwen Code 有适配文件，还没有实测：**[docs/agent-portability.md](docs/agent-portability.md)**。
 
-就这些。在 Claude Code 里，到项目最外层的文件夹开一个新会话，敲 `/duck`；Codex 里敲 `$duck:duck`。它先说一句最省事的用法，再列出菜单。
+就这些。在 Claude Code 里，到项目最外层的文件夹开一个新会话，敲 `/duck`；Codex 里敲 `$duck:duck`。Ducktor 先说一句最省事的用法，再列出菜单。
 
 想让 Ducktor 平时也跟着，在项目里敲一次 `/duck on`。开关记在这个项目的 `.duck/config.md` 里，别的项目不受影响。在 `paper/` 这样的子文件夹里开会话，Doctor Duck 读不到开关。
 
@@ -183,7 +183,7 @@ codex plugin add duck@doctor-duck
 不给你打分。`/duck-idea` 给 idea 打分，`/duck-review` 给稿子打分，评的是东西，不是你。
 
 **为什么叫 Doctor Duck？**
-你认识它。
+开头那只橡皮鸭，现在读完博士了。
 
 ## 来源和致谢
 

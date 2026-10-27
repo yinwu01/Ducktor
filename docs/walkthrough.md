@@ -7,7 +7,7 @@ README 首页只留了最短的一段对比，这一页是完整的一轮。下�
 ```
 你：/duck-review paper/main.tex
 
-Ducktor：## 审稿结果：`paper/main.tex`
+AI：## 审稿结果：`paper/main.tex`
   ### Summary
   - CRITICAL：3
   - MAJOR：9
@@ -34,7 +34,7 @@ Ducktor：## 审稿结果：`paper/main.tex`
 ```
 你：帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。
 
-Ducktor：我改了 `paper/main.tex` 摘要的第一句:
+AI：我改了 `paper/main.tex` 摘要的第一句:
   Long-context inference is slow because attention cost grows quadratically with length.
   我只去掉了 "sequence"。上下文已经说明 length 指序列长度,删掉不影响意思。
   摘要第三句 "significantly outperforms" 没有给出显著性检验。表里 BlockSkip 比 dense 高 0.8 分,而且只跑了一次。要整段摘要按 Supervisor-Skills 的规范过一遍,可以用 `/duck-polish`。……

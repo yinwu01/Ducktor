@@ -41,21 +41,21 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
 | idle | 新项目、单独一个会话，不敲命令，让 AI 把摘要最后一句改紧凑 | 注入的是没开启那一段，没有常驻规则；没建 `.duck/`；回复里没有决策行 |
-| menu | 新会话里 `/duck`，后面各步接着这个会话 | 列出命令；说鸭子在这个项目还没开启；没有因此开启；hook 注入了插件根目录 |
-| enable | `/duck on` | config 里开关是 on；这一轮就读了常驻规则。后面几步每步都恢复会话，hook 会重新注入规则，所以中途开启以后规则能不能一直管住，这套流程测不到 |
+| menu | 新会话里 `/duck`，后面各步接着这个会话 | 列出命令；说 Doctor Duck 在这个项目还没开启；没有因此开启；hook 注入了插件根目录；（should）回复里没有 quack，也没有「鸭子」 |
+| enable | `/duck on` | config 里开关是 on；（should）回复里没有 quack，也没有「鸭子」；这一轮就读了常驻规则。后面几步每步都恢复会话，hook 会重新注入规则，所以中途开启以后规则能不能一直管住，这套流程测不到 |
 | idea | `/duck-idea` 加一段 idea 描述 | 读了 `library/idea-evaluator`；写了报告；笔记本多一行 |
 | review | `/duck-review paper/main.tex` | 读了 `library/pre-submission-reviewer`；写了报告；指出只跑了一次 |
 | propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish`；（should）只改一句，笔记本不多一行 |
 | why | `/duck-why` | 一个引用块，有整行加粗的一句和「下次」一句，没有「用的思路：」这类旧标签；点名的名家都在 cards/MENTORS.md 或卡片里；说明「回到这次」是重建，不是 AI 内部过程的回放；写了报告 |
 | quiet | `/duck quiet` | config 里开关是 quiet |
 | polish-quiet | `/duck-polish` 润色摘要 | 读了 `library/paper-polish`；照样写了报告；对话里没有「为什么」 |
-| quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有鸭子的话；（should）笔记本多了一行，带「这次」 |
+| quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有 Ducktor 的话；（should）笔记本多了一行，带「这次」 |
 | card-draft、card-ok | `/duck-skill card new …`，再说「可以，写吧」 | 写了 `.duck/cards/G01.md`，INDEX 里有 G01 |
 | learn-ask、learn | `/duck-learn`，再答它的一个问题 | 开头只问那一个问题；写了复盘报告 |
 | off | `/duck off` | config 里开关是 off |
 | off-new-session | 新会话里 `/duck-polish` | 注入的是 off 那一段；没有新报告；笔记本没动 |
 
-第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启鸭子，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
+第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启 Doctor Duck，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
@@ -71,7 +71,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 
 每条包装命令还有几条 should：回复里有「为什么」；列出了卡片提醒，带插件自带卡的卡号；intro 和 write 没改 `paper/main.tex`；write 指出方法描述和代码对不上；notes-delete 先给学生看再删。
 
-第三套流程 `loop` 开始前，测试先写好开着鸭子的 `.duck/config.md`（`开关：on`），再往项目的笔记本里写两条「前几周」的条目（10-09 写摘要：只跑了一次的结果不写 significantly，卡 W11；10-12 写引言：挑战段写问题本身为什么难，卡 W09），再走：
+第三套流程 `loop` 开始前，测试先写好开着 Doctor Duck 的 `.duck/config.md`（`开关：on`），再往项目的笔记本里写两条「前几周」的条目（10-09 写摘要：只跑了一次的结果不写 significantly，卡 W11；10-12 写引言：挑战段写问题本身为什么难，卡 W09），再走：
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
@@ -82,7 +82,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | mute | 「多 seed 和方差这类我懂了，以后别讲了」 | config 的「按类静音」里记了这一类 |
 | mute-check | 又一个单次结果，让它记进 notes.md | should：记了；不再讲种子和波动 |
 
-`paper` 流程不用虚构项目，把 `DUCK_E2E_PAPER` 指向的一篇论文的 LaTeX 源码拷进空项目的 `paper/`，走 `/duck-review`、`/duck-why`、`/duck-learn`。这个项目也不开启鸭子，第一步查注入的是没开启那一段。论文源码不进仓库。
+`paper` 流程不用虚构项目，把 `DUCK_E2E_PAPER` 指向的一篇论文的 LaTeX 源码拷进空项目的 `paper/`，走 `/duck-review`、`/duck-why`、`/duck-learn`。这个项目也不开启 Doctor Duck，第一步查注入的是没开启那一段。论文源码不进仓库。
 
 hook 注入的内容，Claude Code 从 stream-json 的 hook 事件里读；Codex 的 `--json` 输出不带它，从会话记录 `~/.codex/sessions/…/rollout-*.jsonl` 里读。
 

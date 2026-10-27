@@ -26,7 +26,7 @@
 
 <p align="center">
   <strong>The AI decides your claims, your wording, and your baselines.</strong><br>
-  <strong>Doctor Duck explains these decisions to you, one at a time.</strong><br>
+  <strong>Ducktor explains these decisions to you, one at a time.</strong><br>
   <strong>It records the principles in your notebook.</strong><br>
   <sub>For Claude Code and Codex. Ducktor gives a source for each principle. If it finds no source, it tells you that the principle is its own judgment.</sub>
 </p>
@@ -40,7 +40,7 @@
 
 You know it: the yellow rubber duck on the desk of a programmer. When your program has a bug, you explain the code to the duck, line by line. While you explain, you find the bug yourself.
 
-Now the AI does your research, so you do not explain anything. Doctor Duck turns this around: Ducktor explains the decisions of the AI to you.
+Now the AI does your research, so you do not explain anything. Doctor Duck turns this around: Ducktor, a mentor, explains the decisions of the AI to you.
 
 ## Before / after
 
@@ -85,7 +85,7 @@ If Ducktor cannot find a source, it tells you that the principle is its own judg
 
 Doctor Duck does not replace your AI. It is a set of rules and commands. Your AI reads them and speaks as Ducktor.
 
-After you install the plugin, Ducktor works only when you type a `/duck-*` command. When you type `/duck on` in a project, Ducktor stays on in that project:
+After you install the plugin, Ducktor works only when you type a `/duck-*` command. When you type `/duck on` in a project, Doctor Duck stays on in that project:
 
 - When the AI completes a step of real work, Ducktor adds a short explanation at the end of the reply. Real work is, for example, a new method, a changed experiment, or a new paragraph.
 - If a decision changes the method, the AI asks you before it acts. It asks a maximum of three questions at one time.
@@ -133,7 +133,7 @@ Then open `/hooks` in Codex. Trust the two Doctor Duck hooks. Start a new sessio
 
 **Other agents:** put the repository on your computer. Copy [`AGENTS.md`](../AGENTS.md) into your project. Tell the AI where the repository is. You get the always-on rules, but no slash commands. To use a command, say "Follow the Doctor Duck /duck-review command." Cursor, Gemini CLI, and Qwen Code have adapter files, but we did not test them: **[docs/agent-portability.md](../docs/agent-portability.md)** (in Chinese).
 
-That is all. In Claude Code, open a new session in the top folder of the project and type `/duck`. In Codex, type `$duck:duck`. It tells you the easiest way to use it. Then it shows the menu.
+That is all. In Claude Code, open a new session in the top folder of the project and type `/duck`. In Codex, type `$duck:duck`. Ducktor first tells you the easiest way to use the commands. Then it shows the menu.
 
 To keep Doctor Duck on in a project, type `/duck on` one time in that project. The file `.duck/config.md` in the project records the mode. Other projects do not change. If you start the session in a subfolder such as `paper/`, Doctor Duck cannot read the mode.
 
@@ -184,7 +184,7 @@ The hook script of the plugin only reads files. It does not connect to the netwo
 It does not score you. `/duck-idea` scores an idea, and `/duck-review` scores a paper. They score the work, not you.
 
 **Why "Doctor Duck"?**
-You know it.
+It is the rubber duck from the start of this page. Now it is a doctor.
 
 ## Sources and thanks
 
