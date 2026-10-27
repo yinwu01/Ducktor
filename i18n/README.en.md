@@ -1,7 +1,14 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/logo-dark.png">
+    <img src="../assets/logo.png" width="220" alt="Doctor Duck: a pixel rubber duck with a graduation cap, on top of a terminal that shows /duck">
+  </picture>
+</p>
+
 <h1 align="center">Doctor Duck</h1>
 
 <p align="center">
-  <em>The AI does the work. The duck asks you first. You know the reason.</em>
+  <em>The AI does the research. The duck explains why. You keep the principles.</em>
 </p>
 
 <p align="center">
@@ -14,57 +21,95 @@
 </p>
 
 <p align="center">
+  <img src="../assets/demo.gif" width="880" alt="An illustration, not a screen recording. Two terminals get the same task: “The experiments are done. Results are in results/. Write a NeurIPS paper.” On the left, there is no duck. The AI reads the results, writes paper/main.tex, and says that it is done. It adds that the ablations ran once, so it made no claim on gaps of 0.1 to 0.3. You get a paper. On the right, Doctor Duck is installed, but it is not turned on in this project. After the same work, you type /duck and see the menu. Then you type “/duck Can you tell me what to learn here?” The duck uses /duck-learn (look back) for this. It asks which step you decided, and you skip the question. Then it tells you the goal, the result, and what a top advisor would check. How it was written: the AI chose the 3 claims; write 1 to 3 claims before the paper (card W01). How to write it well: the AI drew no conclusion on gaps of 0.1 to 0.3; match your words to your evidence (card W11). How to convince a reviewer: on EN-DE, base beats MoE by only 1.3 BLEU; a gap must be larger than seed variation (card E05). The duck was not on, so there is no decision log. From the paper, the AI decided the claims, the wording, and the baselines. The duck saves the 3 principles to .duck/notebook.md.">
+</p>
+
+<p align="center">
+  <strong>The AI decides your claims, your wording, and your baselines.</strong><br>
+  <strong>Doctor Duck explains these decisions to you, one at a time.</strong><br>
+  <strong>It records the principles in your notebook.</strong><br>
+  <sub>For Claude Code and Codex. The duck gives a source for each principle. If it finds no source, it tells you that the principle is its own judgment.</sub>
+</p>
+
+<p align="center">
   <sub><a href="../README.md">简体中文</a> &middot; English</sub><br>
-  <sub>This file is a translation of the Chinese README. If the two files are different, the Chinese file is correct. The rules, the commands, and the experience cards are in Chinese. Some lines in this file are Chinese sentences that you say to the AI. We tested only these Chinese sentences.</sub>
+  <sub>This file is a translation of the Chinese README. If the two files are different, the Chinese file is correct. The rules, the commands, and the experience cards are in Chinese, and we tested the duck only in Chinese. Some lines in this file are Chinese sentences that you say to the AI, with a translation.</sub>
 </p>
 
 ---
 
-You know it: the yellow rubber duck on the desk of a programmer. When your program has a bug, you explain the code to the duck, line by line. The duck says nothing. You find the bug yourself.
+You know it: the yellow rubber duck on the desk of a programmer. When your program has a bug, you explain the code to the duck, line by line. While you explain, you find the bug yourself.
 
-Doctor Duck puts it inside your AI agent. This one talks.
+Now the AI does your research, so you do not explain anything. Doctor Duck turns this around: the duck explains the decisions of the AI to you.
 
 ## Before / after
 
-You tell the AI to add a new result to the table and to write "better" in the abstract. The new method is only a little better than the baseline. When the duck is not on, the AI changes the table and writes "scores higher" in the abstract. After the change, it tells you that the difference is small. When the duck is on, the duck asks you questions before the AI acts: How many runs gave each number? How do you want to write the abstract? The paper does not change.
+<p align="center">
+  <img src="../assets/before-after.png" width="880" alt="An illustration, not a screen recording. The same request: “The experiments are done. Results are in results/. Write a NeurIPS paper.” With no duck, the AI reads the results and writes paper/main.tex. It says that the ablations ran once, so it made no claim on gaps of 0.1 to 0.3. You get a paper. With Doctor Duck, you use three commands. After each command, the duck explains one decision, gives one principle, and tells you what to do first next time. /duck-outline: each claim must change the paper if you cut it (card W08). /duck-write: the AI cited only papers that it found and checked; no AI-made citations (card W13). /duck-review: on EN-DE, big beats base by 1.1 BLEU, but it has over 3 times the parameters and 3 times the training steps; split a big gain into its sources (card R02). Each principle goes into .duck/notebook.md.">
+</p>
 
-The setup and the full chats of this comparison are in [evals/before-after/](../evals/before-after/) (in Chinese).
+You give your experiment results to the AI and tell it to write a paper. With no duck, the AI writes the full paper at once. The AI makes the decisions: what the claims are, how strong the words are, and what to compare with. At the end, it can mention some of them. But it does not turn them into principles, it gives no sources, and it records nothing.
 
-## Ask first, then act
+With the duck commands, you do the same work in steps. `/duck-outline` makes the logic clear. `/duck-write` writes the body. `/duck-review` reviews the paper with the standard of a reviewer. After each command, the duck explains the key decision of the step. It gives you one principle that you can use again. It also tells you what you can do first next time.
 
-`/duck on` turns on the duck in a project. Then you use the AI as usual. If a decision changes the method, the duck asks you first. It asks a maximum of three questions at one time. When the AI selects a method, changes an experiment, or writes a paragraph, the duck adds a short explanation at the end of the reply. If there is a choice between options, the duck also writes one decision line.
+## Ask the duck
 
-## Ask why
+You can also ask after the AI completes the work. Type `/duck` and your question on one line, for example `/duck 可不可以告诉我这个内容里我要学什么？` ("Can you tell me what to learn here?"). First, the duck tells you which command it uses. Then it follows that command. In the animation above, it uses the command that looks back at your work, `/duck-learn`.
 
-`/duck-why` explains the last step of the AI. It finds the decision in that step that you can learn the most from. It tells you what a new researcher usually does, how an experienced researcher thinks, and which well-known researcher wrote about it. You can also give it a file, a git commit, or a paragraph.
+`/duck-why` explains the last step of the AI. It finds the one decision in that step that you can learn the most from. It tells you what people usually do, how an experienced researcher thinks, and which well-known researcher wrote about it. When it gives a number or a change, it tells you which file to check. Then it gives one principle in bold, and one "next time" sentence: what you can do first next time. You can also give it a file, a git commit, or a paragraph.
 
-## Lessons
+## Look back
 
-`/duck-learn` finds the lessons in a stage of work after you complete it. First, it asks you two questions: Which step did you decide yourself? Which step do you want to do again? You can skip the questions. Then it reads the decisions, the reports, and the notes from this stage. It tells you what you planned, what happened, and what an experienced advisor checks. It also tells you which decisions you gave to the AI. Then it gives the next step. If you answered, it uses your answers for the next step.
+`/duck-learn` looks back at a stage of work after you complete it. First, it asks you one question: which step did you decide yourself, and which step do you want to do again? You can skip it. Then it reads the decisions, the reports, and the notes from this stage. It tells you what you planned, what happened, and what a top advisor checks. It also lists the decisions that you gave to the AI. Then it gives the next step. If you answered, it uses your answer for the next step.
 
 ## Notebook and decision record
 
-When the duck is on, it records the principle from each step in `.duck/notebook.md`. It records each decision between options on one line in `.duck/decisions.md`. Each line shows who made the decision: you or the AI. When the duck is not on, only the commands record. When you use a command for similar work later, the duck reads the notebook first. If an old line applies, the duck tells you. If you say 「这类我懂了」 ("I understand this type now"), the duck records that type of principle, but it does not explain it again. If you do not want the explanations in the chat, type `/duck quiet`. The duck continues to record. `/duck on` starts the explanations again.
+The principles that the duck records go into `.duck/notebook.md`, one on each line. It records each decision between options on one line in `.duck/decisions.md`. Each line shows who made the decision: you or the AI. When you use a command for similar work later, the duck reads the notebook first. If an old line applies, the duck tells you. If you say 「这类我懂了」 ("I understand this type now"), the duck records that type of principle, but it does not explain it again.
 
-These records are plain Markdown files in your project. You can commit them to git with your paper. When your advisor asks about the reason for a decision, you can find the answer. The hook script of the plugin only reads files. It does not connect to the network and does not write files. The AI still sends what it reads to the model. `/duck-survey` makes the AI search the web.
+When the duck records: after you turn on the duck in a project (`/duck on`, or `/duck quiet`, which records but does not explain in the chat), each command records one principle. During normal work, a step of real work can also give a principle, and the duck records it. It does not record the same principle two times. If the duck is not on, only the commands record. After `/duck off`, the duck records nothing, and `/duck-why` and `/duck-learn` explain only in the chat.
+
+These records are plain Markdown files in your project. You can commit them to git with your paper. When your advisor asks about the reason for a decision, you can find the answer.
+
+## Where the principles come from
+
+When the duck names a researcher or a source, it uses only these places:
+
+- The [experience cards](../cards/INDEX.md) (in Chinese). The plugin has 23 cards. Each card gives one principle, when to use it, how to use it, and its sources. For example, card W11: match the strength of your words to the strength of your evidence.
+- The [index of essays](../cards/MENTORS.md) (in Chinese). Hamming, Schulman, Karpathy, and other researchers wrote essays about research. For each essay, the index gives the main points in our own words and a link to the original.
+- The [research handbook](../handbook/), from [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills).
+- The cards of your research group. Add them with `/duck-skill`. If your cards and the cards of the plugin do not agree, the duck uses your cards.
+
+If the duck cannot find a source, it tells you that the principle is its own judgment.
 
 ## How it works
 
-When the duck is on, it checks three items before the AI puts an experiment result into a table or a conclusion. If it finds a problem, it stops and asks you:
+Doctor Duck does not replace your AI. It is a set of rules and commands. Your AI reads them and speaks as the duck.
+
+After you install the plugin, the duck works only when you type a `/duck-*` command. When you type `/duck on` in a project, the duck stays on in that project:
+
+- When the AI completes a step of real work, the duck adds a short explanation at the end of the reply. Real work is, for example, a new method, a changed experiment, or a new paragraph.
+- If a decision changes the method, the AI asks you before it acts. It asks a maximum of three questions at one time.
+- If there is a choice between options, the duck writes one decision line. The line shows who decided: you or the AI.
+
+`/duck quiet` also asks first and records, but it does not explain in the chat.
+
+When the duck is on, before the AI puts an experiment result into a table or a conclusion, the duck checks three items. If it finds a problem, it stops and asks you:
 
 1. Did the experiment run only one time? Is the difference larger than the variation between seeds?
 2. If the improvement is large, did you separate its sources, for example with an ablation?
 3. Is the conclusion stronger than the evidence?
 
-When you type a `/duck-*` command, the duck does not check these items. The AI follows the steps of the command. In commands such as `/duck-survey` and `/duck-review`, the AI does the work with the research skills of [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills). HKUSTDial made these 10 skills open source. They go from the literature review and the idea evaluation to the paper review before submission.
+When you type a `/duck-*` command, the AI follows the steps of the command, and these checks do not stop it. At the end, the command reminds you of the related experience cards.
 
-The duck does not give you exercises or a score.
+We compared the two cases: the AI gets the request to add a new result to the table and to write "better" in the abstract, with the duck on and with the duck not turned on. For the setup and the full chats, see [evals/before-after/](../evals/before-after/) (in Chinese).
 
-When the duck names a researcher or a source, it uses only four sources. These are the 23 experience cards, the cards of your research group, the [index of essays](../cards/MENTORS.md) by well-known researchers, and the research handbook. If it cannot find a source, it tells you that the principle is its own judgment.
+In commands such as `/duck-survey` and `/duck-review`, the AI does the work with the research skills of [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills). HKUSTDial made these 10 skills open source. They go from the literature review and the idea evaluation to the paper review before submission.
+
+The duck does not give you exercises, and it does not give you a score.
 
 ## The rules
 
-Doctor Duck is a set of rules and commands. Your AI reads them and speaks as the duck. In a project where the duck is on, each session loads the always-on rules at the start: [`rules/core.md`](../rules/core.md). [`AGENTS.md`](../AGENTS.md) is the version for agents that read only a rules file. The 14 commands are in [`skills/`](../skills/). The 10 research skills are in [`library/`](../library/), with no changes. The experience cards and the index of essays are in [`cards/`](../cards/). The research handbook is in [`handbook/`](../handbook/). The other files install these items into different agents, or they are tests and documents.
+In a project where the duck is on, each session loads the always-on rules at the start: [`rules/core.md`](../rules/core.md). [`AGENTS.md`](../AGENTS.md) is the version for agents that read only a rules file. The 14 commands are in [`skills/`](../skills/). The 10 research skills are in [`library/`](../library/), with no changes. The experience cards and the index of essays are in [`cards/`](../cards/). The research handbook is in [`handbook/`](../handbook/). The other files install these items into different agents, or they are tests and documents.
 
 ## Install
 
@@ -88,9 +133,9 @@ Then open `/hooks` in Codex. Trust the two Doctor Duck hooks. Start a new sessio
 
 **Other agents:** put the repository on your computer. Copy [`AGENTS.md`](../AGENTS.md) into your project. Tell the AI where the repository is. You get the always-on rules, but no slash commands. To use a command, say "Follow the Doctor Duck /duck-review command." Cursor, Gemini CLI, and Qwen Code have adapter files, but we did not test them: **[docs/agent-portability.md](../docs/agent-portability.md)** (in Chinese).
 
-That is all. Open a new session in the top folder of the project. Type `/duck`. In Codex, type `$duck:duck`. The duck says "quack" and shows the menu.
+That is all. In Claude Code, open a new session in the top folder of the project and type `/duck`. In Codex, type `$duck:duck`. The duck says "quack" and shows the menu.
 
-After you install the plugin, the duck is silent. It works only when you type a `/duck-*` command. To turn on the duck in a project, type `/duck on` one time in that project. Then, in that project, the duck asks you before the AI acts. The file `.duck/config.md` in the project records the mode. Other projects do not change. If you start the session in a subfolder such as `paper/`, the duck cannot read the mode.
+To keep the duck on in a project, type `/duck on` one time in that project. The file `.duck/config.md` in the project records the mode. Other projects do not change. If you start the session in a subfolder such as `paper/`, the duck cannot read the mode.
 
 We tested the full workflow only with a local copy. From GitHub, we tested only that it installs. For updates, removal, and common problems, see [INSTALL.md](../INSTALL.md) (in Chinese).
 
@@ -109,7 +154,7 @@ We tested the full workflow only with a local copy. From GitHub, we tested only 
 | `/duck-polish` | Improve the language. |
 | `/duck-review` | Before submission, review your own paper with the standard of a reviewer. |
 | `/duck-why` | Explain the last step. You can also give it a file, a git commit, or a paragraph. |
-| `/duck-learn` | Find the lessons in a stage of work after you complete it. |
+| `/duck-learn` | Look back at a stage of work after you complete it. |
 | `/duck-notes` | Read and change the notebook. |
 | `/duck-skill` | Turn commands off or on. Change a command or the rules for this project only. The plugin does not change. Add the experience cards of your research group. |
 
@@ -129,8 +174,14 @@ The AI changes your paper only when you tell it to. When the duck is on, the duc
 **What if I want the AI to make the change without questions?**
 Say 「这次不用问我，你直接定。」 ("Do not ask me this time. You decide."). Then the AI does not ask first. It still writes a decision line, and the line shows that the AI decided.
 
+**Can the duck be wrong?**
+Yes. What the duck says about this session comes from the code and the records. It is not a replay of what happened inside the AI. Check numbers and changes in the files yourself. `/duck-why` tells you which file to check.
+
+**Does it send my files anywhere?**
+The hook script of the plugin only reads files. It does not connect to the network and does not write files. The AI still sends what it reads to the model. Commands such as `/duck-survey`, `/duck-idea`, and `/duck-review` can make the AI search the web.
+
 **Does it give me a score?**
-No. Only two commands give scores. `/duck-idea` scores an idea, and `/duck-review` scores a paper.
+It does not score you. `/duck-idea` scores an idea, and `/duck-review` scores a paper. They score the work, not you.
 
 **Why "duck"?**
 You know it.
@@ -139,8 +190,9 @@ You know it.
 
 - The name comes from [rubber duck debugging](https://en.wikipedia.org/wiki/Rubber_duck_debugging), from the book *The Pragmatic Programmer*.
 - The method, the handbook, and the 10 research skills come from [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills). Copyright (c) 2026 Yuyu Luo (methodology) and contributors. The commit history of this repository starts from upstream commit c243997 (2026-07-01). It keeps all upstream commits and authors until that date. The content of `library/` and `handbook/` comes from upstream commit aff5de9 (2026-07-16).
+- The paper numbers in the two README images come from Tables 2 and 3 of *Attention Is All You Need* ([arXiv 1706.03762](https://arxiv.org/abs/1706.03762)).
 - The structure and style of this README follow [ponytail](https://github.com/DietrichGebert/ponytail) (MIT). The support for many agents also follows ponytail and [superpowers](https://github.com/obra/superpowers).
 
 ## License
 
-The license depends on the directory. Our text (`skills/`, `rules/`, `cards/`) and `handbook/` use CC BY-NC-SA 4.0, with no commercial use. The code (`bin/`, `hooks/`, `scripts/`, `tests/`) uses MIT. The research skills in `library/` keep their original licenses: 6 use CC BY 4.0, and 4 use CC BY-NC-SA 4.0. See [LICENSE](../LICENSE) and [LICENSES/README.md](../LICENSES/README.md).
+The license depends on the directory. Our text (`skills/`, `rules/`, `cards/`), `handbook/`, and the README images (`assets/`) use CC BY-NC-SA 4.0, with no commercial use. The code (`bin/`, `hooks/`, `scripts/`, `tests/`) uses MIT. The research skills in `library/` keep their original licenses: 6 use CC BY 4.0, and 4 use CC BY-NC-SA 4.0. See [LICENSE](../LICENSE) and [LICENSES/README.md](../LICENSES/README.md).
