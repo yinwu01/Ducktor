@@ -64,7 +64,7 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 
 ## 读插件自己的文件
 
-Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep，调 `bin/duck.js allow-read`。目标路径（解开符号链接以后）在插件根目录下才回答 allow，别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，照宿主原来的规矩走（交互时弹窗问，`-p` 模式下拒绝），所以常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
+Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep、Write、Edit、MultiEdit，调 `bin/duck.js allow`。读：目标路径（解开符号链接以后）在插件根目录下才回答 allow。写：只放行项目 `.duck/` 下 Ducktor 自己记的几样，`notebook.md`、`decisions.md`、`background.md` 和 `reports/` 下的 `.md`；`.duck/`、`reports/` 或文件本身是符号链接的不放行；`config.md`、`skills/`、`cards/` 下一次会话会当设定和规则读进来，照常问学生。2026-10-27 的学生旅程测试里，AI 用 shell 往笔记本追加被权限拦下，记录就丢了，所以加了写这一半。别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，照宿主原来的规矩走（交互时弹窗问，`-p` 模式下拒绝），所以常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
 
 这条 hook 只跳过「要不要允许」的询问；据 Claude Code 的权限文档，用户自己设的 deny、ask 规则照样生效。用户开了 `blockReadsOutsideWorkingDirectories` 时它还管不管用，文档没写，我们也没测。
 

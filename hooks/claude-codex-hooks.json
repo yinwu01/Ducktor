@@ -15,11 +15,11 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Read|Glob|Grep",
+        "matcher": "Read|Glob|Grep|Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(r)require(require('path').join(r,'bin','duck.js')).main('allow-read')\"",
+            "command": "node -e \"const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(r)require(require('path').join(r,'bin','duck.js')).main('allow')\"",
             "timeout": 5
           }
         ]

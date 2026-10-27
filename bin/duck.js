@@ -4,8 +4,10 @@
 //   session-start  tell the AI where the plugin lives and pass along the project's
 //                  .duck/config.md; load the resident rules only when the project has
 //                  turned the duck on (开关：on or quiet), otherwise a short idle note
-//   allow-read     let Claude Code read the plugin's own files (library/, cards/,
-//                  handbook/ ...) without a permission prompt; nothing outside the root
+//   allow          PreToolUse in Claude Code: let it read the plugin's own files (library/,
+//                  cards/, handbook/ ...) and write the records Ducktor keeps in the project's
+//                  .duck/ (notebook, decisions, background, reports) without a permission
+//                  prompt; anything else gets no answer, so the host asks as usual
 // Rule text stays in rules/ (or the student's copy in .duck/skills/), never in this file.
 'use strict';
 
@@ -20,8 +22,9 @@ const MODES = {
   on: 'on', quiet: 'quiet', off: 'off',
   开: 'on', 打开: 'on', 开启: 'on', 启用: 'on', 静音: 'quiet', 安静: 'quiet', 关: 'off', 关闭: 'off', 关掉: 'off',
 };
-// A switch line looks like "开关：quiet". Leading list marks, quotes, headings and bold are allowed.
-const SWITCH_LINE = /^[\s>#*-]*\**开关\**\s*[:：=]\s*(.*)$/gm;
+// A switch line looks like "开关：quiet", or "Switch: quiet" in a config written in English.
+// Leading list marks, quotes, headings and bold are allowed.
+const SWITCH_LINE = /^[\s>#*-]*\**(?:开关|switch)\**\s*[:：=]\s*(.*)$/gim;
 
 function readText(file) {
   try {
@@ -70,14 +73,22 @@ function coreRules(project) {
   return readText(path.join(ROOT, 'rules', 'core.md')) || '（没读到 rules/core.md，常驻规则这次缺席。）';
 }
 
-// The 「东西在哪」 section of the plugin's rules/core.md: where files live, how to read them,
-// the skill-name table. Commands need it even when the resident rules are not loaded.
+// The 「东西在哪」 and 「每次都照做」 sections of the plugin's rules/core.md: where files live,
+// how to read and write them, the skill-name table, and the few rules that hold in every mode
+// (the student's language, checking facts, pushback). Commands need them even when the
+// resident rules are not loaded.
+const BASIC_SECTIONS = ['## 东西在哪\n', '## 每次都照做\n'];
+
 function basics() {
   const core = readText(path.join(ROOT, 'rules', 'core.md')) || '';
-  const start = core.indexOf('## 东西在哪\n');
-  if (start < 0) return '';
-  const end = core.indexOf('\n## ', start + 1);
-  return core.slice(start, end < 0 ? undefined : end).trim();
+  const parts = [];
+  for (const heading of BASIC_SECTIONS) {
+    const start = core.indexOf(heading);
+    if (start < 0) continue;
+    const end = core.indexOf('\n## ', start + 1);
+    parts.push(core.slice(start, end < 0 ? undefined : end).trim());
+  }
+  return parts.join('\n\n');
 }
 
 function buildContext(project) {
@@ -141,8 +152,7 @@ function globBase(pattern) {
   return fixed.join(path.sep) || path.sep;
 }
 
-function allowRead() {
-  const input = readInput();
+function allowRead(input) {
   const toolInput = input.tool_input || {};
   let target = toolInput.file_path || toolInput.path;
   // Glob and Grep can also reach files through a pattern (Glob's pattern, Grep's glob
@@ -166,9 +176,51 @@ function allowRead() {
   }));
 }
 
+// PreToolUse for Write and Edit. Says allow only for the records Ducktor keeps in the
+// project's .duck/: notebook.md, decisions.md, background.md and reports/*.md. A denied
+// prompt there loses the record. Files the next session loads as settings or rules
+// (config.md, skills/, cards/) still get the host's usual prompt, so changing them stays
+// the student's call. A symlinked .duck/, reports/ or record file is not followed.
+const RECORDS = /^(?:(?:notebook|decisions|background)\.md|reports\/[^/]+\.md)$/;
+
+function isRealDir(p) {
+  try {
+    return fs.lstatSync(p).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
+function allowRecord(input) {
+  const file = (input.tool_input || {}).file_path;
+  const project = input.cwd || process.env.CLAUDE_PROJECT_DIR;
+  if (typeof file !== 'string' || !file || typeof project !== 'string' || !project) return;
+  const duck = path.join(path.resolve(project), '.duck');
+  const target = path.resolve(project, file);
+  const rel = path.relative(duck, target).split(path.sep).join('/');
+  if (!RECORDS.test(rel) || !isRealDir(duck)) return;
+  const reports = path.join(duck, 'reports');
+  if (rel.startsWith('reports/') && fs.existsSync(reports) && !isRealDir(reports)) return;
+  try {
+    if (fs.lstatSync(target).isSymbolicLink()) return;
+  } catch (err) { /* a new file */ }
+  fs.writeSync(1, JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'allow',
+      permissionDecisionReason: 'Ducktor writes its own record in .duck/',
+    },
+  }));
+}
+
 function main(command) {
-  if (command === 'allow-read') {
-    try { allowRead(); } catch (err) { /* stay silent: the host asks as usual */ }
+  // allow-read is the name the hooks file used before writes were added.
+  if (command === 'allow' || command === 'allow-read') {
+    try {
+      const input = readInput();
+      if (['Write', 'Edit', 'MultiEdit'].includes(input.tool_name)) allowRecord(input);
+      else allowRead(input);
+    } catch (err) { /* stay silent: the host asks as usual */ }
     return;
   }
   let context = '';

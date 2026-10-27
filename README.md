@@ -67,7 +67,7 @@ Ducktor 记下的原则，每条一行，在 `.duck/notebook.md` 里。有取舍
 
 什么时候记：在项目里打开 Ducktor 以后（`/duck on`，或者只记不讲的 `/duck quiet`），命令做完记一条；平时做完一步实质性的工作，能提炼出一条原则也记，意思重复的不记。没打开时，只有敲命令才记。`/duck off` 以后什么都不记，`/duck-why`、`/duck-learn` 只在对话里讲。
 
-这些记录都是项目里的普通 markdown 文件，可以和论文一起提交进 git。组会上导师问「这个为什么这么定」，你翻得出来。
+这些记录都是项目里的普通 markdown 文件，可以和论文一起提交进 git。组会上导师问「这个为什么这么定」，你翻得出来。不想提交，把 `.duck/` 写进 `.git/info/exclude`。
 
 ## 道理从哪来
 
@@ -86,7 +86,7 @@ Ducktor 不换掉你的 AI。它是一组规则和命令，你的 AI 照着它�
 
 刚装好时，Ducktor 不出声，只在你敲 `/duck-*` 命令时干活。在一个项目里敲 `/duck on`，它就在这个项目里一直跟着：
 
-- AI 做完一步实质性的工作，比如定了方法、改了实验、写完一段，Ducktor 在回复末尾讲一句为什么。
+- AI 做完一步实质性的工作，比如定了方法、改了实验、写完一段，Ducktor 在回复末尾用一两行讲为什么。
 - 会改变做法的决定，AI 动手之前先问你，一次最多问三件。
 - 有取舍时，Ducktor 记一行决策，写明是你定的还是 AI 定的。
 
@@ -112,7 +112,7 @@ Ducktor 不出题，也不给你这个人打分。
 
 ## 安装
 
-需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限。以前装过 Doctor Duck（Ducktor 的旧名字），先照 [INSTALL.md](INSTALL.md) 里「以前装的是 Doctor Duck」一节卸掉旧的，再往下装。
+需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限：`gh repo view JoeyWu-tech/Ducktor` 能打开，就是有了。以前装过 Doctor Duck（Ducktor 的旧名字），先照 [INSTALL.md](INSTALL.md) 里「以前装的是 Doctor Duck」一节卸掉旧的，再往下装。
 
 **Claude Code**，在终端里：
 
@@ -132,7 +132,7 @@ codex plugin add duck@ducktor
 
 **其他 AI 工具：**把仓库放到本机。把 [`AGENTS.md`](AGENTS.md) 复制到你的项目里。告诉 AI 仓库放在哪。这样有常驻规则，没有斜杠命令；要用某条命令，就说「照 Ducktor 的 /duck-review 做」。Cursor、Gemini CLI、Qwen Code 有适配文件，还没有实测：**[docs/agent-portability.md](docs/agent-portability.md)**。
 
-就这些。在 Claude Code 里，到项目最外层的文件夹开一个新会话，敲 `/duck`；Codex 里敲 `$duck:duck`。Ducktor 先说一句最省事的用法，再列出菜单。
+就这些。在 Claude Code 里，到项目最外层的文件夹（新建的空文件夹也行）开一个新会话，敲 `/duck`；Codex 里敲 `$duck:duck`。Ducktor 先说一句最省事的用法，再列出菜单。
 
 想让 Ducktor 平时也跟着，在项目里敲一次 `/duck on`。开关记在这个项目的 `.duck/config.md` 里，别的项目不受影响。在 `paper/` 这样的子文件夹里开会话，Ducktor 读不到开关。
 
@@ -174,10 +174,10 @@ codex plugin add duck@ducktor
 说一句「这次不用问我，你直接定。」AI 就不先问了。它照样记一行决策，写明是 AI 定的。
 
 **Ducktor 讲的会错吗？**
-会。讲这次过程的那几句，是 AI 根据代码和记录重建的，不是 AI 内部过程的回放。数字和改动，自己对一遍原文件；用 `/duck-why` 时，它会说去哪个文件核对。
+会。它说你稿子里的数字、别人的论文做了什么，都可能说错：引用的论文，点开看一眼标题和摘要；数字和改动，自己对一遍原文件。用 `/duck-why` 时，它会说去哪个文件核对。讲「这次怎么做的」那几句，是照文件和对话记录推出来的，AI 当时是不是这么想的，没法确认。
 
 **会把我的东西发出去吗？**
-插件的开场脚本只读文件，不联网，也不写文件。AI 读到的内容照常发给模型。`/duck-survey`、`/duck-idea`、`/duck-review` 这类命令会让 AI 上网查文献。
+插件的 hook 脚本只读文件，不联网，也不写文件。在 Claude Code 里，它替你放行两类操作，不弹窗：读插件自己的文件；写 `.duck/` 里的笔记本、决策记录和报告。改开关和规则（`config.md`、`skills/`、`cards/`）照常问你。AI 读到的内容照常发给模型。`/duck-survey`、`/duck-idea`、`/duck-review` 这类命令会让 AI 上网查文献。
 
 **它给我打分吗？**
 不给你打分。`/duck-idea` 给 idea 打分，`/duck-review` 给稿子打分，评的是东西，不是你。

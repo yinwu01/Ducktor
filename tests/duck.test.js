@@ -39,6 +39,7 @@ test('modeOf reads the switch line in the forms students write', () => {
     ['开关：quiet', 'quiet'], ['开关: off', 'off'], ['- 开关：OFF', 'off'], ['> 开关：quiet', 'quiet'],
     ['**开关**：off', 'off'], ['## 开关：off', 'off'], ['开关 = off', 'off'], ['开关：quiet（这周先静音）', 'quiet'],
     ['开关：关', 'off'], ['开关：关闭', 'off'], ['开关：静音', 'quiet'], ['开关：开', 'on'], ['开关：开启', 'on'],
+    ['Switch: quiet', 'quiet'], ['switch: off', 'off'], ['- **Switch**: on', 'on'],
     ['﻿开关：quiet\r\n', 'quiet'], ['开关：on、quiet、off 三选一\n开关：off', 'off'],
     ['', 'unset'], ['# Ducktor 设定\n\n## 按类静音\n', 'unset'],
   ];
@@ -67,10 +68,15 @@ test('not turned on and off: commands still get the basics from core.md', () => 
   for (const config of [null, '开关：off\n']) {
     const text = duck.buildContext(project(config ? { '.duck/config.md': config } : {}));
     assert.match(text, /## 东西在哪/);
-    assert.match(text, /用 Read 读，不要用 cat/);
+    assert.match(text, /用 Read、Glob、Grep 读，不用 cat/);
     assert.match(text, /upstream\.lock\.json/);
     assert.match(text, /deep-research → \/duck-survey/);
     assert.match(text, /不用破折号/);
+    // The rules that hold in every mode come along: language, checking facts, pushback.
+    assert.match(text, /## 每次都照做/);
+    assert.match(text, /用学生的语言/);
+    assert.match(text, /先回原文核对/);
+    assert.match(text, /只有学生给了新事实/);
     assert.doesNotMatch(text, /## 平时这样做/);
   }
 });
@@ -126,7 +132,7 @@ test('a long config is cut and a non-UTF-8 config is flagged', () => {
 test('the injected text stays well under host limits', () => {
   // Claude Code caps additionalContext at 10,000 characters; Codex moves long context to a file.
   const text = duck.buildContext(project({ '.duck/config.md': `开关：on\n${'x'.repeat(5000)}` }));
-  assert.ok(text.length < 5000, `${text.length} characters`);
+  assert.ok(text.length < 6000, `${text.length} characters`);
 });
 
 test('SessionStart hook: Claude Code environment', () => {
@@ -204,6 +210,42 @@ test('PreToolUse hook allows reads inside the plugin root only', () => {
   } finally {
     fs.rmSync(link, { force: true });
   }
+});
+
+test('PreToolUse hook lets Claude Code write the records in .duck/, nothing else', () => {
+  const dir = project({ '.duck/config.md': '开关：on\n', '.duck/notebook.md': '' });
+  const allow = (tool, file, cwd = dir) => {
+    const run = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: ROOT }, JSON.stringify({ tool_name: tool, cwd, tool_input: { file_path: file } }));
+    return run.stdout ? JSON.parse(run.stdout).hookSpecificOutput.permissionDecision : null;
+  };
+  const duck = path.join(dir, '.duck');
+  assert.equal(allow('Edit', path.join(duck, 'notebook.md')), 'allow');
+  assert.equal(allow('Write', path.join(duck, 'decisions.md')), 'allow');
+  assert.equal(allow('Write', path.join(duck, 'background.md')), 'allow');
+  assert.equal(allow('Write', path.join(duck, 'reports', '2026-10-27-review.md')), 'allow');
+  assert.equal(allow('MultiEdit', '.duck/notebook.md'), 'allow');
+  // Settings and rules the next session loads stay the student's call.
+  assert.equal(allow('Edit', path.join(duck, 'config.md')), null);
+  assert.equal(allow('Write', path.join(duck, 'skills', 'core.md')), null);
+  assert.equal(allow('Write', path.join(duck, 'cards', 'G01.md')), null);
+  assert.equal(allow('Write', path.join(duck, 'reports', 'deep', 'x.md')), null);
+  assert.equal(allow('Write', path.join(duck, 'reports', '..', '..', 'paper.tex')), null);
+  assert.equal(allow('Write', path.join(dir, 'notebook.md')), null);
+  assert.equal(allow('Write', path.join(duck, 'notebook.md'), null), null);
+  // No .duck/ yet: the first write asks as usual.
+  const fresh = project({ 'README.md': 'x' });
+  assert.equal(allow('Write', path.join(fresh, '.duck', 'notebook.md'), fresh), null);
+  // Symlinks are not followed: a linked .duck/, reports/ or record file.
+  const outside = project({ 'notes.md': 'x', 'r/a.md': 'x' });
+  const linked = project({ 'README.md': 'x' });
+  fs.symlinkSync(outside, path.join(linked, '.duck'));
+  assert.equal(allow('Write', path.join(linked, '.duck', 'notebook.md'), linked), null);
+  const linkedReports = project({ '.duck/notebook.md': '' });
+  fs.symlinkSync(path.join(outside, 'r'), path.join(linkedReports, '.duck', 'reports'));
+  assert.equal(allow('Write', path.join(linkedReports, '.duck', 'reports', 'a.md'), linkedReports), null);
+  const linkedFile = project({ '.duck/config.md': '开关：on\n' });
+  fs.symlinkSync(path.join(outside, 'notes.md'), path.join(linkedFile, '.duck', 'decisions.md'));
+  assert.equal(allow('Edit', path.join(linkedFile, '.duck', 'decisions.md'), linkedFile), null);
 });
 
 test('PreToolUse hook stays silent on bad input', () => {

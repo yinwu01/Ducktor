@@ -64,11 +64,11 @@ You can also ask after the AI completes the work. Type `/duck` and your question
 
 ## Notebook and decision record
 
-The principles that Ducktor records go into `.duck/notebook.md`, one on each line. It records each decision between options on one line in `.duck/decisions.md`. Each line shows who made the decision: you or the AI. When you use a command for similar work later, Ducktor reads the notebook first. If an old line applies, Ducktor tells you. If you say 「这类我懂了」 ("I understand this type now"), Ducktor records that type of principle, but it does not explain it again.
+The principles that Ducktor records go into `.duck/notebook.md`, one on each line. It records each decision between options on one line in `.duck/decisions.md`. Each line shows who made the decision: you or the AI. When you use a command for similar work later, Ducktor reads the notebook first. If an old line applies, Ducktor tells you. If you say "I understand this type now" (or 「这类我懂了」), Ducktor records that type of principle, but it does not explain it again.
 
 When Ducktor records: after you turn it on in a project (`/duck on`, or `/duck quiet`, which records but does not explain in the chat), each command records one principle. During normal work, a step of real work can also give a principle, and Ducktor records it. It does not record the same principle two times. If Ducktor is not on, only the commands record. After `/duck off`, Ducktor records nothing, and `/duck-why` and `/duck-learn` explain only in the chat.
 
-These records are plain Markdown files in your project. You can commit them to git with your paper. When your advisor asks about the reason for a decision, you can find the answer.
+These records are plain Markdown files in your project. You can commit them to git with your paper. When your advisor asks about the reason for a decision, you can find the answer. If you do not want to commit them, add `.duck/` to `.git/info/exclude`.
 
 ## Where the principles come from
 
@@ -113,7 +113,7 @@ In a project where Ducktor is on, each session loads the always-on rules at the 
 
 ## Install
 
-You must have Node.js 18 or a later version. At this time, the repository is private. Your GitHub account must have access to it. If you installed Doctor Duck (the old name of Ducktor), remove it first. The steps are in the section 「以前装的是 Doctor Duck」 of [INSTALL.md](../INSTALL.md) (in Chinese).
+You must have Node.js 18 or a later version. At this time, the repository is private. Your GitHub account must have access to it. If `gh repo view JoeyWu-tech/Ducktor` opens the repository, you have access. If you installed Doctor Duck (the old name of Ducktor), remove it first. The steps are in the section "If you installed Doctor Duck" of [INSTALL.en.md](INSTALL.en.md).
 
 **Claude Code**, in a terminal:
 
@@ -129,15 +129,17 @@ codex plugin marketplace add JoeyWu-tech/Ducktor
 codex plugin add duck@ducktor
 ```
 
-Then open `/hooks` in Codex. Trust the two Ducktor hooks. Start a new session.
+Then open `/hooks` in Codex. Trust the two Ducktor hooks. The first hook loads the rules when a session starts. The second hook is for Claude Code only, and it does not run in Codex. Start a new session.
 
 **Other agents:** put the repository on your computer. Copy [`AGENTS.md`](../AGENTS.md) into your project. Tell the AI where the repository is. You get the always-on rules, but no slash commands. To use a command, say "Follow the Ducktor /duck-review command." Cursor, Gemini CLI, and Qwen Code have adapter files, but we did not test them: **[docs/agent-portability.md](../docs/agent-portability.md)** (in Chinese).
 
-That is all. In Claude Code, open a new session in the top folder of the project and type `/duck`. In Codex, type `$duck:duck`. Ducktor first tells you the easiest way to use the commands. Then it shows the menu.
+That is all. In Claude Code, open a new session in the top folder of the project (a new empty folder is also correct) and type `/duck`. In Codex, type `$duck:duck`. Ducktor first tells you the easiest way to use the commands. Then it shows the menu.
+
+Ducktor speaks the language that you write in. If you type only `/duck` at the start of a session, it shows the menu in Chinese and adds one line in English. Write to it in English, and it answers in English. In a project where you write in English, the settings file `.duck/config.md` also uses English labels.
 
 To keep Ducktor on in a project, type `/duck on` one time in that project. The file `.duck/config.md` in the project records the mode. Other projects do not change. If you start the session in a subfolder such as `paper/`, Ducktor cannot read the mode.
 
-We tested the full workflow only with a local copy. From GitHub, we tested only that it installs. For updates, removal, and common problems, see [INSTALL.md](../INSTALL.md) (in Chinese).
+We tested the full workflow only with a local copy. From GitHub, we tested only that it installs. For updates, removal, and common problems, see [INSTALL.en.md](INSTALL.en.md).
 
 ## Commands
 
@@ -172,13 +174,13 @@ No. It asks only about decisions that change the method, and a maximum of three 
 The AI changes your paper only when you tell it to. When Ducktor is on, it checks the evidence before a result goes into the paper. If the evidence is not sufficient, it asks you first.
 
 **What if I want the AI to make the change without questions?**
-Say 「这次不用问我，你直接定。」 ("Do not ask me this time. You decide."). Then the AI does not ask first. It still writes a decision line, and the line shows that the AI decided.
+Say "Do not ask me this time. You decide." (or 「这次不用问我，你直接定。」). Then the AI does not ask first. It still writes a decision line, and the line shows that the AI decided.
 
 **Can Ducktor be wrong?**
-Yes. What Ducktor says about this session comes from the code and the records. It is not a replay of what happened inside the AI. Check numbers and changes in the files yourself. `/duck-why` tells you which file to check.
+Yes. It can be wrong about the numbers in your paper and about what other papers did. When it cites a paper, open it and read the title and the abstract. Check numbers and changes in the files yourself. `/duck-why` tells you which file to check. What Ducktor says about how this session went comes from the files and the chat. We cannot know if the AI really thought that way at the time.
 
 **Does it send my files anywhere?**
-The hook script of the plugin only reads files. It does not connect to the network and does not write files. The AI still sends what it reads to the model. Commands such as `/duck-survey`, `/duck-idea`, and `/duck-review` can make the AI search the web.
+The hook script of the plugin only reads files. It does not connect to the network and does not write files. In Claude Code, it lets two types of action go through without a prompt: the AI reads the files of the plugin, and the AI writes the notebook, the decision log, and the reports in `.duck/`. A change to the mode or the rules (`config.md`, `skills/`, `cards/`) still asks you. The AI still sends what it reads to the model. Commands such as `/duck-survey`, `/duck-idea`, and `/duck-review` can make the AI search the web.
 
 **Does it give me a score?**
 It does not score you. `/duck-idea` scores an idea, and `/duck-review` scores a paper. They score the work, not you.
