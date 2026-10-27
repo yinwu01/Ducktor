@@ -191,7 +191,7 @@ hook 注入的内容，Claude Code 从 stream-json 的 hook 事件里读；Codex
 | 13 | 测试脚本把「最小测试」里的「小测」当成出题 | 改了匹配 |
 
 还没测到的：
-- 从 GitHub 安装：两边都在隔离的配置目录里装成功，但流程是用本地加载跑的。
+- 从 GitHub 安装：两边都在隔离的配置目录里装成功，但流程是用本地加载跑的。2026-10-27 改名以后，用新名字（`JoeyWu-tech/Ducktor`、`duck@ducktor`）在空的配置目录里又装了一次，两边装上的都是 7cbba66。
 - 交互模式：全部是 `claude -p` 和 `codex exec`，没有在交互界面里点过权限弹窗。`/duck-survey` 那一步替学生放行了联网检索（Claude Code 放行 WebSearch、WebFetch，Codex 加 `--search`）；检索出来的引用没有逐条人工核对，Claude Code 的 arXiv 工具在 `-p` 下也没有授权。
 - 每条命令只跑了一两次，模型每次走得不完全一样，上面改掉的问题都是这样一次次跑出来的。
 - Cursor、Gemini CLI、Qwen Code 和只读 `AGENTS.md` 的 agent。
