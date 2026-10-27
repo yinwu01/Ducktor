@@ -61,7 +61,7 @@ test('no config: only the idle note, no resident rules', () => {
   assert.ok(text.startsWith(`Ducktor 插件根目录：${ROOT}`));
   assert.doesNotMatch(text, /# Ducktor 常驻规则/);
   assert.match(text, /没在这个项目开启/);
-  // idle note + 东西在哪 + 每次都照做 (2,622 on 2026-10-27); every project with the plugin pays this.
+  // idle note + 东西在哪 + 每次都照做 (2,675 on 2026-10-27); every project with the plugin pays this.
   assert.ok(text.length < 2800, `${text.length} characters`);
 });
 
@@ -75,6 +75,7 @@ test('not turned on and off: commands still get the basics from core.md', () => 
     assert.match(text, /不用破折号/);
     // The rules that hold in every mode come along: language, checking facts, pushback.
     assert.match(text, /## 每次都照做/);
+    assert.match(text, /## 每次都照做\n（Ducktor 没开启或是 off：下面几条在学生敲 \/duck-xxx 时照做/);
     assert.match(text, /用学生的语言/);
     assert.match(text, /先回原文核对/);
     assert.match(text, /只有学生给了新事实/);
@@ -124,6 +125,12 @@ test("the student's copy of the rules wins over the plugin's", () => {
   assert.match(text, /学生的副本里没有这一节/);
   const withSection = duck.buildContext(project({ '.duck/config.md': '开关：on\n', '.duck/skills/core.md': '# 改过的\n\n## 每次都照做\n- 我们自己的一条\n' }));
   assert.equal(withSection.match(/## 每次都照做/g).length, 1);
+  // Saved on Windows (CRLF), or with the heading as the last line: still found once.
+  for (const copy of ['# 改过的\r\n\r\n## 每次都照做\r\n- 我们自己的一条\r\n', '# 改过的\n\n## 每次都照做']) {
+    const text = duck.buildContext(project({ '.duck/config.md': '开关：on\r\n', '.duck/skills/core.md': copy }));
+    assert.equal(text.match(/## 每次都照做/g).length, 1, JSON.stringify(copy));
+    assert.doesNotMatch(text, /学生的副本里没有这一节/);
+  }
 });
 
 test('a long config is cut and a non-UTF-8 config is flagged', () => {
@@ -148,6 +155,12 @@ test('SessionStart hook: Claude Code environment', () => {
   const out = JSON.parse(run.stdout).hookSpecificOutput;
   assert.equal(out.hookEventName, 'SessionStart');
   assert.match(out.additionalContext, /开关：quiet）/);
+});
+
+test('SessionStart hook: after `cd paper` the project root still decides', () => {
+  const dir = project({ '.duck/config.md': '开关：on\n', 'paper/main.tex': 'x' });
+  const run = runHook('SessionStart', { CLAUDE_PLUGIN_ROOT: ROOT, CLAUDE_PROJECT_DIR: dir }, JSON.stringify({ cwd: path.join(dir, 'paper'), source: 'compact' }));
+  assert.match(JSON.parse(run.stdout).hookSpecificOutput.additionalContext, /# Ducktor 常驻规则/);
 });
 
 test('SessionStart hook: Codex sets only PLUGIN_ROOT', () => {
@@ -258,6 +271,14 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   assert.equal(allow('Edit', 'notebook.md', { old_string: '- 10-26 旧的一条\n', new_string: '' }), null);
   assert.equal(allow('MultiEdit', 'notebook.md', { edits: [ADD, { old_string: '旧', new_string: '新' }] }), null);
   assert.equal(allow('Edit', 'notebook.md', { old_string: '', new_string: 'x' }), null);
+  // Text added inside an old line, or before every line, changes what the line says.
+  assert.equal(allow('Edit', 'decisions.md', { old_string: '决策：A', new_string: '决策：A 被否决，改用 C' }), null);
+  assert.equal(allow('Edit', 'decisions.md', { old_string: '\n', new_string: '\n（作废）', replace_all: true }), null);
+  assert.equal(allow('Edit', 'decisions.md', { old_string: '- 2026', new_string: '- 2026' }), 'allow');
+  // A file with bytes that are not UTF-8 cannot be rewritten through a lossy string.
+  const bad = project({ '.duck/notebook.md': '' });
+  fs.writeFileSync(path.join(bad, '.duck', 'notebook.md'), Buffer.from([0x2d, 0x20, 0xff, 0x0a]));
+  assert.equal(allowWrite('Write', path.join(bad, '.duck', 'notebook.md'), bad, { content: '- \ufffd\n- 新的\n' }), null);
   // Reports may be corrected after a conclusion is overturned.
   assert.equal(allow('Edit', 'reports/r.md', { old_string: '# 旧报告', new_string: '# 改过的报告' }), 'allow');
   // An empty log may be written whole.

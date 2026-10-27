@@ -35,7 +35,7 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 2. 按开关放一段规则。Ducktor 要在项目里开启才主动：开关是 on 或 quiet，放常驻规则（项目里有学生改过的 `.duck/skills/core.md` 就用它，否则用插件的 `rules/core.md`）；开关是 off，放 `rules/off.md` 那一小段；没开启，放 `rules/idle.md` 那一小段，说平时照常干活，只有学生敲命令时才照命令做。
 3. 项目 `.duck/config.md` 的内容（最多 1,200 字），以及从中读出的开关。没有这个文件就不放。
 
-没开启的项目注入约 2,600 字符：`rules/idle.md` 那一小段，加上常驻规则里「东西在哪」「每次都照做」两节（插件文件在哪、在 Claude Code 里用 Read 读、原技能名和命令的对照、`.duck/` 里不用破折号；用学生的语言、核对原文、被反驳时怎么办、`.duck/` 用编辑工具写），命令要用这些；「每次都照做」在没开启和 off 时只管命令，平时干活照宿主自己的规矩。开关是 off 时同样带上这两节。开启了约 5,200 字符（10-27 实测：`开关：on` 一行的 config.md 时 5,167 字符，加上 config.md 的上限 1,200 字是 6,385；测试卡在 7,000）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
+没开启的项目注入约 2,700 字符：`rules/idle.md` 那一小段，加上常驻规则里「东西在哪」「每次都照做」两节（插件文件在哪、在 Claude Code 里用 Read 读、原技能名和命令的对照、`.duck/` 里不用破折号；用学生的语言、核对原文、被反驳时怎么办、`.duck/` 用编辑工具写），命令要用这些；「每次都照做」在没开启和 off 时只管命令，平时干活照宿主自己的规矩。开关是 off 时同样带上这两节。开启了约 5,200 字符（10-27 实测：`开关：on` 一行的 config.md 时 5,211 字符，加上 config.md 的上限 1,200 字是 6,429；测试卡在 7,000）。Claude Code 对 hook 注入的上限是 10,000 字符，超过的部分会被写进会话目录下的文件，上下文里只留前 2,000 字符的预览和文件路径。会话恢复、清空、压缩、分叉时 hook 会重跑。
 
 `bin/duck.js` 只读文件、拼文字，规则的原文都在 `rules/` 下，不写进代码。这样代码可以用 MIT，文字用 CC BY-NC-SA，两者不混（见 `LICENSES/README.md`）。
 
@@ -64,7 +64,7 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 
 ## 读插件自己的文件
 
-Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep、Write、Edit、MultiEdit，调 `bin/duck.js allow`。读：目标路径（解开符号链接以后）在插件根目录下才回答 allow。写：只放行项目 `.duck/` 下 Ducktor 自己记的几样，`notebook.md`、`decisions.md` 和 `reports/` 下的 `.md`。项目按 `CLAUDE_PROJECT_DIR` 认（没有才用 hook 输入里的 cwd），AI `cd paper` 以后照样放行；路径都解开符号链接再比。笔记本和决策记录是学生拿去组会用的日志，只放行追加：新建或空文件、新内容以原内容开头的 Write、新文字以旧文字开头的 Edit；改旧行、删行照常问。`.duck/`、`reports/` 或文件本身是符号链接或硬链接的不放行；`config.md`、`skills/`、`cards/` 下一次会话会当设定和规则读进来，照常问学生。2026-10-27 的学生旅程测试里，AI 用 shell 往笔记本追加被权限拦下，记录就丢了，所以加了写这一半。别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，照宿主原来的规矩走（交互时弹窗问，`-p` 模式下拒绝），所以常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
+Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep、Write、Edit、MultiEdit，调 `bin/duck.js allow`。读：目标路径（解开符号链接以后）在插件根目录下才回答 allow。写：只放行项目 `.duck/` 下 Ducktor 自己记的几样，`notebook.md`、`decisions.md` 和 `reports/` 下的 `.md`。项目按 `CLAUDE_PROJECT_DIR` 认（没有才用 hook 输入里的 cwd），AI `cd paper` 以后照样放行；路径都解开符号链接再比。笔记本和决策记录是学生拿去组会用的日志，只放行追加：新建或空文件；Write 或 Edit 照宿主的做法套到原文件上以后，原文件一字节不差地留在开头。改旧行、删行、往旧行中间插字、replace_all 照常问。`.duck/`、`reports/` 或文件本身是符号链接或硬链接的不放行；`config.md`、`skills/`、`cards/` 下一次会话会当设定和规则读进来，照常问学生。2026-10-27 的学生旅程测试里，AI 用 shell 往笔记本追加被权限拦下，记录就丢了，所以加了写这一半。别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，照宿主原来的规矩走（交互时弹窗问，`-p` 模式下拒绝），所以常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
 
 这条 hook 只跳过「要不要允许」的询问；据 Claude Code 的权限文档，用户自己设的 deny、ask 规则照样生效。用户开了 `blockReadsOutsideWorkingDirectories` 时它还管不管用，文档没写，我们也没测。
 
