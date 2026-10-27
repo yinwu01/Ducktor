@@ -303,7 +303,7 @@ function mainStages() {
       ['must', 'hook injected the idle note, not the resident rules', (t) => IDLE_ONLY(t)],
       ['must', 'no .duck/ folder', () => !fs.existsSync(path.join(PROJECT, '.duck'))],
       ['must', 'no decision line', (t) => !/▸ ?决策/.test(t.reply)],
-      ['should', 'does not bring up the duck', (t) => !/duck-|Doctor Duck|鸭子/i.test(t.reply)],
+      ['should', 'does not bring up the duck', (t) => !/duck-|Doctor Duck|Ducktor|鸭子/i.test(t.reply)],
       ['should', 'paper/main.tex untouched', () => projectFile('paper/main.tex') === fixture('paper/main.tex')],
     ] },
     { name: 'menu', resume: false, prompt: cmd('duck'), checks: [
@@ -370,7 +370,7 @@ function mainStages() {
     ] },
     { name: 'off-new-session', resume: false, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的结论一节`,
       before: () => ({ reports: allReports().length, notebook: text('notebook.md') }), checks: [
-        ['must', 'hook injected the off note', (t) => /鸭子现在是 off/.test(t.injected)],
+        ['must', 'hook injected the off note', (t) => /Doctor Duck 现在是 off/.test(t.injected)],
         ['must', 'no new report', (t, before) => allReports().length === before.reports],
         ['must', 'notebook untouched', (t, before) => text('notebook.md') === before.notebook],
       ] },

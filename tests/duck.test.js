@@ -98,7 +98,7 @@ test('quiet: rules load and the config is passed through', () => {
 test('off: the off note replaces the rules', () => {
   const text = duck.buildContext(project({ '.duck/config.md': '开关：off\n' }));
   assert.doesNotMatch(text, /# Doctor Duck 常驻规则/);
-  assert.match(text, /鸭子现在是 off/);
+  assert.match(text, /Doctor Duck 现在是 off/);
 });
 
 test('an unknown switch value is reported to the AI and does not turn the duck on', () => {
@@ -165,7 +165,7 @@ test('Cursor gets additional_context only', () => {
   });
   const out = JSON.parse(run.stdout);
   assert.deepEqual(Object.keys(out), ['additional_context']);
-  assert.match(out.additional_context, /鸭子现在是 off/);
+  assert.match(out.additional_context, /Doctor Duck 现在是 off/);
 });
 
 test('PreToolUse hook allows reads inside the plugin root only', () => {

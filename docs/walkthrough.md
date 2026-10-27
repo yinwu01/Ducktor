@@ -7,7 +7,7 @@ README 首页只留了最短的一段对比，这一页是完整的一轮。下�
 ```
 你：/duck-review paper/main.tex
 
-鸭子：## 审稿结果：`paper/main.tex`
+Ducktor：## 审稿结果：`paper/main.tex`
   ### Summary
   - CRITICAL：3
   - MAJOR：9
@@ -22,7 +22,7 @@ README 首页只留了最短的一段对比，这一页是完整的一轮。下�
   ……
 ```
 
-审稿结果后面，鸭子附了一小段引用，讲这次为什么这么判。讲的是道理，不是「原技能规定这样判」。终端里它也是这样一段引用，和审稿结果分得开：
+审稿结果后面，Ducktor 附了一小段引用，讲这次为什么这么判。讲的是道理，不是「原技能规定这样判」。终端里它也是这样一段引用，和审稿结果分得开：
 
 > 这次把"表里没有现有稀疏注意力方法"定成 CRITICAL，把"0.8 个点没有波动"定成 MAJOR：前者让摘要里的一句话变成假话，后者只是证据弱。同样一句 significantly，要先看有没有东西可比，再看比出来的差距大不大。……
 > **论文里每个强词（significantly、best、general、demonstrates）都要能指到表里一个具体数字，指不到就降级成 suggests 或直接删掉。**
@@ -34,7 +34,7 @@ README 首页只留了最短的一段对比，这一页是完整的一轮。下�
 ```
 你：帮我把 paper/main.tex 摘要的第一句改得更紧凑一点。
 
-鸭子：我改了 `paper/main.tex` 摘要的第一句:
+Ducktor：我改了 `paper/main.tex` 摘要的第一句:
   Long-context inference is slow because attention cost grows quadratically with length.
   我只去掉了 "sequence"。上下文已经说明 length 指序列长度,删掉不影响意思。
   摘要第三句 "significantly outperforms" 没有给出显著性检验。表里 BlockSkip 比 dense 高 0.8 分,而且只跑了一次。要整段摘要按 Supervisor-Skills 的规范过一遍,可以用 `/duck-polish`。……
@@ -57,16 +57,16 @@ README 首页只留了最短的一段对比，这一页是完整的一轮。下�
 
 改一句话本身可讲的不多，它直说了，转而讲顺带看到的那个 significantly：常见的做法是什么，有经验的人怎么想，再配一位名家的看法，并说明「把它用到这个词上，是我的延伸」。名家的名字和看法只从插件里的名家文章索引、卡片和手册里取，找不到对得上的，它直说是自己的判断。提到数字，它会告诉你去哪个文件核；逐条的过程还原写在 `.duck/reports/` 的报告里。
 
-一段做完，敲 `/duck-learn` 复盘。这回鸭子先问你。复盘一共五段，这里节选后面几段：
+一段做完，敲 `/duck-learn` 复盘。这回 Ducktor 先问你。复盘一共五段，这里节选后面几段：
 
 ```
 你：/duck-learn
 
-鸭子：先说一句：这次哪一步是你自己定的，哪一步最想重来？不想说可以跳过。
+Ducktor：先说一句：这次哪一步是你自己定的，哪一步最想重来？不想说可以跳过。
 
 你：补 seed 是我定的。最想重来的是摸方向，搜得太窄了。
 
-鸭子：……
+Ducktor：……
   - 记录里查不到补 seed 的决策行，也没有补跑的结果。如果你在记录之外做过，我这边没有数字可引用。
   ……
   这次交给 AI 的判断：评估走完全程、新颖性标"未核实"；缺同类对手判 CRITICAL；摘要第三句删掉无证据的比较
