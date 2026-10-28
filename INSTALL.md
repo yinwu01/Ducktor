@@ -33,7 +33,7 @@ codex plugin add duck@ducktor
 
 然后开 Codex，在 `/hooks` 里信任 Ducktor 的两条 hook（第一条在开会话时加载规则；第二条是给 Claude Code 放行读插件文件、写笔记用的，在 Codex 里不会触发），敲 `$duck:duck` 看菜单。
 
-- **更新**：`codex plugin marketplace upgrade ducktor`，再 `codex plugin add duck@ducktor`；hook 有改动时要重新信任（2026-10-27 这次更新改了第二条 hook 的命令，要在 `/hooks` 里重新信任）。
+- **更新**：`codex plugin marketplace upgrade ducktor`，再 `codex plugin add duck@ducktor`；hook 有改动时要在 `/hooks` 里重新信任。0.2.0 改了两条 hook 的命令，更新到 0.2.0 以后两条都要重新信任。
 - **卸载**：`codex plugin remove duck@ducktor`，`codex plugin marketplace remove ducktor`。
 - **本地试改过的版本**：`codex plugin marketplace add <本仓库路径>`，再 `codex plugin add duck@ducktor`。Codex 会把整个目录拷进缓存，改了要重新 add。
 
@@ -59,9 +59,11 @@ Codex 里是 `codex plugin remove duck@doctor-duck` 和 `codex plugin marketplac
 
 ## 常见问题
 
+- **`marketplace add` 卡住、超时或者拉取失败**：git 要能连上 GitHub。需要代理的网络里，先给 git 设好代理（`git config --global http.proxy http://地址:端口`，或者设 `HTTPS_PROXY` 环境变量）再装。Claude Code 报 `Git clone timed out` 时，设环境变量 `CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS=300000`（等 5 分钟）再试。Codex 的 `marketplace upgrade` 等 git 的时间固定是 30 秒，网慢时设好代理再跑一次。
 - **每次开会话（Claude Code 里还有每次读写文件）都看到一条 hook 报错**：多半是没装 Node（`node: command not found`）。命令照样能用，只是开启了的项目也没有常驻规则；Claude Code 里读插件文件时还会多弹几次询问。装上 Node 就好。
 - **Claude Code 里命令跑起来一直问能不能读某个 `library/` 文件**：说明放行的 hook 没跑。看看是不是关掉了全部 hook（设置里的 `disableAllHooks`），或者没装 Node。
 - **Codex 里 AI 写不了 `.duck/` 下的文件，或者每条 shell 命令都失败**：看报错里有没有 `bwrap: Unexpected capabilities`。有的话是机器环境的问题，和插件无关：Codex 进程带着 ambient capabilities，有些版本的 bubblewrap（比如 0.6.1）因此不肯启动。用 `setpriv --inh-caps=-all --ambient-caps=-all codex` 启动 Codex。
 - **`/duck-review` 叫不出来，或者叫到了别的东西**：用插件命令的全名 `/duck:duck-review`。
 - **第一次跑 `/duck-survey` 弹了好几次授权**：Claude Code 第一次用 WebSearch、WebFetch 上网查文献时会问你。点允许；选了不再询问，以后就不问了。
 - **Claude Code 里改开关时问能不能改 `.duck/config.md`**：正常。`.duck/` 建好以后，往笔记本、决策记录里追加和写报告由插件放行，不弹窗；改已有的行、改开关和规则文件要你点头。
+- **Windows**：还没在 Windows 上实测过。hook 跑不起来时，命令照样能用，只是开启了的项目也没有常驻规则，Claude Code 里读插件文件会多弹几次询问。

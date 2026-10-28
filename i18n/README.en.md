@@ -167,6 +167,9 @@ The commands need the full plugin, because the nine wrapper commands read the re
 **Do I need a configuration file?**
 No. `/duck on` creates `.duck/config.md` in the project. You can use `/duck-skill` to turn off commands or add cards. You do not have to do this.
 
+**What does it do in a project where it is not on?**
+When a session starts, the hook adds a short note to the context: where the plugin is, and that Ducktor is not on in this project. The AI works as usual. Ducktor explains and records only when you type a `/duck-xxx` command. When Ducktor is on, the hook adds all of the always-on rules, which are longer.
+
 **Does it ask me questions all the time?**
 No. It asks only about decisions that change the method, and a maximum of three at one time. For a small change, such as a typo or one sentence, it does not explain.
 
