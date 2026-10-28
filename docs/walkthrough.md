@@ -1,6 +1,6 @@
 # 看它干活：一轮完整的演示
 
-README 首页只留了最短的一段对比，这一页是完整的一轮。下面是测试时的原话，节选。项目是虚构的（[`tests/fixtures/grad-project`](../tests/fixtures/grad-project)）：一个研究生在做长文本推理加速，手里有实验笔记、一段代码和一份论文草稿，草稿里写着 delve into、game-changer 这种词。跑在 Claude Code 里，模型是 Sonnet 5.5。
+README 首页只留了最短的一段对比，这一页是完整的一轮。下面是 2026-10-20、10-21 两次测试时的原话，节选，用的是当时的规则。之后规则改过（比如提到卡时先说卡名，卡号只放在括号里），现在的回复会和这里有出入。项目是虚构的（[`tests/fixtures/grad-project`](../tests/fixtures/grad-project)）：一个研究生在做长文本推理加速，手里有实验笔记、一段代码和一份论文草稿，草稿里写着 delve into、game-changer 这种词。跑在 Claude Code 里，模型是 Sonnet 5.5。
 
 投稿前先审一遍。草稿拿了 3 分（满分 10），game-changer 也没跑掉：
 
