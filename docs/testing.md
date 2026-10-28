@@ -10,9 +10,10 @@ Node 自带的 `node:test`，不装依赖，几秒跑完。
 - 开关行的各种写法（中文同义词、markdown 修饰、`=`、说明行排在前面），认不出时按没开启处理并提示 AI。
 - 没开启（没有 config.md、没有开关行、值认不出）和三档开关下注入的内容；学生改过的 `.duck/skills/core.md` 优先；过长的 config 被截断，非 UTF-8 的 config 被提示。
 - 注入长度远低于宿主上限。
-- 用 `sh -c` 真跑 hooks 文件里的命令：设了 `CLAUDE_PLUGIN_ROOT`、只设了 `PLUGIN_ROOT`（Codex 两个都设，这条防它以后只设一个）、两个都没有、stdin 是坏的，都退出 0 并给出可读的文字。
+- 用 `sh -c` 真跑 hooks 文件里的命令：设了 `CLAUDE_PLUGIN_ROOT`、只设了 `PLUGIN_ROOT`（Codex 两个都设，这条防它以后只设一个）、两个都没有、指向的文件夹不存在、stdin 是坏的，都退出 0，给出可读的文字或者不出声，不报栈。
 - Cursor 只拿到 `additional_context` 一个字段。
-- 读文件放行的 hook：插件根目录内才放行，根目录外、`..` 跳出、符号链接指出去、输入是坏的，都不放行。
+- 读文件放行的 hook：插件根目录内才放行，根目录外、`..` 跳出、符号链接指出去、输入是坏的，都不放行；Glob、Grep 的模式里只要带 `..`（`{..,x}` 这种花括号写法也算），也不放行。
+- 写记录放行的 hook：`.duck/` 已经在时，只放行往笔记本、决策记录里追加，以及写报告、改报告（推翻了结论要回去改）。改笔记本和决策记录里已有的行、往没有换行的最后一行后面直接接字、改开关和规则文件、写到别处、`.duck/` 下的链接，都不放行；项目按会话开始时的根目录算，`cd paper` 以后也一样。
 
 `tests/structure.test.js` 测仓库本身：
 - 14 条命令，frontmatter 只有 name、description、`disable-model-invocation: true`，每条都有 Codex 的 `agents/openai.yaml`。
