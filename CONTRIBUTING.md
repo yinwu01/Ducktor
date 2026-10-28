@@ -18,7 +18,7 @@
 
 真模型测试要花钱，一次的费用记在 `docs/testing.md` 里。
 
-有些文件是生成的，不直接改：9 条包装命令（`skills/` 下除了 duck、duck-why、duck-learn、duck-notes、duck-skill 以外的那些）的 `SKILL.md` 和 `agents/openai.yaml`，由 `rules/wrapper-template.md` 和 `rules/commands.json` 生成；每条命令开头「先记住的规矩」一节抄自 `rules/core.md`；`AGENTS.md` 由 `rules/agents-header.md` 加上 `rules/core.md` 拼成。改了这些源文件，跑 `npm run build`。生成的文件不是最新的，`npm test` 会报错。
+有些文件是生成的，不直接改：9 条包装命令（`skills/` 下除了 duck、duck-why、duck-learn、duck-notes、duck-skill 以外的那些）的 `SKILL.md` 和 `agents/openai.yaml`，由 `rules/wrapper-template.md` 和 `rules/commands.json` 生成；除了总入口 `/duck`，每条命令开头「先记住的规矩」一节抄自 `rules/core.md`（总入口只列菜单、切开关、挑命令，挑中的命令自己带着这一节）；`AGENTS.md` 由 `rules/agents-header.md` 加上 `rules/core.md` 拼成。改了这些源文件，跑 `npm run build`。生成的文件不是最新的，`npm test` 会报错。
 
 ## 所有改动
 

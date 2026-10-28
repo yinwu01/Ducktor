@@ -4,7 +4,7 @@
 //
 //   skills/<name>/SKILL.md, skills/<name>/agents/openai.yaml
 //       the nine /duck-* wrappers, from rules/wrapper-template.md + rules/commands.json
-//   the 「先记住的规矩」 block in every command
+//   the 「先记住的规矩」 block in every command except the hub (skills/duck)
 //       the 「东西在哪」 and 「每次都照做」 sections of rules/core.md, so a command has them
 //       in a project that has not turned Ducktor on (the hook then injects only a short
 //       note); in the hand-written commands it sits between basics:start and basics:end
@@ -53,7 +53,10 @@ function basics() {
   ].join('\n');
 }
 
-const HAND_WRITTEN = ['duck', 'duck-why', 'duck-learn', 'duck-notes', 'duck-skill'];
+// The hub (skills/duck) gets no copy. It only lists, switches and routes, and the command it
+// picks carries the block. With a copy in it (at the top or at the end), `/duck <sentence>`
+// was mostly answered by the hub itself instead of routed (route A/B, 2026-10-28, docs/testing.md).
+const HAND_WRITTEN = ['duck-why', 'duck-learn', 'duck-notes', 'duck-skill'];
 const SLOT = /(<!-- basics:start -->\n)[\s\S]*?(<!-- basics:end -->)/;
 
 function handWritten(block) {

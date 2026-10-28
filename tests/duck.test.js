@@ -86,6 +86,16 @@ test('not turned on and off: the hook gives no rules, the commands carry the bas
   };
   for (const name of fs.readdirSync(path.join(ROOT, 'skills')).filter((d) => d.startsWith('duck'))) {
     const text = fs.readFileSync(path.join(ROOT, 'skills', name, 'SKILL.md'), 'utf8');
+    if (name === 'duck') {
+      // The hub only lists, switches and routes; the command it picks carries the basics. It
+      // keeps the rules it needs itself: Read for plugin files, Write/Edit for .duck/, the
+      // student's language.
+      assert.ok(!text.includes('<!-- basics:start -->'), 'duck: no basics block');
+      assert.match(text, /用 Read 读，不用 cat/, 'duck: Read for plugin files');
+      assert.match(text, /Write、Edit），不用 echo/, 'duck: Write and Edit for .duck/');
+      assert.match(text, /照学生的语言说/, 'duck: the student\'s language');
+      continue;
+    }
     // Copied whole from core.md, so a command in a project that has not turned Ducktor on
     // still reads plugin files with Read, maps skill names, and follows the every-time rules.
     assert.ok(text.includes(section('东西在哪')), `${name}: 东西在哪`);
