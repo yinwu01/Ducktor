@@ -61,25 +61,31 @@ test('no config: only the idle note, no resident rules', () => {
   assert.ok(text.startsWith(`Ducktor 插件根目录：${ROOT}`));
   assert.doesNotMatch(text, /# Ducktor 常驻规则/);
   assert.match(text, /没在这个项目开启/);
-  // idle note + 东西在哪 + 每次都照做 (2,509 on 2026-10-27); every project with the plugin pays this.
-  assert.ok(text.length < 2800, `${text.length} characters`);
+  // Every session in every project with the plugin pays this: keep it to the short note.
+  // (2,509 characters on 2026-10-27, when the note also carried 东西在哪 and 每次都照做.)
+  assert.ok(text.length < 900, `${text.length} characters`);
 });
 
-test('not turned on and off: commands still get the basics from core.md', () => {
+test('not turned on and off: the hook gives no rules, the commands carry the basics', () => {
   for (const config of [null, '开关：off\n']) {
     const text = duck.buildContext(project(config ? { '.duck/config.md': config } : {}));
-    assert.match(text, /## 东西在哪/);
-    assert.match(text, /用 Read、Glob、Grep 读，不用 cat/);
-    assert.match(text, /upstream\.lock\.json/);
-    assert.match(text, /deep-research → \/duck-survey/);
-    assert.match(text, /不用破折号/);
-    // The rules that hold in every mode come along: language, checking facts, pushback.
-    assert.match(text, /## 每次都照做/);
-    assert.match(text, /## 每次都照做\n（Ducktor 没开启或是 off：下面几条在学生敲 \/duck-xxx 时照做/);
-    assert.match(text, /用学生的语言/);
-    assert.match(text, /先回原文核对/);
-    assert.match(text, /只有学生给了新事实/);
-    assert.doesNotMatch(text, /## 平时这样做/);
+    assert.doesNotMatch(text, /## 东西在哪|## 每次都照做|## 平时这样做/);
+  }
+  const core = fs.readFileSync(path.join(ROOT, 'rules', 'core.md'), 'utf8');
+  const section = (title) => {
+    const at = core.indexOf(`## ${title}\n`);
+    const end = core.indexOf('\n## ', at + 1);
+    return core.slice(at, end < 0 ? undefined : end).trim().replace(/^## /, '### ');
+  };
+  for (const name of fs.readdirSync(path.join(ROOT, 'skills')).filter((d) => d.startsWith('duck'))) {
+    const text = fs.readFileSync(path.join(ROOT, 'skills', name, 'SKILL.md'), 'utf8');
+    // Copied whole from core.md, so a command in a project that has not turned Ducktor on
+    // still reads plugin files with Read, maps skill names, and follows the every-time rules.
+    assert.ok(text.includes(section('东西在哪')), `${name}: 东西在哪`);
+    assert.ok(text.includes(section('每次都照做')), `${name}: 每次都照做`);
+    assert.match(text, /用 Read、Glob、Grep 读，不用 cat/, name);
+    assert.match(text, /deep-research → \/duck-survey/, name);
+    assert.match(text, /用学生的语言/, name);
   }
 });
 

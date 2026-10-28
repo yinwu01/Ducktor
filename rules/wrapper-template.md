@@ -10,6 +10,8 @@ disable-model-invocation: true
 
 插件根目录：开场注入的第一行写着。没有这一行时，就是这份文件往上两级的目录，因为这份文件在「插件根目录/skills/{{name}}/SKILL.md」。下文的路径都相对插件根目录；「项目」指学生当前的工作目录。
 
+{{basics}}
+
 ## 1. 先查两件事
 - 读项目的 .duck/config.md，没有就跳过这一条。「关掉的命令」（英文的 config 里叫 Disabled commands）下面写了 {{short}}，就回一句「/{{name}} 已关闭，敲 /duck-skill enable {{short}} 可以打开。」然后停下。
 - 项目里有 .duck/skills/{{name}}/SKILL.md，而你现在读的不是它：改读那一份，从头照做，这一份不再往下读。
@@ -22,7 +24,7 @@ disable-model-invocation: true
 {{skill_block}}
 - 先把原技能的 SKILL.md 读完再动手。学生只要其中一部分（比如只写一节、只查一项）也一样：SKILL.md 里的硬规则照样管这一部分；references/ 下的文件按 SKILL.md 的指引再读，不跳过 SKILL.md 直接去读 references/。
 - 原技能写的相对路径（references/…、scripts/… 这类）都相对它自己的文件夹，不是相对这份文件。
-- 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在开场注入的「东西在哪」一节里）。
+- 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在上面「东西在哪」一节里）。
 - 原技能要求的步骤、检查和输出格式全部照做，不因为外面包了一层就省略。{{extra}}
 
 ## 4. 加查项

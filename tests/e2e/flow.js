@@ -538,6 +538,10 @@ function globalChecks(transcripts) {
     ['must', 'decision lines read "- YYYY-MM-DD ▸ 决策：…"', () => !exists('decisions.md') || text('decisions.md').split('\n').filter((l) => l.trim()).every((l) => /^- \d{4}-\d{2}-\d{2} ▸ ?决策[:：]/.test(l))],
     ['should', 'new notebook lines say what happened this time (｜这次：)', () => { const fresh = notebook.filter((l) => !LOOP_NOTEBOOK.includes(l)); return (fresh.length > 0 || FLOW === 'loop') && fresh.every((l) => /｜这次[:：]/.test(l)); }],
     ['must', 'no bold marks in notebook lines', () => !/\*\*/.test(text('notebook.md'))],
+    // Claude Code allows Read, Glob and Grep on the plugin's files; a shell read (cat, ls, find)
+    // asks the student or is denied. The commands say so in their 「东西在哪」 block.
+    ['should', 'Claude Code read plugin files without the shell', () => HOST !== 'claude'
+      || transcripts.every((t) => !t.tools.some((x) => /^Bash /.test(x) && x.includes(ROOT)))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
     // The short why names cards by title; a bare card number is jargon the student cannot read.
     ['should', 'no card number on its own in a short why', () => transcripts.map((t) => lastWhy(t.reply)).every((w) => !bareCardId(w))],

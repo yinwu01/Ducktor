@@ -4,6 +4,10 @@
 //
 //   skills/<name>/SKILL.md, skills/<name>/agents/openai.yaml
 //       the nine /duck-* wrappers, from rules/wrapper-template.md + rules/commands.json
+//   the 「先记住的规矩」 block in every command
+//       the 「东西在哪」 and 「每次都照做」 sections of rules/core.md, so a command has them
+//       in a project that has not turned Ducktor on (the hook then injects only a short
+//       note); in the hand-written commands it sits between basics:start and basics:end
 //   AGENTS.md
 //       the always-on rules for agents without a session-start hook,
 //       from rules/agents-header.md + rules/core.md
@@ -25,7 +29,45 @@ function fill(text, values) {
   return text.replace(/\{\{(\w+)\}\}/g, (whole, key) => (key in values ? values[key] : whole));
 }
 
-function wrappers() {
+// One "## " section of a rules file, heading included; '' when it is not there.
+function sectionOf(text, title) {
+  const m = new RegExp(`^##[ \\t]*${title}[ \\t]*$`, 'm').exec(text);
+  if (m === null) return '';
+  const end = text.indexOf('\n## ', m.index + 1);
+  return text.slice(m.index, end < 0 ? undefined : end).trim();
+}
+
+// What every command needs even when the resident rules are not loaded.
+function basics() {
+  const core = read('rules/core.md');
+  const sections = ['东西在哪', '每次都照做'].map((title) => {
+    const s = sectionOf(core, title);
+    if (!s) throw new Error(`rules/core.md has no "## ${title}" section`);
+    return s.replace(/^## /, '### ');
+  });
+  return [
+    '## 先记住的规矩',
+    '下面两节和常驻规则里的同名两节一样：Ducktor 没在这个项目开启时，这条命令也照它们做；开场注入里有常驻规则时，以注入的为准。',
+    '',
+    sections.join('\n\n'),
+  ].join('\n');
+}
+
+const HAND_WRITTEN = ['duck', 'duck-why', 'duck-learn', 'duck-notes', 'duck-skill'];
+const SLOT = /(<!-- basics:start -->\n)[\s\S]*?(<!-- basics:end -->)/;
+
+function handWritten(block) {
+  const files = {};
+  for (const name of HAND_WRITTEN) {
+    const rel = `skills/${name}/SKILL.md`;
+    const text = read(rel);
+    if (!SLOT.test(text)) throw new Error(`${rel} has no basics:start / basics:end slot`);
+    files[rel] = text.replace(SLOT, (whole, start, end) => `${start}${block}\n${end}`);
+  }
+  return files;
+}
+
+function wrappers(block) {
   const template = read('rules/wrapper-template.md');
   const { default_skill_block: defaultBlock, commands } = JSON.parse(read('rules/commands.json'));
   const files = {};
@@ -37,6 +79,7 @@ function wrappers() {
     }
     const values = {
       ...c,
+      basics: block,
       skill_block: c.skill_block || fill(defaultBlock, { skill: c.skills[0] }),
       extra: c.extra ? `\n- ${c.extra}` : '',
       checks: c.checks ? c.checks.join('\n') : '还没有。以后经过评测的查项会钉在这里，每条标卡号。',
@@ -62,7 +105,8 @@ function agentsMd() {
 }
 
 function render() {
-  return { ...wrappers(), ...agentsMd() };
+  const block = basics();
+  return { ...wrappers(block), ...handWritten(block), ...agentsMd() };
 }
 
 function main(argv) {

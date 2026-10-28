@@ -84,14 +84,12 @@ function coreRules(project) {
   return readText(path.join(ROOT, 'rules', 'core.md')) || '（没读到 rules/core.md，常驻规则这次缺席。）';
 }
 
-// The 「东西在哪」 and 「每次都照做」 sections of the plugin's rules/core.md: where files live,
-// how to read and write them, the skill-name table, and the few rules that hold in every mode
-// (the student's language, checking facts, pushback). Commands need them even when the
-// resident rules are not loaded.
+// The 「每次都照做」 section of rules/core.md: the few rules that hold in every mode (the
+// student's language, checking facts, pushback). A student's copy of the rules made before
+// it existed gets it from the plugin. Commands carry it, with 「东西在哪」, in their own
+// files (scripts/build.js copies both in), so a project that has not turned Ducktor on
+// pays only for the short idle note.
 const EVERY_TIME = /^##[ \t]*每次都照做[ \t]*$/m;
-const BASIC_SECTIONS = [/^##[ \t]*东西在哪[ \t]*$/m, EVERY_TIME];
-// Said right under 「每次都照做」 when the resident rules are not loaded.
-const EVERY_TIME_SCOPE = '（Ducktor 没开启或是 off：下面几条在学生敲 /duck-xxx 时照做；平时干活照宿主自己的规矩，只有「回复：短」平时也算数。）';
 
 // One "## " section of a rules file, heading included; '' when it is not there.
 function sectionOf(text, heading) {
@@ -99,16 +97,6 @@ function sectionOf(text, heading) {
   if (m === null) return '';
   const end = text.indexOf('\n## ', m.index + 1);
   return text.slice(m.index, end < 0 ? undefined : end).trim();
-}
-
-function basics() {
-  const core = readText(path.join(ROOT, 'rules', 'core.md')) || '';
-  return BASIC_SECTIONS.map((heading) => {
-    const section = sectionOf(core, heading);
-    if (!section || heading !== EVERY_TIME) return section;
-    const firstBreak = section.indexOf('\n');
-    return firstBreak < 0 ? section : `${section.slice(0, firstBreak)}\n${EVERY_TIME_SCOPE}${section.slice(firstBreak)}`;
-  }).filter(Boolean).join('\n\n');
 }
 
 function buildContext(project) {
@@ -119,8 +107,6 @@ function buildContext(project) {
   if (mode === 'unset' || mode === 'off') {
     // off is the same as not turned on: the idle note, and commands keep their why and records.
     parts.push(readText(path.join(ROOT, 'rules', 'idle.md')) || 'Ducktor 没在这个项目开启。');
-    const b = basics();
-    if (b) parts.push(b);
   } else {
     parts.push(coreRules(project));
   }

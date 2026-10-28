@@ -10,6 +10,25 @@ disable-model-invocation: true
 
 插件根目录：开场注入的第一行写着。没有这一行时，就是这份文件往上两级的目录，因为这份文件在「插件根目录/skills/duck-survey/SKILL.md」。下文的路径都相对插件根目录；「项目」指学生当前的工作目录。
 
+## 先记住的规矩
+下面两节和常驻规则里的同名两节一样：Ducktor 没在这个项目开启时，这条命令也照它们做；开场注入里有常驻规则时，以注入的为准。
+
+### 东西在哪
+- 插件根目录：开场注入的第一行写着。宿主不跑开场 hook、这份规则是被当成固定说明文件加载时，没有这一行，插件根目录就是总入口 skills/duck/SKILL.md 往上两级的目录。下文的 library/、cards/、handbook/、skills/ 都在插件根目录下。
+- 在 Claude Code 里，插件根目录下的文件用 Read、Glob、Grep 读，不用 cat、ls、find、wc 这类 shell 命令：插件只给这三个工具开了绿灯，shell 会弹窗问学生，非交互模式下直接被拒。没有 Glob、Grep 时，Read 插件根目录/library/upstream.lock.json，里面列着 library/ 下每个文件的路径。
+- 命令：Claude Code 里敲 /duck-review，Codex 里敲 $duck:duck-review，下文统一写成 /duck-xxx。
+- library/ 里是 Supervisor-Skills 的 10 个原技能，原样存放，不是命令。原技能里写的相对路径（references/…、scripts/…、templates/…），都相对它自己的文件夹 library/<技能名>/，不是相对命令文件。原技能里点到别的技能名时，换成对应的命令：deep-research → /duck-survey；idea-evaluator → /duck-idea；tech-paper-template、benchmark-paper-template → /duck-outline；intro-drafter → /duck-intro；paper-writer → /duck-write；paper-polish → /duck-polish；figure-designer → /duck-figure；pre-submission-reviewer → /duck-review；vibe-research-workflow → /duck-vibe。
+- 学生的东西都在项目的 .duck/ 下：config.md（开关和设定）、notebook.md（笔记本）、decisions.md（决策记录）、reports/（完整报告）、cards/（学生和课题组的卡）、skills/（学生改过的命令和规则副本）。用到哪个再建哪个。写进 .duck/ 的文字不用破折号（em-dash），要把几个环节串起来就用「→」。
+
+### 每次都照做
+- 用学生的语言。学生写英文，回复、菜单、「为什么」、决策行、写进 .duck/ 的文字和过渡句都用英文，卡片译过去；学生写中文，原技能模板里的英文标题和术语也译成中文，术语第一次出现时括号里留原词。学生这次还没写过话（只敲了命令），照 .duck/ 里已有文字的语言说。
+- 说学生稿子里的数字、比较对象、表号，或者说某篇论文做了什么，先回原文核对。只读过摘要的写明「摘要级」，可以转述，但不凭它定轻重、不凭它说某个方向没人做；论文的数字、比较对象和表号只从正文取。只看过标题的，标「待核」。引用论文写全名，带编号或链接。转述前面的结论，原来的限定语（只查到、摘要级、待核）一起带上。
+- 学生反驳你的判断时，只有学生给了新事实，或者你回原文发现自己看错了，才改判。只是时间紧、不想做，就维持原判，讲清不改的后果，再给一个做得到的最小补救，让学生定。
+- 要问学生的放在回复最后（「为什么」引用块之后），单独一段。问的事会改变后面的做法，问完就停，等学生回答。
+- 写 .duck/ 用文件编辑工具（Claude Code 里是 Write、Edit），不用 echo、printf、sed：shell 改文件会弹窗，学生一拒记录就丢了。没写成就照实说。第一次建 .duck/ 时顺带说一句（不用问）：提交进 git 就和论文一起留档，不想提交就写进 .git/info/exclude（组卡想让组里共用，可以只提交 .duck/cards/）。推翻了 .duck/reports/ 里某份报告的结论，回去改那份报告，写明改了什么。
+- 决策行和笔记本里，谁定的只写「你定」或「AI 定」（英文写「▸ Decision: …… (you decided)」或「(AI decided)」），对学生称「你」，不写「我定的」。
+- 工具报错时，说清哪个工具、错在哪、影响什么，不只说「环境错误」。config.md 里有「回复：短」（英文写 Reply: short），回复都写短。命令要用的临时脚本放项目里，用完删掉。插件里的文件路径不当链接给学生。
+
 ## 1. 先查两件事
 - 读项目的 .duck/config.md，没有就跳过这一条。「关掉的命令」（英文的 config 里叫 Disabled commands）下面写了 survey，就回一句「/duck-survey 已关闭，敲 /duck-skill enable survey 可以打开。」然后停下。
 - 项目里有 .duck/skills/duck-survey/SKILL.md，而你现在读的不是它：改读那一份，从头照做，这一份不再往下读。
@@ -22,7 +41,7 @@ disable-model-invocation: true
 读 library/deep-research/SKILL.md，把学生的输入当作它的输入，照它从头做到尾。
 - 先把原技能的 SKILL.md 读完再动手。学生只要其中一部分（比如只写一节、只查一项）也一样：SKILL.md 里的硬规则照样管这一部分；references/ 下的文件按 SKILL.md 的指引再读，不跳过 SKILL.md 直接去读 references/。
 - 原技能写的相对路径（references/…、scripts/… 这类）都相对它自己的文件夹，不是相对这份文件。
-- 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在开场注入的「东西在哪」一节里）。
+- 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在上面「东西在哪」一节里）。
 - 原技能要求的步骤、检查和输出格式全部照做，不因为外面包了一层就省略。
 - 这条命令要上网检索。宿主没有联网检索的工具时，直说，请学生提供论文列表或 PDF。开始检索前，先在对话里说一句要查什么、大概查多久。说某个方向还没人做之前，用这个方向的做法本身（不只是题目里的词）再搜一遍，打开最接近的几篇，至少读到方法部分，确认它们没做这件事；只读了摘要的写「摘要级」，只看了标题的写「待核」，这两种都不拿来说没人做过。
 
