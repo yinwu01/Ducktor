@@ -35,7 +35,7 @@ Ducktor 比 ponytail 多一个约束：命令要读 `library/` 里的原技能�
 **Codex**
 - 命令写成 `$duck:duck-review`。
 - 第一次用要在 `/hooks` 里信任 Ducktor 的 hook；hook 定义改了要重新信任。`codex exec` 测试时可以加 `--dangerously-bypass-hook-trust`，只对这一次生效。
-- `codex plugin marketplace add` 用 git 克隆整个仓库，带完整历史，再把插件目录连 `.git` 一起拷进 `~/.codex/plugins/cache/`。10-28 在本机量过：只克隆一个分支也有约 90 MB，其中 `.git` 约 81 MB，仓库里的文件约 7.8 MB（演示动图换成 WebP 以后）。历史里的大头是 10-19 删掉的上游存档（`docs/supervisor-skills/`，其中一个 PDF 就有 17 MB）和演示 GIF 的六个旧版本（共约 37 MB）。要变小只能改写历史，这要仓库主人定。加 `--sparse <路径>` 时只取列出的路径，本机量约 2.6 MB；本机的 git 2.34 用非 cone 模式，根目录下的文件取不到，这样装上以后能不能正常用还没测。从 GitHub 装的体积没量成（本机的代理连不上 GitHub）。Claude Code 从 GitHub 装是浅克隆，只取最新一版（官方文档的说法）。本地路径装的，改了插件要重新 `codex plugin add duck@ducktor`。
+- `codex plugin marketplace add` 用 git 克隆仓库。Codex 0.164.0 克隆 git 来源时用部分克隆（它的程序里写的参数是 `--filter=blob:none --no-checkout`），历史里的旧文件不下载。10-28 在本机对这个仓库的一个分支照样做部分克隆再检出：`.git` 约 6.8 MB，仓库里的文件约 7.8 MB（演示动图换成 WebP 以后）。从 GitHub 装的实际体积没量成（本机的代理连不上 GitHub）。不带 `--filter` 的完整克隆，一个分支就有约 90 MB，其中 `.git` 约 81 MB：历史里的大头是 10-19 删掉的上游存档（`docs/supervisor-skills/`，其中一个 PDF 就有 17 MB）和演示 GIF 的六个旧版本（共约 37 MB）。要让完整克隆也变小，只能改写历史，这要仓库主人定。加 `--sparse <路径>` 时只取列出的路径，本机量约 2.6 MB；本机的 git 2.34 用非 cone 模式，根目录下的文件取不到，这样装上以后能不能正常用还没测。Claude Code 从 GitHub 装是浅克隆，只取最新一版（官方文档的说法）。从本地路径装的，Codex 把整个目录连 `.git` 拷进 `~/.codex/plugins/cache/`，改了插件要重新 `codex plugin add duck@ducktor`。
 - 沙箱用 bubblewrap。进程带着 ambient capabilities 时（比如继承了 CAP_NET_ADMIN），bwrap 0.6.1 会拒绝启动，表现为 AI 写不了文件。先用 `setpriv --inh-caps=-all --ambient-caps=-all` 去掉再启动 Codex 就好，这是机器环境的问题，和插件无关。
 
 **Cursor**

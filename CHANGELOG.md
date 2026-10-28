@@ -9,24 +9,25 @@
 更新以后要做的：
 
 - Claude Code：`claude plugin marketplace update ducktor`，再 `claude plugin update duck@ducktor`，然后开新会话。
-- Codex：两条 hook 的命令都改了，要在 `/hooks` 里重新信任这两条。
+- Codex：`codex plugin marketplace upgrade ducktor`，再 `codex plugin add duck@ducktor`。两条 hook 的命令都改了，要在 `/hooks` 里重新信任这两条，然后开新会话。
+- 用 `/duck-skill edit` 改过命令或规则的：项目 `.duck/skills/` 里是旧版的副本，没有新加的「先记住的规矩」，off 也还是旧的意思。先把副本删掉（比如 `/duck-skill reset review`，规则是 `/duck-skill reset rules`），再照原来的改法改一遍。
 
 变了什么：
 
-- `/duck off` 回到刚装好的样子：平时不出声，敲 `/duck-xxx` 时照常讲为什么、照常记。以前 off 下命令也不讲、不记。不想让 `.duck/` 进仓库，把它写进 `.git/info/exclude`。
+- `/duck off` 回到刚装好的样子：平时不出声，敲 `/duck-xxx` 时照常讲为什么、照常记。以前 off 下命令也不讲、不记。不想让 `.duck/` 进仓库，把它写进 `.git/info/exclude`。某条命令根本不想用，可以关掉它（比如 `/duck-skill disable figure`）。
 - 没开启的项目，每次开会话只放一小段说明。命令要用的规矩挪进了每条命令自己的文件，敲命令时才读。
 - 说「这类我懂了」、嫌回复长，在没开启的项目里也记得下来，而且不会顺手把 Ducktor 打开。
 - `.duck/config.md` 已经在、只是没有开关行时（比如只记过静音），`/duck on` 只加开关那一行，不动别的设定。
 - `/duck` 后面问「这段工作里我要学什么」，会挑 `/duck-learn`；问某一步为什么这么做，挑 `/duck-why`。项目里没有决策记录时，`/duck-learn` 用这次会话里做过的事来复盘。
-- 讲到经验卡时，先说卡名和卡上讲了什么，卡号只放在卡名后面的括号里，并说明这是 Ducktor 自带的经验卡，不是文献。
+- 讲到经验卡时，先说卡名和卡上讲了什么，卡号只放在卡名后面的括号里。插件自带的卡，说明这是 Ducktor 自带的经验卡，不是文献；项目 `.duck/cards/` 里的卡，说是你或你们组的。
 - 读插件文件不用 shell 命令的那条规矩补上了 grep，并写明查卡就读卡片文件。
-- 自动放行收紧了两处：带 `..` 的 Glob、Grep 模式不再自动放行；笔记本或决策记录的最后一行没有换行时，紧接着往后写的字会拼进那一行，这算改已有的行，要你点头。
+- 自动放行收紧了：读插件文件只放行 Read、Glob、Grep，Glob、Grep 只按要搜的目录判断；模式里带 `..`、`~`，或者花括号里另起一个绝对路径（比如 `{/etc/*,x}`），不再自动放行。笔记本或决策记录的最后一行没有换行时，紧接着往后写的字会拼进那一行，这算改已有的行，要你点头。
 - 插件文件不全时（比如更新到一半），hook 只给一句提示，不再报一大段错误。
 - README 的演示动图换成了 WebP，仓库里的文件从约 15 MB 降到约 8 MB。
 - 许可证：附上 CC BY 4.0 的法律文本；`LICENSES/README.md` 列全了每个目录用的许可证。
 - 安装说明加了两条常见问题：网慢或要走代理时怎么装；Windows 还没实测过。
 
-## 0.1.0（2026-10-17 到 10-28）
+## 0.1.0（2026-10-17 到 10-27）
 
 第一版。总入口 `/duck` 加 13 条命令：9 条包装 Supervisor-Skills 的 10 个原技能（放在 `library/`），另有 `/duck-why`、`/duck-learn`、`/duck-notes`、`/duck-skill`。开关有 on、quiet、off 三档；笔记本、决策记录和报告都写在项目的 `.duck/` 下；自带 23 张经验卡和名家文章的转述；支持 Claude Code 和 Codex。
 

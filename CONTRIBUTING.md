@@ -18,7 +18,7 @@
 
 真模型测试要花钱，一次的费用记在 `docs/testing.md` 里。
 
-有些文件是生成的，不直接改：9 条包装命令（`skills/` 下除了 duck、duck-why、duck-learn、duck-notes、duck-skill 以外的那些）由 `rules/wrapper-template.md` 和 `rules/commands.json` 生成；每条命令开头「先记住的规矩」一节和 `AGENTS.md` 抄自 `rules/core.md`。改了这些源文件，跑 `npm run build`。生成的文件不是最新的，`npm test` 会报错。
+有些文件是生成的，不直接改：9 条包装命令（`skills/` 下除了 duck、duck-why、duck-learn、duck-notes、duck-skill 以外的那些）的 `SKILL.md` 和 `agents/openai.yaml`，由 `rules/wrapper-template.md` 和 `rules/commands.json` 生成；每条命令开头「先记住的规矩」一节抄自 `rules/core.md`；`AGENTS.md` 由 `rules/agents-header.md` 加上 `rules/core.md` 拼成。改了这些源文件，跑 `npm run build`。生成的文件不是最新的，`npm test` 会报错。
 
 ## 所有改动
 
@@ -32,6 +32,6 @@
 
 ## 发版（维护者）
 
-1. 改版本号：`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`.cursor-plugin/plugin.json`、`gemini-extension.json` 和 `package.json` 一起改，`npm test` 会查它们一致。Claude Code 按版本号判断有没有更新：插件文件变了、版本号没变，装过的人拿不到新版，`npm run check` 会报错。
-2. 在 `CHANGELOG.md` 最上面加这一版：对用户有什么变化，更新以后要做什么（比如 Codex 要重新信任 hook）。
-3. 先 `claude plugin tag --dry-run` 看一眼，再 `claude plugin tag`，打出 `duck--v版本号` 的标签，推送标签。
+1. 改版本号：`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`.cursor-plugin/plugin.json`、`gemini-extension.json` 和 `package.json` 一起改，`npm test` 会查它们一致。Claude Code 按版本号判断有没有更新：插件文件变了、版本号没变，装过的人拿不到新版。有了上一版的 `duck--v` 标签以后，`npm run check` 会查出这种情况；版本号比上一版低，也会报错。
+2. 在 `CHANGELOG.md` 最上面加这一版：对用户有什么变化，更新以后要做什么（比如 Codex 要重新信任 hook）。没有这一版的标题，`npm test` 会报错。
+3. 改动合进 main 以后，在 main 的那个提交上，先 `claude plugin tag --dry-run` 看一眼，再 `claude plugin tag --push`，打出并推送 `duck--v版本号` 的标签。
