@@ -54,8 +54,8 @@ disable-model-invocation: true
 | **投稿前** | |
 | /duck-review | 按审稿人的眼光审自己的稿子 |
 | **学东西** | |
-| /duck-why | 刚才那一步能学到什么（也可以指定文件、git 提交、段落） |
-| /duck-learn | 一段做完，复盘 |
+| /duck-why | 刚才那一步为什么这么做（也可以指定文件、git 提交、段落） |
+| /duck-learn | 一段工作做完（一篇稿子、一轮实验），复盘这一段要学什么 |
 | /duck-notes | 看、改学习笔记 |
 | **设置** | |
 | /duck-skill | 关掉命令、加你们组自己的经验卡 |
@@ -112,7 +112,7 @@ When the student says "I've got this kind", add a line here.
 
 ## 三、后面是一句话：替学生挑命令
 
-1. 按上面那张表，挑最贴合的一条。拿不准时，把两条候选摆给学生，问一句，不要猜。
+1. 按上面那张表，挑最贴合的一条。问一整段做完的工作（一篇稿子、一轮实验）里要学什么，挑 /duck-learn；问某一步、某处改动为什么这么做，挑 /duck-why。拿不准时，把两条候选摆给学生，问一句，不要猜。
 2. 先说一句按哪条处理，例如「按润色处理（/duck-polish）；要审稿请敲 /duck-review。」
 3. 然后读那条命令的说明文件「插件根目录/skills/duck-xxx/SKILL.md」，把学生这句话当作敲在命令后面的内容，照说明从头做到尾，开头和收尾的步骤一步都不跳。
 4. 学生自己加的命令（.claude/skills/duck-xxx/ 或 .agents/skills/duck-xxx/）也在挑选范围里，挑中了就读那一份。
