@@ -104,7 +104,8 @@ test('hook commands use no shell syntax that differs between sh, PowerShell and 
 });
 
 test('our own text has no em-dash', () => {
-  const ours = ['README.md', 'INSTALL.md', 'AGENTS.md', 'LICENSE', 'rules', 'skills', 'cards', 'bin', 'hooks', 'scripts', 'tests', 'docs'];
+  // LICENSES/ holds upstream legal texts as published; only its README is ours.
+  const ours = ['README.md', 'INSTALL.md', 'AGENTS.md', 'LICENSE', 'LICENSES/README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'i18n', '.github', 'rules', 'skills', 'cards', 'bin', 'hooks', 'scripts', 'tests', 'docs'];
   const skip = [/^docs\/(design|research)\//, /^tests\/fixtures\//];
   const hits = [];
   const visit = (rel) => {
@@ -112,7 +113,7 @@ test('our own text has no em-dash', () => {
     if (!fs.existsSync(full) || skip.some((re) => re.test(rel))) return;
     if (fs.statSync(full).isDirectory()) {
       for (const name of fs.readdirSync(full)) visit(`${rel}/${name}`);
-    } else if (/\.(md|js|json|yaml|txt)$|^LICENSE$/.test(path.basename(full)) && read(rel).includes(String.fromCharCode(0x2014))) {
+    } else if (/\.(md|js|json|ya?ml|txt)$|^LICENSE$/.test(path.basename(full)) && read(rel).includes(String.fromCharCode(0x2014))) {
       hits.push(rel);
     }
   };
