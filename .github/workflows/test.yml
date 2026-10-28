@@ -1,5 +1,6 @@
 # Offline checks on every push and pull request: unit and structure tests, generated files
-# up to date, library/ and handbook/ still match the upstream lock. No model calls, no keys.
+# up to date, library/ and handbook/ still match the upstream lock, and the version was raised
+# if the plugin changed since the last release tag. No model calls, no keys.
 name: test
 
 on:
@@ -17,6 +18,8 @@ jobs:
         node: [18, 22]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the release check compares with the last release tag
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
