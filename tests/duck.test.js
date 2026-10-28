@@ -223,6 +223,9 @@ test('PreToolUse hook allows reads inside the plugin root only', () => {
   assert.equal(allowTool('Glob', { pattern: '**/*.md', path: path.join(ROOT, 'library') }), 'allow');
   assert.equal(allowTool('Glob', { pattern: path.join(ROOT, 'library', '*', 'SKILL.md') }), 'allow');
   assert.equal(allowTool('Glob', { pattern: '../../**/*', path: path.join(ROOT, 'library') }), null);
+  assert.equal(allowTool('Glob', { pattern: '{..,x}/**/*', path: path.join(ROOT, 'library') }), null);
+  assert.equal(allowTool('Glob', { pattern: '{..,x}/**/*', path: ROOT }), null);
+  assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '{..,x}/*.md' }), null);
   assert.equal(allowTool('Glob', { pattern: '/etc/*', path: ROOT }), null);
   assert.equal(allowTool('Glob', { pattern: '~/.ssh/*', path: ROOT }), null);
   assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '*.md' }), 'allow');

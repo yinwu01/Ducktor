@@ -163,11 +163,12 @@ function allowRead(input) {
   const toolInput = input.tool_input || {};
   let target = toolInput.file_path || toolInput.path;
   // Glob and Grep can also reach files through a pattern (Glob's pattern, Grep's glob
-  // filter). Allow only patterns that stay inside the root: no '..', no '~', and an
-  // absolute pattern must start inside the root.
+  // filter). Allow only patterns that stay inside the root: no '..' anywhere (braces such as
+  // {..,x} would hide it from a check of whole path parts), no '~', and an absolute pattern
+  // must start inside the root.
   const pattern = input.tool_name === 'Glob' ? toolInput.pattern : input.tool_name === 'Grep' ? toolInput.glob : undefined;
   if (typeof pattern === 'string' && pattern) {
-    if (pattern.startsWith('~') || pattern.split(/[\\/]/).includes('..')) return;
+    if (pattern.startsWith('~') || pattern.includes('..')) return;
     if (path.isAbsolute(pattern)) {
       if (!insideRoot(globBase(pattern))) return;
       if (!target) target = globBase(pattern);
