@@ -163,6 +163,9 @@ const cardIds = (s) => {
   const letters = [...new Set([...PLUGIN_CARDS].map((id) => id[0]).concat('G'))].join('');
   return lines.flatMap((l) => [...l.matchAll(new RegExp(`\\b([${letters}]\\d{2})\\b`, 'g'))].map((m) => m[1]));
 };
+// A plugin card number anywhere in the text. Conversation should name cards by title only;
+// card numbers belong in the 卡片提醒 list and notebook sources, after the title.
+const anyCardId = (s) => [...PLUGIN_CARDS].some((id) => new RegExp(`\\b${id}\\b`).test(s));
 // The hook injected the not-turned-on note and not the resident rules. Matches idle.md's first
 // words, which no command file contains (Codex's rollout also holds the command files it read).
 const IDLE_ONLY = (t) => /Ducktor 没在这个项目开启：/.test(t.injected) && !/# Ducktor 常驻规则/.test(t.injected);
@@ -465,6 +468,7 @@ function loopStages() {
       before: () => projectFile('paper/main.tex'), checks: [
         ['must', 'raises seeds or run-to-run variation', (t) => /seed|种子|波动|方差|标准差/.test(t.reply)],
         ['should', 'asks before editing the table', (t, before) => /[？?]/.test(t.reply) && projectFile('paper/main.tex') === before],
+        ['should', 'the reply writes no card number', (t) => !anyCardId(t.reply)],
       ] },
     { name: 'exp-ok', resume: true, prompt: '先补到 3 个 seed，表等结果出来再改。', before: () => decisions().length, checks: [
       ['must', 'a new decision line says the student decided', (t, before) => decisions().slice(before).some((l) => /你定/.test(l))],
@@ -525,13 +529,8 @@ function globalChecks(transcripts) {
     ['should', 'new notebook lines say what happened this time (｜这次：)', () => { const fresh = notebook.filter((l) => !LOOP_NOTEBOOK.includes(l)); return (fresh.length > 0 || FLOW === 'loop') && fresh.every((l) => /｜这次[:：]/.test(l)); }],
     ['must', 'no bold marks in notebook lines', () => !/\*\*/.test(text('notebook.md'))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
-    // A card number in every short why is the old 原技能要求 crutch with a new name.
-    ['should', 'no card number appears in more than half of the short whys', () => {
-      const whys = transcripts.map((t) => lastWhy(t.reply)).filter(Boolean);
-      if (whys.length < 3) return true;
-      const ids = new Set(whys.flatMap(cardIds));
-      return [...ids].every((id) => whys.filter((w) => cardIds(w).includes(id)).length * 2 <= whys.length);
-    }],
+    // The short why names cards by title; a card number there is jargon the student cannot read.
+    ['should', 'the short whys write no card number', () => transcripts.map((t) => lastWhy(t.reply)).every((w) => !anyCardId(w))],
     // Most notebook lines are written by the AI; quoting one as the student's own is wrong.
     ['should', 'does not credit a notebook line to the student (你 MM-DD 记下的)', () => transcripts.every((t) => !/你 ?\d{2}-\d{2} ?记下的/.test(t.reply))],
     ['must', 'no quizzes, homework or scoring the student', () => transcripts.every((t) => !QUIZ.test(t.reply))],
