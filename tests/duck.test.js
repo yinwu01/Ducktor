@@ -88,14 +88,18 @@ test('not turned on and off: the hook gives no rules, the commands carry the bas
     const text = fs.readFileSync(path.join(ROOT, 'skills', name, 'SKILL.md'), 'utf8');
     if (name === 'duck') {
       // The hub only lists, switches and routes; the command it picks carries the basics. It
-      // keeps the rules it needs itself: Read for plugin files, Write/Edit for .duck/, the
-      // student's language.
+      // keeps the rules it needs itself: Read for plugin files, Write/Edit for .duck/ (and say so
+      // when a write failed), the student's language, no em-dash, the git note, the Codex form of
+      // /duck-xxx, and that quiet still asks first.
       assert.ok(!text.includes('<!-- basics:start -->'), 'duck: no basics block');
       assert.match(text, /用 Read 读，不用 cat/, 'duck: Read for plugin files');
       assert.match(text, /Write、Edit），不用 echo/, 'duck: Write and Edit for .duck/');
       assert.match(text, /照学生的语言说/, 'duck: the student\'s language');
       assert.match(text, /写进 \.duck\/ 的文字不用破折号/, 'duck: no em-dash in .duck/');
       assert.match(text, /\.git\/info\/exclude/, 'duck: the git note when .duck/ is first made');
+      assert.match(text, /没写成就照实说/, 'duck: say so when a write failed');
+      assert.match(text, /在 Codex 里对学生写成 \$duck:duck-xxx/, 'duck: the Codex form of /duck-xxx');
+      assert.match(text, /- quiet：照样先问/, 'duck: quiet still asks first');
       // The block must not come back without its markers either.
       assert.doesNotMatch(text, /^##+ 先记住的规矩|^### (东西在哪|每次都照做)/m, 'duck: no copy of the basics');
       continue;
