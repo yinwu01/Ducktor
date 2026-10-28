@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 插件根目录：开场注入的第一行写着。没有这一行时，就是这份文件往上两级的目录。「项目」指学生当前的工作目录。
 
-学生专门敲了这条命令，所以开关是 quiet 或 off 时也照常用。
+学生专门敲了这条命令，所以开关是 quiet 时也照常用。
 
 ## 1. 先查两件事
 - 读项目的 .duck/config.md，没有就跳过这一条。「关掉的命令」（Disabled commands）下面写了 notes，就回一句「/duck-notes 已关闭，敲 /duck-skill enable notes 可以打开。」然后停下。

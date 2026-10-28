@@ -44,7 +44,7 @@ Cursor, Gemini CLI, and Qwen Code have adapter files, but we did not test them o
 ## How to make sure that it works
 
 1. Start a new session and type `/duck` (in Codex, `$duck:duck`). It first tells you the easiest way to use it. Then it shows 13 commands (14 with `/duck`), and it tells you that Ducktor is not on in this project yet. If you typed nothing else before `/duck`, the menu is in Chinese with one line in English. Write to it in English, and it answers in English.
-2. In a project, type `/duck on`. The file `.duck/config.md` appears in the project, and its switch line says on. From that turn, Ducktor also follows your normal work. If you delete that line, Ducktor goes back to the default: it is silent during normal work and explains only when you type a command. `/duck off` does more: it also stops the explanation at the end of each command.
+2. In a project, type `/duck on`. The file `.duck/config.md` appears in the project, and its switch line says on. From that turn, Ducktor also follows your normal work. If you type `/duck off` or delete that line, Ducktor goes back to the default: it is silent during normal work and explains only when you type a command.
 
 ## If you installed Doctor Duck
 

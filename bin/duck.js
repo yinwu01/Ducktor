@@ -48,8 +48,8 @@ function readInput() {
 
 // Returns { mode, note }. mode is on, quiet, off, or unset: the duck has not been turned
 // on in this project (no file, no switch line, or a value we cannot read). Only an explicit
-// on or quiet loads the resident rules. note is a sentence for the AI when the switch line
-// was there but could not be read.
+// on or quiet loads the resident rules; off is the same as not turned on. note is a sentence
+// for the AI when the switch line was there but could not be read.
 function modeOf(config) {
   if (!config) return { mode: 'unset', note: null };
   const seen = [];
@@ -117,10 +117,8 @@ function buildContext(project) {
   const parts = [`Ducktor 插件根目录：${ROOT}`];
 
   if (mode === 'unset' || mode === 'off') {
-    const note = mode === 'unset'
-      ? readText(path.join(ROOT, 'rules', 'idle.md')) || 'Ducktor 没在这个项目开启。'
-      : readText(path.join(ROOT, 'rules', 'off.md')) || '开关：off。';
-    parts.push(note);
+    // off is the same as not turned on: the idle note, and commands keep their why and records.
+    parts.push(readText(path.join(ROOT, 'rules', 'idle.md')) || 'Ducktor 没在这个项目开启。');
     const b = basics();
     if (b) parts.push(b);
   } else {
@@ -131,7 +129,8 @@ function buildContext(project) {
     const shown = config.length > CONFIG_LIMIT
       ? `${config.slice(0, CONFIG_LIMIT)}\n……（后面太长没放进来，要用时直接读这个文件）`
       : config;
-    parts.push(`项目的 .duck/config.md（开关：${mode === 'unset' ? '没开启' : mode}）：\n${shown}`);
+    const label = { unset: '没开启', off: 'off，和没开启一样' }[mode] || mode;
+    parts.push(`项目的 .duck/config.md（开关：${label}）：\n${shown}`);
     if (note) parts.push(note);
     if (config.includes('�')) parts.push('.duck/config.md 里有读不出的字节（可能不是 UTF-8 编码），开关可能没认对。');
   }

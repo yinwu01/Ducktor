@@ -374,12 +374,16 @@ function mainStages() {
     ] },
     { name: 'off', resume: true, prompt: `${cmd('duck')} off`, checks: [
       ['must', 'config says off', () => switchIs('off')],
+      // off is the fresh-install state, not a stronger "off" than that.
+      ['should', 'reply says this is back to not turned on', (t) => /刚装好|没开启|未.{0,4}开启|没有开启/.test(t.reply)],
     ] },
+    // A new session after /duck off: same as a project that never turned Ducktor on. The hook
+    // gives the idle note, and a command still explains itself and keeps its records.
     { name: 'off-new-session', resume: false, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的结论一节`,
-      before: () => ({ reports: allReports().length, notebook: text('notebook.md') }), checks: [
-        ['must', 'hook injected the off note', (t) => /Ducktor 现在是 off/.test(t.injected)],
-        ['must', 'no new report', (t, before) => allReports().length === before.reports],
-        ['must', 'notebook untouched', (t, before) => text('notebook.md') === before.notebook],
+      before: () => ({ reports: allReports().length }), checks: [
+        ['must', 'hook injected the not-turned-on note', (t) => IDLE_ONLY(t)],
+        ['must', 'wrote a polish report', (t, before) => allReports().length > before.reports],
+        ['should', 'reply has the why block', (t) => WHY_BLOCK.test(t.reply)],
       ] },
   ];
 }

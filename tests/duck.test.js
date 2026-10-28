@@ -103,10 +103,14 @@ test('quiet: rules load and the config is passed through', () => {
   assert.match(text, /开关：quiet）/);
 });
 
-test('off: the off note replaces the rules', () => {
-  const text = duck.buildContext(project({ '.duck/config.md': '开关：off\n' }));
-  assert.doesNotMatch(text, /# Ducktor 常驻规则/);
-  assert.match(text, /Ducktor 现在是 off/);
+test('off: the same as not turned on', () => {
+  const off = duck.buildContext(project({ '.duck/config.md': '开关：off\n' }));
+  assert.doesNotMatch(off, /# Ducktor 常驻规则/);
+  assert.match(off, /没在这个项目开启/);
+  assert.match(off, /开关：off，和没开启一样）/);
+  const idle = duck.buildContext(project({ '.duck/config.md': '# Ducktor 设定\n' }));
+  // Same note and basics; only the config line differs.
+  assert.equal(off.split('\n\n项目的 .duck/config.md')[0], idle.split('\n\n项目的 .duck/config.md')[0]);
 });
 
 test('an unknown switch value is reported to the AI and does not turn the duck on', () => {
@@ -190,7 +194,7 @@ test('Cursor gets additional_context only', () => {
   });
   const out = JSON.parse(run.stdout);
   assert.deepEqual(Object.keys(out), ['additional_context']);
-  assert.match(out.additional_context, /Ducktor 现在是 off/);
+  assert.match(out.additional_context, /没在这个项目开启/);
 });
 
 test('PreToolUse hook allows reads inside the plugin root only', () => {

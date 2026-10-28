@@ -52,8 +52,8 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有 Ducktor 的话；（should）笔记本多了一行，带「这次」 |
 | card-draft、card-ok | `/duck-skill card new …`，再说「可以，写吧」 | 写了 `.duck/cards/G01.md`，INDEX 里有 G01 |
 | learn-ask、learn | `/duck-learn`，再答它的一个问题 | 开头只问那一个问题；写了复盘报告 |
-| off | `/duck off` | config 里开关是 off |
-| off-new-session | 新会话里 `/duck-polish` | 注入的是 off 那一段；没有新报告；笔记本没动 |
+| off | `/duck off` | config 里开关是 off；回复说回到了没开启的样子（should） |
+| off-new-session | 新会话里 `/duck-polish` | 注入的是没开启那一段；照常写了 polish 报告；回复带「为什么」引用块（should） |
 
 第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启 Ducktor，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
 

@@ -66,7 +66,7 @@ You can also ask after the AI completes the work. Type `/duck` and your question
 
 The principles that Ducktor records go into `.duck/notebook.md`, one on each line. It records each decision between options on one line in `.duck/decisions.md`. Each line shows who made the decision: you or the AI. When you use a command for similar work later, Ducktor reads the notebook first. If an old line applies, Ducktor tells you. If you say "I understand this type now" (or 「这类我懂了」), Ducktor records that type of principle, but it does not explain it again.
 
-When Ducktor records: after you turn it on in a project (`/duck on`, or `/duck quiet`, which records but does not explain in the chat), each command records one principle. During normal work, a step of real work can also give a principle, and Ducktor records it. It does not record the same principle two times. If Ducktor is not on, only the commands record. After `/duck off`, Ducktor records nothing, and `/duck-why` and `/duck-learn` explain only in the chat.
+When Ducktor records: after you turn it on in a project (`/duck on`, or `/duck quiet`, which records but does not explain in the chat), each command records one principle. During normal work, a step of real work can also give a principle, and Ducktor records it. It does not record the same principle two times. If Ducktor is not on, only the commands record. `/duck off` puts Ducktor back to how it was before you turned it on.
 
 These records are plain Markdown files in your project. You can commit them to git with your paper. When your advisor asks about the reason for a decision, you can find the answer. If you do not want to commit them, add `.duck/` to `.git/info/exclude`.
 
@@ -145,7 +145,7 @@ We tested the full workflow only with a local copy. From GitHub, we tested only 
 
 | Command | What it does |
 |---------|--------------|
-| `/duck [on \| quiet \| off]` | Without an argument, it shows the menu. `on` turns on Ducktor in this project. `quiet` records but does not explain. `off` turns off Ducktor: the commands still work, but they do not explain or record. `/duck-why` and `/duck-learn` still explain. If you add a sentence, for example `/duck 帮我写引言` ("help me write the introduction"), Ducktor selects a command for you. It tells you which command it selected. Then it runs that command. |
+| `/duck [on \| quiet \| off]` | Without an argument, it shows the menu. `on` turns on Ducktor in this project. `quiet` records but does not explain. `off` puts Ducktor back to how it is after you install it: it is silent during normal work, and the commands still explain and record. If you add a sentence, for example `/duck 帮我写引言` ("help me write the introduction"), Ducktor selects a command for you. It tells you which command it selected. Then it runs that command. |
 | `/duck-survey` | Find a research direction. Do a literature review. |
 | `/duck-idea` | Find out if an idea is worth the work. |
 | `/duck-vibe` | Decide how much of this work the AI does, and which parts you check yourself. |
