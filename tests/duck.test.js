@@ -294,6 +294,13 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   // An empty log may be written whole.
   const empty = project({ '.duck/decisions.md': '' });
   assert.equal(allowWrite('Write', path.join(empty, '.duck', 'decisions.md'), empty, { content: 'x\n' }), 'allow');
+  // No newline at the end: text joined onto the last line changes it; a new line is adding.
+  const open = project({ '.duck/decisions.md': '- 2026-10-26 ▸ 决策：A（你定）' });
+  const openAllow = (tool, extra) => allowWrite(tool, path.join(open, '.duck', 'decisions.md'), open, extra);
+  assert.equal(openAllow('Edit', { old_string: 'A（你定）', new_string: 'A（你定）作废，实际是 AI 定的' }), null);
+  assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）作废\n' }), null);
+  assert.equal(openAllow('Edit', { old_string: 'A（你定）', new_string: 'A（你定）\n- 2026-10-27 ▸ 决策：B（AI 定）' }), 'allow');
+  assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）\r\n- 2026-10-27 ▸ 决策：B（AI 定）\r\n' }), 'allow');
 });
 
 test('PreToolUse hook: the project is the session root, not the shell folder', () => {

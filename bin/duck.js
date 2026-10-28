@@ -242,7 +242,12 @@ function onlyAdds(input, target, stat) {
   }
   if (typeof result !== 'string') return false;
   const bytes = Buffer.from(result, 'utf8');
-  return bytes.length >= old.length && bytes.subarray(0, old.length).equals(old);
+  if (bytes.length < old.length || !bytes.subarray(0, old.length).equals(old)) return false;
+  // When the old file does not end in a newline, text added straight after it lands on the
+  // old last line and changes what that line says. Only a new line counts as adding.
+  if (bytes.length === old.length || old[old.length - 1] === 0x0a) return true;
+  const next = bytes[old.length];
+  return next === 0x0a || (next === 0x0d && bytes[old.length + 1] === 0x0a);
 }
 
 function allowRecord(input) {
