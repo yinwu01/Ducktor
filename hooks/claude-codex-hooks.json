@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;let m;if(r)try{m=require(require('path').join(r,'bin','duck.js'))}catch(e){}if(m)m.main('session-start');else process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:'Ducktor: the session-start hook found no plugin root, or could not load bin/duck.js from it, so the always-on rules were not loaded. The plugin root is two levels above skills/duck/SKILL.md.'}}))\"",
+            "command": "node -e \"const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;let m;if(r)try{m=require(require('path').join(r,'bin','duck.js')).main}catch(e){}if(typeof m==='function')m('session-start');else process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:'Ducktor: the session-start hook found no plugin root, or could not load bin/duck.js from it, so the always-on rules were not loaded. The plugin root is two levels above skills/duck/SKILL.md.'}}))\"",
             "timeout": 10,
             "statusMessage": "Loading Ducktor..."
           }

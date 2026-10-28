@@ -13,8 +13,15 @@ const ROOT = path.resolve(__dirname, '..');
 const duck = require('../bin/duck.js');
 const HOOKS = JSON.parse(fs.readFileSync(path.join(ROOT, 'hooks', 'claude-codex-hooks.json'), 'utf8')).hooks;
 
+// Every project folder a test makes is removed when the file's tests end.
+const made = [];
+test.after(() => {
+  for (const dir of made) fs.rmSync(dir, { recursive: true, force: true });
+});
+
 function project(files = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'duck-test-'));
+  made.push(dir);
   for (const [rel, text] of Object.entries(files)) {
     const file = path.join(dir, rel);
     fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -242,6 +249,19 @@ test('PreToolUse hook allows reads inside the plugin root only', () => {
   assert.equal(allowTool('Glob', { pattern: '~/.ssh/*', path: ROOT }), null);
   assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '*.md' }), 'allow');
   assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '../**/*.md' }), null);
+  // Brace alternatives: relative ones stay inside the root; one that starts a new absolute
+  // path, or has '~' anywhere, leaves it.
+  assert.equal(allowTool('Glob', { pattern: '{library,handbook}/**/*.md', path: ROOT }), 'allow');
+  assert.equal(allowTool('Grep', { pattern: 'polish', path: ROOT, glob: '*.{md,txt}' }), 'allow');
+  assert.equal(allowTool('Glob', { pattern: '{/etc/*,x}', path: ROOT }), null);
+  assert.equal(allowTool('Glob', { pattern: '{x, /etc/*}', path: ROOT }), null);
+  assert.equal(allowTool('Glob', { pattern: '{~/.ssh/*,x}', path: ROOT }), null);
+  // Glob and Grep search the folder in path; a file_path next to it does not count.
+  assert.equal(allowTool('Grep', { pattern: 'x', file_path: ROOT, path: '/etc' }), null);
+  assert.equal(allowTool('Glob', { pattern: '*', file_path: ROOT, path: '/etc' }), null);
+  // Only Read, Glob and Grep are allowed here, whatever path another tool names.
+  assert.equal(allowTool('NotebookRead', { notebook_path: path.join(ROOT, 'x.ipynb'), path: ROOT }), null);
+  assert.equal(allowTool('WebFetch', { url: 'https://example.com', path: ROOT }), null);
 
   // A symlink inside a project that points into the plugin is fine; one inside the
   // plugin that points out is not followed.
@@ -361,4 +381,18 @@ test('PreToolUse hook stays silent on bad input', () => {
   const run = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: ROOT }, 'not json');
   assert.equal(run.status, 0);
   assert.equal(run.stdout, '');
+});
+
+test('hooks with a bin/duck.js that loads but has no main: a note at session start, silence before tools', () => {
+  const half = path.join(project({}), 'half');
+  fs.mkdirSync(path.join(half, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(half, 'bin', 'duck.js'), '');
+  const start = runHook('SessionStart', { CLAUDE_PLUGIN_ROOT: half }, '{}');
+  assert.equal(start.status, 0);
+  assert.equal(start.stderr, '');
+  assert.match(JSON.parse(start.stdout).hookSpecificOutput.additionalContext, /could not load bin\/duck\.js/);
+  const pre = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: half }, JSON.stringify({ tool_name: 'Read', tool_input: { file_path: path.join(half, 'x') } }));
+  assert.equal(pre.status, 0);
+  assert.equal(pre.stdout, '');
+  assert.equal(pre.stderr, '');
 });
