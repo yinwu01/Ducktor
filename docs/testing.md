@@ -55,7 +55,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | off | `/duck off` | config 里开关是 off；回复说回到了没开启的样子（should） |
 | off-new-session | 新会话里 `/duck-polish` | 注入的是没开启那一段；照常写了 polish 报告；回复带「为什么」引用块（should） |
 
-第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启 Ducktor，测的是只敲命令的用法：第一步还查注入的是没开启那一段。
+第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启 Ducktor，测的是只敲命令的用法：第一步还查注入的是没开启那一段，最后一步查没开启时说「这类我懂了」也记得下来。
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
@@ -68,6 +68,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | vibe | `/duck-vibe` 下周的实验哪些交给 AI | 读了 `library/vibe-research-workflow`；写了报告 |
 | notes | `/duck-notes` | 笔记本里的每个阶段都列出来了；笔记本没动 |
 | notes-delete、notes-ok | `/duck-notes 删掉最后一条`，再说「可以，删吧」 | 删掉的正好是最后一条，其余不变 |
+| mute | 「多 seed 和方差这类我懂了，以后别讲了」 | config 的「按类静音」里记了这一类；没有因此开启。should：没写开关行 |
 
 每条包装命令还有几条 should：回复里有「为什么」；列出了卡片提醒，带插件自带卡的卡号；intro 和 write 没改 `paper/main.tex`；write 指出方法描述和代码对不上；notes-delete 先给学生看再删。
 

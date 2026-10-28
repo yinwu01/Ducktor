@@ -445,6 +445,12 @@ function moreStages() {
         return notes.lines.length > 0 && now.length === notes.lines.length - 1 && now.every((l, i) => l === notes.lines[i]);
       }],
     ] },
+    // Not turned on: 「这类我懂了」 is recorded all the same, without turning Ducktor on.
+    { name: 'mute', resume: true, prompt: '多 seed 和方差这类我懂了，以后别讲了。', checks: [
+      ['must', 'config mutes the category', () => /按类静音[\s\S]*(seed|种子|方差)/.test(text('config.md'))],
+      ['must', 'did not turn Ducktor on', () => !switchIs('on') && !switchIs('quiet')],
+      ['should', 'wrote no switch line', () => !/^[\s>*#-]*开关\s*[:：]/m.test(text('config.md'))],
+    ] },
   ];
 }
 

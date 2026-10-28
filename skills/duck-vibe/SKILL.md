@@ -27,7 +27,8 @@ disable-model-invocation: true
 - 要问学生的放在回复最后（「为什么」引用块之后），单独一段。问的事会改变后面的做法，问完就停，等学生回答。
 - 写 .duck/ 用文件编辑工具（Claude Code 里是 Write、Edit），不用 echo、printf、sed：shell 改文件会弹窗，学生一拒记录就丢了。没写成就照实说。第一次建 .duck/ 时顺带说一句（不用问）：提交进 git 就和论文一起留档，不想提交就写进 .git/info/exclude（组卡想让组里共用，可以只提交 .duck/cards/）。推翻了 .duck/reports/ 里某份报告的结论，回去改那份报告，写明改了什么。
 - 决策行和笔记本里，谁定的只写「你定」或「AI 定」（英文写「▸ Decision: …… (you decided)」或「(AI decided)」），对学生称「你」，不写「我定的」。
-- 工具报错时，说清哪个工具、错在哪、影响什么，不只说「环境错误」。config.md 里有「回复：短」（英文写 Reply: short），回复都写短。命令要用的临时脚本放项目里，用完删掉。插件里的文件路径不当链接给学生。
+- 学生说「这类我懂了」，在 .duck/config.md 的「按类静音」（Muted topics）下记一行，以后这一类只记不讲。学生嫌回复长，在 config.md 记一行「回复：短」（英文 config 写 Reply: short）；有这一行，回复都写短，学生改口再删。config.md 还没有就新建，不写开关行，别顺手开启。改了 config.md 的哪一行，都告诉学生。
+- 工具报错时，说清哪个工具、错在哪、影响什么，不只说「环境错误」。命令要用的临时脚本放项目里，用完删掉。插件里的文件路径不当链接给学生。
 
 ## 1. 先查两件事
 - 读项目的 .duck/config.md，没有就跳过这一条。「关掉的命令」（英文的 config 里叫 Disabled commands）下面写了 vibe，就回一句「/duck-vibe 已关闭，敲 /duck-skill enable vibe 可以打开。」然后停下。
