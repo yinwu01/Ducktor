@@ -381,7 +381,7 @@ function mainStages() {
     { name: 'off', resume: true, prompt: `${cmd('duck')} off`, checks: [
       ['must', 'config says off', () => switchIs('off')],
       // off is the fresh-install state, not a stronger "off" than that.
-      ['should', 'reply says this is back to not turned on', (t) => /刚装好|没开启|未.{0,4}开启|没有开启/.test(t.reply)],
+      ['should', 'reply says this is back to not turned on', (t) => /刚.{0,2}装好|没开启|未.{0,4}开启|没有开启/.test(t.reply)],
     ] },
     // A new session after /duck off: same as a project that never turned Ducktor on. The hook
     // gives the idle note, and a command still explains itself and keeps its records.

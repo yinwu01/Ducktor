@@ -17,6 +17,14 @@ const ROOT = path.resolve(__dirname, '..');
 const SHIPPED = ['AGENTS.md', 'bin', 'cards', 'gemini-extension.json', 'handbook', 'hooks', 'library', 'rules', 'skills',
   '.claude-plugin/plugin.json', '.codex-plugin/plugin.json', '.cursor-plugin/plugin.json'];
 
+// True when version a (x.y.z) is lower than b. Versions that are not x.y.z are not compared.
+function lower(a, b) {
+  const [x, y] = [a, b].map((v) => (v.match(/^(\d+)\.(\d+)\.(\d+)/) || []).slice(1).map(Number));
+  if (x.length < 3 || y.length < 3) return false;
+  for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] < y[i];
+  return false;
+}
+
 function git(args) {
   return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 }
@@ -38,6 +46,10 @@ function main() {
   }
   const released = tag.slice(`${name}--v`.length);
   if (released !== version) {
+    if (lower(version, released)) {
+      console.error(`release-check: version ${version} is lower than the last release ${tag}. Versions only go up.`);
+      process.exit(1);
+    }
     console.log(`release-check: version ${version}, last release ${tag}`);
     return;
   }

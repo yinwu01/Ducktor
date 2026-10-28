@@ -93,6 +93,9 @@ test('manifests parse, agree on name and version, and point at real files', () =
   assert.equal(json('.agents/plugins/marketplace.json').plugins[0].name, codex.name);
   // Gemini CLI auto-loads hooks/hooks.json; the Claude/Codex hooks must not sit there.
   assert.ok(!fs.existsSync(path.join(ROOT, 'hooks', 'hooks.json')));
+  // Each version tells its users what changed and what to do after the update.
+  const heading = new RegExp(`^## ${claude.version.replace(/\./g, '\\.')}（`, 'm');
+  assert.match(read('CHANGELOG.md'), heading, `CHANGELOG.md has no entry for ${claude.version}`);
 });
 
 test('hook commands use no shell syntax that differs between sh, PowerShell and cmd', () => {
