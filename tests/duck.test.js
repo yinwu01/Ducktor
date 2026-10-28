@@ -94,6 +94,10 @@ test('not turned on and off: the hook gives no rules, the commands carry the bas
       assert.match(text, /用 Read 读，不用 cat/, 'duck: Read for plugin files');
       assert.match(text, /Write、Edit），不用 echo/, 'duck: Write and Edit for .duck/');
       assert.match(text, /照学生的语言说/, 'duck: the student\'s language');
+      assert.match(text, /写进 \.duck\/ 的文字不用破折号/, 'duck: no em-dash in .duck/');
+      assert.match(text, /\.git\/info\/exclude/, 'duck: the git note when .duck/ is first made');
+      // The block must not come back without its markers either.
+      assert.doesNotMatch(text, /^##+ 先记住的规矩|^### (东西在哪|每次都照做)/m, 'duck: no copy of the basics');
       continue;
     }
     // Copied whole from core.md, so a command in a project that has not turned Ducktor on

@@ -17,6 +17,8 @@
 //   DUCK_E2E_WRAP    command prefix for the host, e.g. "setpriv --inh-caps=-all --ambient-caps=-all"
 //                    when bwrap refuses to start under ambient capabilities (Codex sandbox)
 //   DUCK_E2E_ONLY    comma-separated stage names to run (later stages may depend on earlier ones)
+//   DUCK_E2E_NOT_ON  1: the loop flow writes no .duck/config.md, so `DUCK_E2E_ONLY=route` checks
+//                    `/duck <sentence>` in a project that has not turned Ducktor on
 //   DUCK_E2E_PAPER   for the paper flow: a folder holding one paper's LaTeX source; it is copied
 //                    to paper/ in an empty project
 //
@@ -351,6 +353,13 @@ function mainStages() {
     { name: 'why', resume: true, prompt: cmd('duck-why'), checks: whyChecks() },
     { name: 'quiet', resume: true, prompt: `${cmd('duck')} quiet`, checks: [
       ['must', 'config says quiet', () => switchIs('quiet')],
+      // quiet still asks before research decisions (core rule 1 covers on and quiet). Off does stop
+      // asking, so a line that names off does not count, nor does the line after it (a bullet's
+      // text can start on the next line).
+      ['should', 'does not say quiet stops asking first', (t) => {
+        const lines = t.reply.split('\n');
+        return !lines.some((l, i) => /不再先问|不先问了|不会先问/.test(l) && !/off/i.test(l) && !/off/i.test(lines[i - 1] || ''));
+      }],
     ] },
     { name: 'polish-quiet', resume: true, prompt: `${cmd('duck-polish')} 润色 paper/main.tex 的摘要`, before: () => allReports().length, checks: [
       ['must', 'read library/paper-polish', (t) => readOf(t, 'paper-polish')],
@@ -580,7 +589,7 @@ function setup() {
   if (FLOW === 'loop') {
     fs.mkdirSync(path.join(PROJECT, '.duck'), { recursive: true });
     fs.writeFileSync(path.join(PROJECT, '.duck', 'notebook.md'), `${LOOP_NOTEBOOK.join('\n')}\n`);
-    fs.writeFileSync(path.join(PROJECT, '.duck', 'config.md'), LOOP_CONFIG);
+    if (process.env.DUCK_E2E_NOT_ON !== '1') fs.writeFileSync(path.join(PROJECT, '.duck', 'config.md'), LOOP_CONFIG);
   }
   if (HOST === 'codex') {
     const cache = path.join(process.env.HOME, '.codex', 'plugins', 'cache', 'ducktor', 'duck');
