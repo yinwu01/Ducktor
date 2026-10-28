@@ -172,6 +172,8 @@ main 自己在这四轮里 20 次过了 17 次：一次是自己答了；两次�
 - 7cc143b（「这类我懂了」在没开启时也记）：more 的 outline 和 mute 两步，22/22。
 - fedbd0e（问「要学什么」挑 /duck-learn）：照 README 的「事后问」演示走了两遍，两遍都挑了 /duck-learn，先问那一句，给了五段复盘，笔记本记了 3 行。
 
+从 0.1.0 更新到 0.2.0（Claude Code 2.1.312，空的配置目录）：用 git 的 `url.<地址>.insteadOf` 把一个假的 https 地址指到本机的裸仓库，按 git 来源加 marketplace（从 GitHub 装的也是 git 来源），不经网络。裸仓库的 main 先停在 8a3eeed（0.1.0），装上。把 main 换成 0e08c3a（文件变了，版本号还是 0.1.0）：`claude plugin marketplace update ducktor` 拉到了新提交，`claude plugin update duck@ducktor` 回「already at the latest version (0.1.0)」，装着的还是 8a3eeed。再换成 d78f99c（0.2.0）：回「updated from 0.1.0 to 0.2.0」，缓存里换成了新文件（没有 `rules/off.md` 了），在这份副本上直接跑开场 hook，没开启和开启了的项目都照常注入。从本地文件夹装的不看版本号：插件直接从那个文件夹读，改了，下次开会话就生效。从 GitHub 本身更新、Codex 的更新，都没测。
+
 更早一轮（10-21）：
 
 2026-10-21，命令收尾的短版「为什么」和常驻规则第 2 条也改成导师口吻之后，四套全跑。插件内容在提交 b90b55b。
