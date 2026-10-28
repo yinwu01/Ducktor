@@ -186,6 +186,18 @@ test('SessionStart hook: no plugin root gives a note, not a stack trace', () => 
   assert.match(JSON.parse(run.stdout).hookSpecificOutput.additionalContext, /no plugin root/);
 });
 
+test('hooks with a plugin root that is not there: a note at session start, silence before tools', () => {
+  const gone = path.join(project({}), 'gone');
+  const start = runHook('SessionStart', { CLAUDE_PLUGIN_ROOT: gone }, '{}');
+  assert.equal(start.status, 0);
+  assert.equal(start.stderr, '');
+  assert.match(JSON.parse(start.stdout).hookSpecificOutput.additionalContext, /could not load bin\/duck\.js/);
+  const pre = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: gone }, JSON.stringify({ tool_name: 'Read', tool_input: { file_path: path.join(gone, 'x') } }));
+  assert.equal(pre.status, 0);
+  assert.equal(pre.stdout, '');
+  assert.equal(pre.stderr, '');
+});
+
 test('SessionStart hook: bad stdin still produces context', () => {
   const run = runHook('SessionStart', { CLAUDE_PLUGIN_ROOT: ROOT }, 'not json');
   assert.equal(run.status, 0, run.stderr);
