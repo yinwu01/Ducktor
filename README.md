@@ -124,14 +124,14 @@ Ducktor 将过程中的认知资产以纯文本 Markdown 存储在项目本地�
 ## 安装与快速开始
 
 **环境要求**：Node.js 18 及以上版本。
-*(注：当前仓库处于私有测试期，请先确认你的 GitHub 账号已开通访问权限，可通过 `gh repo view JoeyWu-tech/Ducktor` 验证。若此前安装过旧版 `Doctor Duck`，请先参照 [INSTALL.md](INSTALL.md) 中的卸载指南清理旧版本。)*
+*(注：当前仓库处于私有测试期，请先确认你的 GitHub 账号已开通访问权限，可通过 `gh repo view yinwu01/Ducktor` 验证。若此前安装过旧版 `Doctor Duck`，请先参照 [INSTALL.md](INSTALL.md) 中的卸载指南清理旧版本。)*
 
 ### Claude Code
 
 在终端中执行：
 
 ```bash
-claude plugin marketplace add JoeyWu-tech/Ducktor
+claude plugin marketplace add yinwu01/Ducktor
 claude plugin install duck@ducktor
 ```
 
@@ -140,7 +140,7 @@ claude plugin install duck@ducktor
 在终端中执行：
 
 ```bash
-codex plugin marketplace add JoeyWu-tech/Ducktor
+codex plugin marketplace add yinwu01/Ducktor
 codex plugin add duck@ducktor
 ```
 安装后，请在 Codex 中打开 `/hooks`，信任 Ducktor 注册的两条 Hook，随后开启新会话即可。
