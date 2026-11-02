@@ -8,15 +8,15 @@
 <h1 align="center">Ducktor</h1>
 
 <p align="center">
-  在 vibe research 下，我们这些新入学的研究生除了能看 agent 帮你做完一切、过程中刷刷手机以外，还能学到什么？如何实现一个在 vibe research 下的知识闭环？
+  在 vibe research 下，研究者除了边刷手机边等agent出结果，还还能不能像“古法科研”一样从这个过程学到宝贵的科研知识？是否能有类似于导师的角色在日益加速的科研过程中，补上我们缺失的科研学习环节？
 </p>
 
 <p align="center">
-  有没有可能，即使在 agent 能够全自动帮你把一堆零散数据整合并写成论文的过程中，它也能像导师一样，一步步告诉你这个过程中你可以学到哪些东西？
+  这就是Ducktor，一个适配主流agent harness平台的科研学习知识闭环插件。**Trust me, I'm a Ducktor.**
 </p>
-
+ 
 <p align="center">
-  <sub>Trust me, I'm a Ducktor.</sub>
+  <sub>本项目为早期测试版本，欢迎大家随时提出意见，我们团队随时修改</sub>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <sub>简体中文 &middot; <a href="i18n/README.en.md">English</a></sub>
+  <sub>简体中文 · <a href="i18n/README.en.md">English</a></sub>
 </p>
 
 ---
@@ -151,22 +151,22 @@ codex plugin add duck@ducktor
 
 ## 命令
 
-| 命令 | 作用 |
-|------|------|
+| 命令                         | 作用                                                                                                                                                                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `/duck [on \| quiet \| off]` | 不带参数时列出菜单。`on` 在这个项目里打开 Ducktor，`quiet` 只记不讲。`off` 回到刚装好的样子：平时不出声，敲命令时照常讲、照常记。后面接一句话时，比如 `/duck 帮我写引言`，它替你挑一条命令，先说挑了哪条，再做。 |
-| `/duck-survey` | 找研究方向，做文献综述。 |
-| `/duck-idea` | 评估一个 idea 值不值得做。 |
-| `/duck-vibe` | 判断这块活让 AI 干到哪一步，哪些由你自己把关。 |
-| `/duck-outline` | 理清论文的逻辑。技术论文和 benchmark 论文各有一个模板。 |
-| `/duck-intro` | 写引言。 |
-| `/duck-write` | 写正文。 |
-| `/duck-figure` | 设计图，检查出图质量。 |
-| `/duck-polish` | 润色。 |
-| `/duck-review` | 投稿前，用审稿人的标准审你自己的稿子。 |
-| `/duck-why` | 讲刚才那一步。也可以指定文件、git 提交或段落。 |
-| `/duck-learn` | 一段工作做完时复盘。 |
-| `/duck-notes` | 看、改笔记本。 |
-| `/duck-skill` | 关掉或打开命令。改这个项目里的命令和规则，插件本身不变。加你们组自己的经验卡。 |
+| `/duck-survey`             | 找研究方向，做文献综述。                                                                                                                                                                                                 |
+| `/duck-idea`               | 评估一个 idea 值不值得做。                                                                                                                                                                                               |
+| `/duck-vibe`               | 判断这块活让 AI 干到哪一步，哪些由你自己把关。                                                                                                                                                                           |
+| `/duck-outline`            | 理清论文的逻辑。技术论文和 benchmark 论文各有一个模板。                                                                                                                                                                  |
+| `/duck-intro`              | 写引言。                                                                                                                                                                                                                 |
+| `/duck-write`              | 写正文。                                                                                                                                                                                                                 |
+| `/duck-figure`             | 设计图，检查出图质量。                                                                                                                                                                                                   |
+| `/duck-polish`             | 润色。                                                                                                                                                                                                                   |
+| `/duck-review`             | 投稿前，用审稿人的标准审你自己的稿子。                                                                                                                                                                                   |
+| `/duck-why`                | 讲刚才那一步。也可以指定文件、git 提交或段落。                                                                                                                                                                           |
+| `/duck-learn`              | 一段工作做完时复盘。                                                                                                                                                                                                     |
+| `/duck-notes`              | 看、改笔记本。                                                                                                                                                                                                           |
+| `/duck-skill`              | 关掉或打开命令。改这个项目里的命令和规则，插件本身不变。加你们组自己的经验卡。                                                                                                                                           |
 
 命令要装整个插件才能用，因为九条包装命令要读 `library/` 里的科研技能。在 Codex 里，`/duck-review` 写成 `$duck:duck-review`，其他命令照此类推。只读 `AGENTS.md` 的 AI 工具只加载常驻规则，敲不了这些命令。
 
