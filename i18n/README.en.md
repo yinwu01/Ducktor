@@ -113,19 +113,19 @@ In a project where Ducktor is on, each session loads the always-on rules at the 
 
 ## Install
 
-You must have Node.js 18 or a later version. At this time, the repository is private. Your GitHub account must have access to it. If `gh repo view JoeyWu-tech/Ducktor` opens the repository, you have access. If you installed Doctor Duck (the old name of Ducktor), remove it first. The steps are in the section "If you installed Doctor Duck" of [INSTALL.en.md](INSTALL.en.md).
+You must have Node.js 18 or a later version. At this time, the repository is private. Your GitHub account must have access to it. If `gh repo view yinwu01/Ducktor` opens the repository, you have access. If you installed Doctor Duck (the old name of Ducktor), remove it first. The steps are in the section "If you installed Doctor Duck" of [INSTALL.en.md](INSTALL.en.md).
 
 **Claude Code**, in a terminal:
 
 ```bash
-claude plugin marketplace add JoeyWu-tech/Ducktor
+claude plugin marketplace add yinwu01/Ducktor
 claude plugin install duck@ducktor
 ```
 
 **Codex:**
 
 ```bash
-codex plugin marketplace add JoeyWu-tech/Ducktor
+codex plugin marketplace add yinwu01/Ducktor
 codex plugin add duck@ducktor
 ```
 

@@ -2,19 +2,19 @@
 
 You must have Claude Code or Codex, and [Node.js](https://nodejs.org/) 18 or a later version. Both hooks use Node.js. It installs no packages.
 
-> At this time, the repository is private. Before you install, your GitHub account must have access to the repository, and git must be able to use that account (for example, with `gh` installed and logged in). If `gh repo view JoeyWu-tech/Ducktor` opens the repository, you have access. If it does not open, `marketplace add` also fails. Ask the owner of the repository for access first.
+> At this time, the repository is private. Before you install, your GitHub account must have access to the repository, and git must be able to use that account (for example, with `gh` installed and logged in). If `gh repo view yinwu01/Ducktor` opens the repository, you have access. If it does not open, `marketplace add` also fails. Ask the owner of the repository for access first.
 
 ## Claude Code
 
 ```
-/plugin marketplace add JoeyWu-tech/Ducktor
+/plugin marketplace add yinwu01/Ducktor
 /plugin install duck@ducktor
 ```
 
 You can also use the command line:
 
 ```
-claude plugin marketplace add JoeyWu-tech/Ducktor
+claude plugin marketplace add yinwu01/Ducktor
 claude plugin install duck@ducktor
 ```
 
@@ -27,7 +27,7 @@ You install it one time, and it works in all projects. Open a new session in the
 ## Codex
 
 ```
-codex plugin marketplace add JoeyWu-tech/Ducktor
+codex plugin marketplace add yinwu01/Ducktor
 codex plugin add duck@ducktor
 ```
 
