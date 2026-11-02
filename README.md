@@ -52,6 +52,13 @@
 
 我们希望避免人在这 vibe research 中彻底丧失掌控力与思考能力，这就是 Ducktor 这个项目真正想做的事。
 
+<details>
+<summary>为什么叫 Ducktor？</summary>
+
+因为我们希望可以学习[小黄鸭调试法](https://zh.wikipedia.org/wiki/%E5%B0%8F%E9%BB%84%E9%B8%AD%E8%B0%83%E8%AF%95%E6%B3%95)（Rubber Duck Debugging）。在这种方法中，一次有效的 debug 过程就是工程师随身携带一只小黄鸭，在调试代码的时候会在桌上放上这只小黄鸭，然后详细地向鸭子解释每行代码。这种互动交流过程，将让人逐渐知道代码的问题，获取新的知识。所以我们希望 Ducktor 也是这样的一只小黄鸭，在和用户的互动中，达成学习的闭环。
+
+</details>
+
 ## 之前 / 之后
 
 <p align="center">
@@ -195,9 +202,6 @@ codex plugin add duck@ducktor
 
 **它给我打分吗？**
 不给你打分。`/duck-idea` 给 idea 打分，`/duck-review` 给稿子打分，评的是东西，不是你。
-
-**为什么叫 Ducktor？**
-程序员桌上常有一只黄色的橡皮鸭。程序出了 bug，你把代码一行一行讲给它听，讲着讲着，自己就找到了 bug。这只橡皮鸭读完了博士，就成了 Ducktor。
 
 ## 来源和致谢
 
