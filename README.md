@@ -8,19 +8,19 @@
 <h1 align="center">Ducktor</h1>
 
 <p align="center">
-  在 vibe research 下，研究者除了边刷手机边等agent出结果，还还能不能像“古法科研”一样从这个过程学到宝贵的科研知识？是否能有类似于导师的角色在日益加速的科研过程中，补上我们缺失的科研学习环节？
+  在 vibe research 下，研究者除了边刷手机边等 agent 出结果，还能不能像“古法科研”一样从这个过程学到宝贵的科研知识？是否能有类似于导师的角色在日益加速的科研过程中，补上我们缺失的科研学习环节？
 </p>
 
 <p align="center">
-  这就是Ducktor，一个适配主流agent harness平台的科研学习知识闭环插件。**Trust me, I'm a Ducktor.**
+  这就是 Ducktor，一个适配主流 agent harness 平台的科研学习知识闭环插件。<b>Trust me, I'm a Ducktor.</b>
 </p>
- 
+
 <p align="center">
   <sub>本项目为早期测试版本，欢迎大家随时提出意见，我们团队随时修改</sub>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/works%20with-Claude%20Code%20%C2%B7%20Codex-111111?style=flat-square" alt="Works with Claude Code and Codex">
+  <img src="https://img.shields.io/badge/works%20with-Codex%20%C2%B7%20Claude%20Code%20%C2%B7%20ZCode%20%C2%B7%20Gemini%20CLI%20%C2%B7%20Qwen%20Code%20%C2%B7%20CodeBuddy%20%C2%B7%20Cursor-111111?style=flat-square" alt="Works with Codex, Claude Code, ZCode, Gemini CLI, Qwen Code, CodeBuddy and Cursor">
   <img src="https://img.shields.io/badge/license-MIT%20%C2%B7%20CC%20BY--NC--SA%204.0%20%C2%B7%20CC%20BY%204.0-111111?style=flat-square" alt="License: MIT, CC BY-NC-SA 4.0 and CC BY 4.0">
 </p>
 
