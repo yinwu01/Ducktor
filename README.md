@@ -8,15 +8,14 @@
 <h1 align="center">Ducktor</h1>
 
 <p align="center">
-  在 vibe research 下，研究者除了边刷手机边等 agent 出结果，还能不能像“古法科研”一样从这个过程学到宝贵的科研知识？是否能有类似于导师的角色在日益加速的科研过程中，补上我们缺失的科研学习环节？
+  <b>面向 AI 科研时代的「方法论与认知闭环」插件</b><br>
+  当 Agent 将科研流程加速为 <code>Data In, Paper Out</code> 的黑盒，研究者如何避免沦为被动的旁观者？<br>
+  Ducktor 适配主流 Agent Harness 平台，在推进研究的同时，为你补齐缺失的导师指引与科研训练闭环。<br>
+  <b>Trust me, I'm a Ducktor.</b>
 </p>
 
 <p align="center">
-  这就是 Ducktor，一个适配主流 agent harness 平台的科研学习知识闭环插件。<b>Trust me, I'm a Ducktor.</b>
-</p>
-
-<p align="center">
-  <sub>本项目为早期测试版本，欢迎大家随时提出意见，我们团队随时修改</sub>
+  <sub>当前处于早期测试阶段（Early Preview），欢迎提交 Issue 或 PR，我们将持续快速迭代。</sub>
 </p>
 
 <p align="center">
@@ -25,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/demo.zh-CN.webp" width="880" alt="示意动图，不是录屏。两个终端做同一件事：「实验都做完了，结果在 results/ 里。帮我写成一篇 NeurIPS 论文。」左边没装 Ducktor：AI 很快写完 paper/main.tex，说都做完了，又说为了不夸大，消融只跑了一次，0.1 到 0.3 的差没下结论。你拿到一篇论文。右边先敲 /duck on，在这个项目开启 Ducktor：平时干活也讲为什么、记决策，结果进论文前先对标准。再说同一句话。Ducktor 读完结果，说按 /duck-write 来写，动笔前先说：消融只跑了一次，0.1 到 0.3 的差没和 seed 间的波动比过，先补 seed，还是先写？你回了一句「你定」。写完以后它讲为什么：先写不先补 seed，消融只报数，不下结论，免得把波动写成发现；三条贡献各对一节，审稿人能逐条核对。决策行记下三件事：先写不先补 seed、贡献写三条、引言先写挑战再给方法，都是 AI 定的。然后敲 /duck-learn：它先问这次哪一步是你自己定的、哪一步最想重来，你答「跳过」。它讲本来想干什么、实际怎样；顶级导师会盯的是差距要大过种子间的波动（卡 E05，Ducktor 自带的经验卡，不是文献），这次消融只跑了一次；再列出这次交给 AI 的判断，说下次想自己定，说一声就行；下一步是先弄清引言为什么这样排，消融补两个 seed。复盘存进 .duck/reports/，原则记进笔记本。最后敲 /duck-why，问写引言这一步有什么值得学习和注意的。Ducktor 说最值得学的是引言第二段：讲完 RNN、卷积的不足，先写翻译本身难在哪，远处的词也要连上，词序决定意思。这样排是 AI 定的。常见写法是讲完不足就给出方法；有经验的人先写问题的难处，再让每条对上一个模块：远处的词靠自注意力一步连上，词序靠位置编码。Widom 在 Tips for Writing Technical Papers 里说，引言要回答为什么难。这次两处难点各对上了模块，见 paper/main.tex 第 49 行。原则「挑战写问题的难处，每条对上一个模块」记进笔记本，讲解存进 .duck/reports/；下次写引言前，先列出这个问题本身的两三处难点。它最后注明，讲「这次怎么做的」那几句是照文件和对话记录推出来的，AI 当时是不是这么想的，没法确认。">
+  <img src="assets/demo.zh-CN.webp" width="880" alt="示意动图（非实机录屏）：对比两个终端执行同一指令「实验都做完了，结果在 results/ 里。帮我写成一篇 NeurIPS 论文。」。左侧未安装 Ducktor：AI 直接生成 paper/main.tex，仅附带说明因消融实验只跑了一次未下定论。右侧开启 /duck on：Ducktor 在写入论文前先执行证据标准核查，指出消融实验仅单次运行且 0.1~0.3 的增益未与随机种子波动对比，询问「先补跑 Seed 还是先落笔」；定稿后拆解核心取舍、记录决策归属，并通过 /duck-learn 与 /duck-why 结合经验卡（如 E05）与名家方法论（如 Widom 论文写作指南）完成复盘与知识沉淀。">
 </p>
 
 <p align="center">
@@ -36,180 +35,208 @@
 
 ## 为什么做 Ducktor
 
-**在 vibe research 浪潮之下，研究者（特别是新入学的研究生）在研究过程中究竟能获得什么样的知识？这是我们在 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)（![GitHub stars](https://img.shields.io/github/stars/HKUSTDial/Supervisor-Skills?style=flat-square&label=stars&color=111111)）获得学术界和业界的认可之后，越来越关注的一个问题。**
+在 **Vibe Research** 浪潮下，编码与科研 Agent 极大地压缩了从实验到成文的周期。但这也是我们在开源 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)（![GitHub stars](https://img.shields.io/github/stars/HKUSTDial/Supervisor-Skills?style=flat-square&label=stars&color=111111)）并获得学界与业界广泛认可后，愈发担忧的一个问题：**当 AI 接管了执行细节，研究者（尤其是高年级本科生与低年级研究生）还能否从科研过程中习得真正的学术判断力？**
 
-我们从社群中发现，许多 skill 使用者是正在学习科研流程或希望继续精进的研究人员及研究生。对他们而言，我们之前的 Supervisor 系列工作能够提供有深度且结构化的知识认知与引导，**但尚无法提供直接指导**。
+在社区反馈中我们发现，许多研究者依赖 `Supervisor-Skills` 获取结构化的科研认知，但静态的技能库仍缺少**伴随式的实时指导**。与此同时，当前多数自动化科研工具本质上是一个开环系统——**Data In, Paper Out**。Agent 替你完成了所有隐性决策（如何界定核心贡献、结论下到什么分寸、消融实验如何归因），而人却被排除在思考回路之外。
 
-与此同时，agent 将过往的科研过程大大压缩，传统由导师指导或学生自行反复探索再进步的范式正逐渐失效。我们就在思考：在车轮之下，作为 human，我们的思维是否也能同步跟上 agent 步伐？我们的脑子能否在这个过程中真正学到东西并以此精进？
+**Ducktor 旨在打破这种「执行加速、认知空心化」的困境，构建属于研究者的知识闭环：**
 
-目前许多这类 vibe research 工具只是一个开环系统：**data in**，然后 **paper out**，整个过程中没有形成人的知识闭环。
-
-因此，我们希望通过 Ducktor 这个项目来补上闭环的缺口：
-
-1. 你的输入不再仅仅是 data，而是将 data 与你想要参考的顶级学者思想共同作为 input。
-2. 在 agent 执行 research 的过程中，Ducktor 会拆解出用户真正应该学习掌握的内容，整理成册，并与你实时互动。
-3. 让你不仅能在这里学到足够扎实的内容，还能在此过程中将 paper 润色打磨，最终输出高质量的成果。
-
-我们希望避免人在这 vibe research 中彻底丧失掌控力与思考能力，这就是 Ducktor 这个项目真正想做的事。
+1. **注入顶尖学术品味**：输入不再只是实验数据，还将顶尖学者的方法论、审稿标准与你们课题组的经验共同作为上下文约束。
+2. **过程拆解与实时对齐**：在 Agent 推进研究的关键节点，Ducktor 主动暴露背后的学术取舍（Trade-offs），将隐性判断转化为可习得的显性原则。
+3. **能力与成果双重沉淀**：在打磨出高质量论文的同时，生成可溯源的决策日志与个人科研笔记，让研究者的学术直觉与 Agent 同步进化。
 
 <details>
-<summary>为什么叫 Ducktor？</summary>
-
-因为我们希望可以学习[小黄鸭调试法](https://zh.wikipedia.org/wiki/%E5%B0%8F%E9%BB%84%E9%B8%AD%E8%B0%83%E8%AF%95%E6%B3%95)（Rubber Duck Debugging）。在这种方法中，一次有效的 debug 过程就是工程师随身携带一只小黄鸭，在调试代码的时候会在桌上放上这只小黄鸭，然后详细地向鸭子解释每行代码。这种互动交流过程，将让人逐渐知道代码的问题，获取新的知识。所以我们希望 Ducktor 也是这样的一只小黄鸭，在和用户的互动中，达成学习的闭环。
-
+<summary><b>💡 为什么取名为 Ducktor？</b></summary>
+<br>
+灵感源于软件工程中的<a href="https://zh.wikipedia.org/wiki/%E5%B0%8F%E9%BB%84%E9%B8%AD%E8%B0%83%E8%AF%95%E6%B3%95">小黄鸭调试法（Rubber Duck Debugging）</a>——工程师通过向桌上的小黄鸭逐行解释代码逻辑，在自我审视与复述中发现盲区、厘清思路。<b>Ducktor（Duck + Doctor/Mentor）</b> 扮演的正是终端里这只戴博士帽的“学术小黄鸭”：通过高频、轻量的方法论互动，帮你夺回对研究过程的掌控力与思考深度。
 </details>
 
-## 之前 / 之后
+---
+
+## 核心体验：之前 vs. 之后
 
 <p align="center">
-  <img src="assets/before-after.zh-CN.png" width="880" alt="示意图，不是录屏。同一句话：「实验都做完了，结果在 results/ 里。帮我写成一篇 NeurIPS 论文。」没装 Ducktor：AI 读完结果，一口气写完 paper/main.tex，说消融只跑了一次，0.1 到 0.3 的差没下结论。你拿到一篇论文。有 Ducktor，分三条命令做，每条命令讲一个为什么、一条原则和一句下次。/duck-outline：贡献要具体到，删掉它主张就变（卡 W08）。/duck-write：参考文献没让 AI 凭记忆写，每条都是这次查到、核对过的，引用不能让 AI 生成或猜（卡 W13）。/duck-review：英德上 big 比 base 高 1.1，可参数是 3 倍多、步数是 3 倍，大幅提升，要把来源拆开（卡 R02）。每条原则都记进 .duck/notebook.md。">
+  <img src="assets/before-after.zh-CN.png" width="880" alt="示意图：同样面对「实验都做完了，结果在 results/ 里。帮我写成一篇 NeurIPS 论文。」。未装 Ducktor 时，AI 一口气生成全文，隐性取舍不透明。使用 Ducktor 时，通过 /duck-outline（关联卡 W08：贡献需具体到删去即改变核心主张）、/duck-write（关联卡 W13：杜绝凭记忆生成伪造引用，逐条核验）、/duck-review（关联卡 R02：大幅性能提升需解耦参数量与训练步数来源）分步推进，每步输出核心取舍、可迁移原则与下次行动建议，并沉淀至 .duck/notebook.md。">
 </p>
 
-你把实验结果交给 AI，让它写成论文。没有 Ducktor，AI 一口气写完。贡献怎么定、话说多满、拿什么比，这些判断都是 AI 做的。它也许在最后提几句，但不拆成道理，不给出处，也不记下来。
+当你把实验结果交给常规 AI 撰写论文时，AI 会一次性输出初稿。**核心贡献如何提炼、结论措辞的强弱边界、对比基线的合理性**，全部由模型在黑盒中自行决断——你可能拿到了一篇通顺的草稿，却错失了最重要的方法论训练，也为后续审稿埋下了隐患。
 
-用 Ducktor 的命令，同一件事分几步做。`/duck-outline` 理清逻辑，`/duck-write` 写正文，`/duck-review` 按审稿人的眼光审稿。每条命令做完，Ducktor 讲这一步的关键取舍，给一条带得走的原则，再说下次你自己可以先做什么。
+引入 Ducktor 后，同样的任务被重构为透明的教研闭环：
+- 使用 `/duck-outline` 梳理主线逻辑，`/duck-write` 撰写正文，`/duck-review` 以审稿人视角严苛自查。
+- 每完成一个关键阶段，Ducktor 都会为你提炼三要素：**这一步的核心取舍（Why）**、**一条可迁移的科研原则（Principle）**，以及**下次你可以主动前置的操作建议（Next Time）**。
 
-## 问 Ducktor
+---
 
-AI 已经做完了，你也可以事后问。敲 `/duck`，后面直接接问题，比如 `/duck 可不可以告诉我这个内容里我要学什么？`。Ducktor 先说按哪条命令处理，再照那条命令讲。
+## 核心机制与工作流
 
-`/duck-why` 讲 AI 刚才那一步。它只挑一件最值得学的事：常见的做法是什么，有经验的研究者怎么想，哪位名家写过这个道理。提到数字或改动时，它说去哪个文件核对。讲完加粗一句原则，再一句「下次」，是你下次可以先做的事。你也可以指定一个文件、一次 git 提交或一个段落。
+Ducktor 并不替换你现有的底层模型，而是作为一套轻量级规则、Hook 与技能层，引导你的 AI 扮演严谨的学术导师。
 
-## 复盘
+### 1. 双模式运行与「证据护栏」
 
-`/duck-learn` 在一段工作做完时复盘。它先问你：哪一步是你定的，哪一步最想重来。你可以不答。然后它读这一段的决策、报告和笔记。它讲本来想做什么、实际怎样、有经验的导师会盯哪里。它列出哪些判断交给了 AI，最后给下一步。你答了的话，下一步会用上你的回答。
+安装后，Ducktor 默认处于**按需模式**，仅在你显式调用 `/duck-*` 命令时介入。在项目根目录下执行 `/duck on` 后，将开启当前项目的**伴随指导模式**（或使用 `/duck quiet` 开启仅记录、不输出的静默模式）：
 
-## 笔记本和决策记录
+* **即时方法论点拨**：当 AI 完成具有实质意义的研究动作（如确定技术路线、调整实验设计、完成核心段落撰写），Ducktor 会在回复末尾用一两句话点出背后的科研考量。
+* **关键决策前置征询**：面对会改变研究走向的重大取舍，AI 在动手前会先向你确认（单次最多提出 3 个核心问题，避免过度打扰）。
+* **结果入文前的「证据护栏」**：当你在伴随模式下要求 AI 将实验数据写入表格或推导结论时，Ducktor 会前置核查三项审稿级红线（发现隐患将暂停写入并征询你的意见）：
+  1. **统计显著性**：实验是否仅运行了单次？性能差距是否大于不同随机种子（Seed）间的波动？
+  2. **归因解耦**：当出现大幅性能提升时，收益来源（如参数量扩张、训练步数增加 vs. 方法本身改进）是否已拆解清楚？
+  3. **主张与证据对齐**：行文结论的措辞强度，是否超出了现有实验证据的支撑范围？
 
-Ducktor 记下的原则，每条一行，在 `.duck/notebook.md` 里。有取舍的决定，每条一行，记进 `.duck/decisions.md`，写明是你定的还是 AI 定的。下次敲命令做同类的事，Ducktor 先翻笔记本，用得上的旧条目会点出来。你说「这类我懂了」，这一类以后只记不讲。
+> 📌 *注：显式执行 `/duck-*` 命令时，工作流将遵循对应命令的专属步骤，上述三项检查将在命令结束时通过「经验卡」形式提示。关于开启 Ducktor 前后的真实对话对比，请参阅评测集 [evals/before-after/](evals/before-after/)。*
 
-什么时候记：在项目里打开 Ducktor 以后（`/duck on`，或者只记不讲的 `/duck quiet`），命令做完记一条；平时做完一步实质性的工作，能提炼出一条原则也记，意思重复的不记。没打开时，只有敲命令才记。`/duck off` 回到没打开时的样子。
+### 2. 事后追问（`/duck-why`）与阶段复盘（`/duck-learn`）
 
-这些记录都是项目里的普通 markdown 文件，可以和论文一起提交进 git。组会上导师问「这个为什么这么定」，你翻得出来。不想提交，把 `.duck/` 写进 `.git/info/exclude`。
+* **即时追问 (`/duck` & `/duck-why`)**：即使 AI 已经执行完毕，你也可以随时输入 `/duck <你的问题>`（例如 `/duck 这一步有哪些值得注意的科研规范？`），系统会自动路由至最匹配的命令进行解答。调用 `/duck-why` 时，Ducktor 会针对刚才的操作（或你指定的文件、Git Commit、段落），聚焦剖析**最值得学习的一处细节**：对比新手常见误区与资深学者思路、给出名家文献出处、指明数据核对路径，并沉淀出一条**加粗原则**与**下次行动指南**。
+* **阶段复盘 (`/duck-learn`)**：在一个研究阶段告一段落时调用。它会先询问你*“哪一步是由你亲自拍板的？哪一步最想推倒重来？”*（可跳过），随后结合项目中的决策记录、报告与笔记，对比“初始预期”与“实际产出”，指出顶尖导师会重点审视的薄弱环节，并梳理出此前完全托管给 AI 的判断清单，帮助你逐步收回学术主导权。
 
-## 道理从哪来
+### 3. 个人知识沉淀与决策溯源（`.duck/`）
 
-Ducktor 讲道理时，名家和出处只从这几处取：
+Ducktor 将过程中的认知资产以纯文本 Markdown 存储在项目本地的 `.duck/` 目录下：
 
-- [经验卡](cards/INDEX.md)，插件带 23 张。每张写一条道理、什么时候用、怎么用，以及出处。比如卡 W11：用词强度跟证据强度对齐。
-- [名家文章索引](cards/MENTORS.md)。Hamming、Schulman、Karpathy 等研究者写过讲科研的文章。每篇用我们自己的话转述要点，附原文链接。
-- [科研手册](handbook/)，来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)。
-- 你们组自己加的卡，用 `/duck-skill` 加。和插件的卡冲突时，以你们的为准。
+* **科研原则笔记本 (`.duck/notebook.md`)**：按行记录提炼出的科研原则。下次执行同类任务时，Ducktor 会自动检索并唤醒相关历史原则。如果你表示“这类原则我已经掌握”，后续将转为只记录、不重复说教。
+* **决策溯源日志 (`.duck/decisions.md`)**：按行记录研究过程中的关键取舍，并明确标注决策者（`Human` 或 `AI`）。
+* **复盘与精讲报告 (`.duck/reports/`)**：存档 `/duck-learn` 与 `/duck-why` 的深度分析。
 
-找不到出处时，Ducktor 直说这是它自己的判断。
+所有记录均为标准 Markdown 文件，可直接随论文代码库提交至 Git（组会上面对导师追问“当时为什么这样设计实验”，可随时溯源）；若无需入库，将 `.duck/` 加入 `.git/info/exclude` 即可。
 
-## 工作原理
+### 4. 可溯源的导师知识库（拒绝凭空说教）
 
-Ducktor 不换掉你的 AI。它是一组规则和命令，你的 AI 照着它们当导师。
+为避免大模型产生空洞的“正确的废话”，Ducktor 阐述方法论时的引用严格限定于以下四个来源（若无明确出处，Ducktor 会坦诚声明这仅是当前模型的推论）：
 
-刚装好时，Ducktor 不出声，只在你敲 `/duck-*` 命令时干活。在一个项目里敲 `/duck on`，它就在这个项目里一直跟着：
+* **[经验卡 (Experience Cards)](cards/INDEX.md)**：内置 23 张高频科研经验卡，涵盖适用场景、操作准则与文献溯源（例如 `W11`：行文措辞强度必须与实验证据强度严格对齐）。
+* **[名家方法论索引 (Mentors)](cards/MENTORS.md)**：结构化提炼 Richard Hamming、John Schulman、Andrej Karpathy、Jennifer Widom 等学者的经典科研方法论文章要点，并附原文链接。
+* **[科研手册 (Handbook)](handbook/)**：源自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的系统化科研指南。
+* **课题组自定义经验卡**：支持通过 `/duck-skill` 注入你们实验室内部的审稿偏好与写作规范（发生冲突时，优先以课题组自定义规则为准）。
 
-- AI 做完一步实质性的工作，比如定了方法、改了实验、写完一段，Ducktor 在回复末尾用一两行讲为什么。
-- 会改变做法的决定，AI 动手之前先问你，一次最多问三件。
-- 有取舍时，Ducktor 记一行决策，写明是你定的还是 AI 定的。
+---
 
-`/duck quiet` 照样先问、照样记，只是不在对话里讲。
+## 仓库架构
 
-开着 Ducktor 时，你让 AI 把实验结果写进表或结论，它先查三件事。查到问题，它先停下来问你：
+开启 Ducktor 的项目会在每次会话初始化时加载常驻规则 [`rules/core.md`](rules/core.md)（针对仅支持规则文件的工具提供 [`AGENTS.md`](AGENTS.md)）。核心组件分布如下：
 
-1. 只跑了一次吗？差距和种子之间的波动比过吗？
-2. 提升很大时，来源拆清楚了吗？
-3. 结论比证据说得更强吗？
+* [`skills/`](skills/)：14 条交互命令的定义与编排逻辑。
+* [`library/`](library/)：完整集成的 10 项 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 核心科研技能（涵盖文献综述、Idea 评估、投稿前审稿等）。
+* [`cards/`](cards/) & [`handbook/`](handbook/)：内置经验卡、名家文章索引与科研手册。
+* `bin/`、`hooks/`、`scripts/`：多平台插件适配脚本与生命周期 Hook。
 
-敲 `/duck-*` 命令时，AI 照命令自己的步骤走，这三件不拦命令；命令做完，会用经验卡提醒。
+---
 
-这一条有对比：AI 碰到「把新结果加进表，摘要里补一句更好」时，开着 Ducktor 和没开时各怎么做。设置和对话原文见 [evals/before-after/](evals/before-after/)。
+## 安装与快速开始
 
-`/duck-survey`、`/duck-review` 这类命令里，AI 照 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 的科研技能干活。这套技能是 HKUSTDial 开源的，一共 10 个，从文献综述、评估 idea 到投稿前审稿。
+**环境要求**：Node.js 18 及以上版本。
+*(注：当前仓库处于私有测试期，请先确认你的 GitHub 账号已开通访问权限，可通过 `gh repo view JoeyWu-tech/Ducktor` 验证。若此前安装过旧版 `Doctor Duck`，请先参照 [INSTALL.md](INSTALL.md) 中的卸载指南清理旧版本。)*
 
-Ducktor 不出题，也不给你这个人打分。
+### Claude Code
 
-## 规则
-
-开着 Ducktor 的项目，每个会话开头都加载常驻规则 [`rules/core.md`](rules/core.md)。给只读规则文件的 AI 工具用的版本是 [`AGENTS.md`](AGENTS.md)。14 条命令在 [`skills/`](skills/)，10 个科研技能原样放在 [`library/`](library/)。经验卡和名家文章索引在 [`cards/`](cards/)，科研手册在 [`handbook/`](handbook/)。其余的文件，有的把这些装进不同的 AI 工具，有的是测试和文档。
-
-## 安装
-
-需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限：`gh repo view yinwu01/Ducktor` 能打开，就是有了。以前装过 Doctor Duck（Ducktor 的旧名字），先照 [INSTALL.md](INSTALL.md) 里「以前装的是 Doctor Duck」一节卸掉旧的，再往下装。
-
-**Claude Code**，在终端里：
+在终端中执行：
 
 ```bash
-claude plugin marketplace add yinwu01/Ducktor
+claude plugin marketplace add JoeyWu-tech/Ducktor
 claude plugin install duck@ducktor
 ```
 
-**Codex：**
+### Codex
+
+在终端中执行：
 
 ```bash
-codex plugin marketplace add yinwu01/Ducktor
+codex plugin marketplace add JoeyWu-tech/Ducktor
 codex plugin add duck@ducktor
 ```
+安装后，请在 Codex 中打开 `/hooks`，信任 Ducktor 注册的两条 Hook，随后开启新会话即可。
 
-然后在 Codex 里打开 `/hooks`，信任 Ducktor 的两条 hook，再开一个新会话。
+### 其他 AI 编程工具（Cursor / Gemini CLI / Qwen Code 等）
 
-**其他 AI 工具：**把仓库放到本机。把 [`AGENTS.md`](AGENTS.md) 复制到你的项目里。告诉 AI 仓库放在哪。这样有常驻规则，没有斜杠命令；要用某条命令，就说「照 Ducktor 的 /duck-review 做」。Cursor、Gemini CLI、Qwen Code 有适配文件，还没有实测：**[docs/agent-portability.md](docs/agent-portability.md)**。
+将本仓库克隆至本地，把 [`AGENTS.md`](AGENTS.md) 复制到你的目标项目根目录，并在对话中告知 AI 本仓库的本地路径。此模式下常驻规则自动生效；由于无原生斜杠命令支持，可通过自然语言触发（如*“请按照 Ducktor 的 `/duck-review` 流程审阅当前草稿”*）。各平台适配详情请参阅 **[docs/agent-portability.md](docs/agent-portability.md)**。
 
-就这些。在 Claude Code 里，到项目最外层的文件夹（新建的空文件夹也行）开一个新会话，敲 `/duck`；Codex 里敲 `$duck:duck`。Ducktor 先说一句最省事的用法，再列出菜单。
+### 启动验证
 
-想让 Ducktor 平时也跟着，在项目里敲一次 `/duck on`。开关记在这个项目的 `.duck/config.md` 里，别的项目不受影响。在 `paper/` 这样的子文件夹里开会话，Ducktor 读不到开关。
+1. 在项目**最外层根目录**（新建空目录亦可）启动新的终端会话。
+2. 在 Claude Code 中输入 `/duck`（Codex 中输入 `$duck:duck`），Ducktor 将展示极简上手指引与命令菜单。
+3. 若希望在日常对话中开启伴随指导，执行一次 `/duck on` 即可。开关状态独立保存在当前项目的 `.duck/config.md` 中，不会污染其他项目（注意：请勿在 `paper/` 等子目录下启动会话，否则无法读取根目录配置）。
 
-完整流程只用本地副本测过；从 GitHub 安装，只测过能装上。更新、卸载和常见问题见 [INSTALL.md](INSTALL.md)。
+> 更多关于版本更新、卸载流程与故障排查，请参阅 **[INSTALL.md](INSTALL.md)**。
 
-## 命令
+---
 
-| 命令                         | 作用                                                                                                                                                                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/duck [on \| quiet \| off]` | 不带参数时列出菜单。`on` 在这个项目里打开 Ducktor，`quiet` 只记不讲。`off` 回到刚装好的样子：平时不出声，敲命令时照常讲、照常记。后面接一句话时，比如 `/duck 帮我写引言`，它替你挑一条命令，先说挑了哪条，再做。 |
-| `/duck-survey`             | 找研究方向，做文献综述。                                                                                                                                                                                                 |
-| `/duck-idea`               | 评估一个 idea 值不值得做。                                                                                                                                                                                               |
-| `/duck-vibe`               | 判断这块活让 AI 干到哪一步，哪些由你自己把关。                                                                                                                                                                           |
-| `/duck-outline`            | 理清论文的逻辑。技术论文和 benchmark 论文各有一个模板。                                                                                                                                                                  |
-| `/duck-intro`              | 写引言。                                                                                                                                                                                                                 |
-| `/duck-write`              | 写正文。                                                                                                                                                                                                                 |
-| `/duck-figure`             | 设计图，检查出图质量。                                                                                                                                                                                                   |
-| `/duck-polish`             | 润色。                                                                                                                                                                                                                   |
-| `/duck-review`             | 投稿前，用审稿人的标准审你自己的稿子。                                                                                                                                                                                   |
-| `/duck-why`                | 讲刚才那一步。也可以指定文件、git 提交或段落。                                                                                                                                                                           |
-| `/duck-learn`              | 一段工作做完时复盘。                                                                                                                                                                                                     |
-| `/duck-notes`              | 看、改笔记本。                                                                                                                                                                                                           |
-| `/duck-skill`              | 关掉或打开命令。改这个项目里的命令和规则，插件本身不变。加你们组自己的经验卡。                                                                                                                                           |
+## 命令参考
 
-命令要装整个插件才能用，因为九条包装命令要读 `library/` 里的科研技能。在 Codex 里，`/duck-review` 写成 `$duck:duck-review`，其他命令照此类推。只读 `AGENTS.md` 的 AI 工具只加载常驻规则，敲不了这些命令。
+| 命令 | 核心作用与适用场景 |
+| :--- | :--- |
+| `/duck [on \| quiet \| off]` | **总控与智能路由**。不带参数时展示菜单；`on` 开启项目伴随模式；`quiet` 开启静默记录模式；`off` 恢复按需触发模式。后接自然语言（如 `/duck 帮我写引言`）时，自动匹配并执行对应子命令。 |
+| `/duck-survey` | **文献调研**：探索研究方向，生成结构化文献综述。 |
+| `/duck-idea` | **课题评估**：审视研究 Idea 的新颖性、可行性与潜在审稿风险。 |
+| `/duck-vibe` | **人机边界划分**：评估当前模块哪些工作可托管给 AI，哪些核心科学判断必须由研究者亲自把关。 |
+| `/duck-outline` | **逻辑架构**：梳理整篇论文的论证脉络（内置技术论文与 Benchmark 论文双模板）。 |
+| `/duck-intro` | **引言撰写**：构建“背景—挑战—方法映射—贡献”严密咬合的 Introduction。 |
+| `/duck-write` | **正文撰写**：基于真实实验证据撰写方法与实验章节，严控引用真实性。 |
+| `/duck-figure` | **图表设计**：规划科研图表结构并核查可视化信息密度与规范。 |
+| `/duck-polish` | **学术润色**：提升学术表达的精准度、可读性与行文节奏。 |
+| `/duck-review` | **模拟审稿**：在投稿前以顶会 Reviewer 的严苛视角对稿件进行全面体检。 |
+| `/duck-why` | **方法论溯源**：深度剖析上一步操作（或指定文件、Commit、段落）背后的学术取舍与名家依据。 |
+| `/duck-learn` | **阶段性复盘**：对比预期与结果，诊断薄弱环节，盘点交给 AI 的隐性决策。 |
+| `/duck-notes` | **知识库管理**：查看、检索或编辑本地沉淀的 `.duck/notebook.md` 科研原则。 |
+| `/duck-skill` | **定制与扩展**：启停特定命令、针对当前项目微调规则，或注入课题组专属经验卡。 |
 
-## 常见问题
+*注：9 条核心科研工作流命令依赖 `library/` 下的技能库，需完整安装插件方可使用。在 Codex 环境中，请将 `/duck-review` 替换为 `$duck:duck-review`（其余命令同理）。*
 
-**要配置文件吗？**
-不用。`/duck on` 会在项目里建 `.duck/config.md`。你可以用 `/duck-skill` 关掉命令或加卡。这些都可以不做。
+---
 
-**没开启的项目里，它会做什么？**
-每次开会话，hook 往上下文里放一小段说明：插件装在哪，这个项目没开启。AI 照常干活。只有你敲 `/duck-xxx` 时，它才照命令讲、照命令记。你说「这类我懂了」或者嫌回复长，它会记进 `.duck/config.md`，以后照着做。开启以后，hook 放的是整份常驻规则，长一些。
+## 常见问题 (FAQ)
 
-**它会一直问我吗？**
-不会。只有会改变做法的决定才问，一次最多三件。改错别字、只改一两句这类小事，它也不讲为什么。
+<details>
+<summary><b>1. 需要手动编写配置文件吗？</b></summary>
+<br>
+不需要。执行 <code>/duck on</code> 时会自动在项目下创建 <code>.duck/config.md</code>。后续你可以通过 <code>/duck-skill</code> 启停特定命令或添加自定义经验卡，也可在对话中直接要求“缩短回复篇幅”或“这类知识点无需再讲”，偏好会自动写入配置。
+</details>
 
-**它会改我的论文吗？**
-你让 AI 改，AI 才改。开着 Ducktor 时，结果要写进论文，它先查证据。证据不够，它先问你。
+<details>
+<summary><b>2. 未开启 <code>/duck on</code> 的项目会消耗额外上下文吗？</b></summary>
+<br>
+几乎不会。在未开启伴随模式的项目中，Session Hook 仅向模型上下文注入极简的路径说明（告知插件位置且当前处于关闭状态），AI 完全按原生方式工作；只有当你显式调用 <code>/duck-*</code> 命令时，才会按需加载对应规则。开启 <code>/duck on</code> 后，才会注入完整的常驻导师规则。
+</details>
 
-**我就想让它直接改呢？**
-说一句「这次不用问我，你直接定。」AI 就不先问了。它照样记一行决策，写明是 AI 定的。
+<details>
+<summary><b>3. 它会频繁打断我的工作流、或者擅自修改论文吗？</b></summary>
+<br>
+<b>不会频繁打断</b>：仅当面临会改变研究走向或违背证据护栏的重大取舍时，AI 才会前置提问（且单次不超过 3 个问题）；修改拼写、润色单句等常规操作均直接执行。<br>
+<b>不会擅自改稿</b>：只有在你下达修改指令时 AI 才会改动文件。如果你赶时间希望跳过征询，只需说一句<i>“这次不用问我，你直接定”</i>，AI 便会直接执行，并将该决策标记为 <code>AI</code> 记入日志。
+</details>
 
-**Ducktor 讲的会错吗？**
-会。它说你稿子里的数字、别人的论文做了什么，都可能说错：引用的论文，点开看一眼标题和摘要；数字和改动，自己对一遍原文件。用 `/duck-why` 时，它会说去哪个文件核对。讲「这次怎么做的」那几句，是照文件和对话记录推出来的，AI 当时是不是这么想的，没法确认。
+<details>
+<summary><b>4. Ducktor 讲述的方法论或引用的数据会出错（幻觉）吗？</b></summary>
+<br>
+<b>有可能，请始终保持研究者的最终核验权。</b>模型在转述你稿件中的实验数值或他人文献结论时仍可能出现偏差：对于外部文献，请务必点击链接核对标题与摘要；对于文内数据，请对照源文件复核（<code>/duck-why</code> 会明确给出需核对的文件路径与行号）。此外，复盘时关于“AI 当时为何这样做”的分析，是基于文件变更与对话历史的事后逆向推演，并不代表底层模型真实的内部推理状态。
+</details>
 
-**会把我的东西发出去吗？**
-插件的 hook 脚本只读文件，不联网，也不写文件。在 Claude Code 里，它替你放行两类操作，不弹窗：读插件自己的文件；`.duck/` 建好以后，往笔记本、决策记录里追加，以及写报告。改笔记本、决策记录里已有的行，改开关和规则（`config.md`、`skills/`、`cards/`），照常问你。AI 读到的内容照常发给模型。`/duck-survey`、`/duck-idea`、`/duck-review` 这类命令会让 AI 上网查文献。
+<details>
+<summary><b>5. 插件的权限边界与数据隐私如何保障？</b></summary>
+<br>
+插件自带的本地 Hook 脚本仅做本地文件读取，<b>绝不联网，也不主动修改业务代码</b>。在 Claude Code 中，Hook 仅对两类安全操作配置了免弹窗放行：（1）读取插件自身目录文件；（2）<code>.duck/</code> 目录初始化后，向笔记本、决策日志追加条目及生成复盘报告。若涉及修改已有笔记、变更配置（<code>config.md</code>）或改动技能卡片（<code>skills/</code>、<code>cards/</code>），依然会正常触发终端授权确认。此外，执行 <code>/duck-survey</code>、<code>/duck-idea</code>、<code>/duck-review</code> 等命令时，AI 会按需调用搜索工具联网检索公开文献。
+</details>
 
-**它给我打分吗？**
-不给你打分。`/duck-idea` 给 idea 打分，`/duck-review` 给稿子打分，评的是东西，不是你。
+<details>
+<summary><b>6. Ducktor 会对研究者进行能力评分吗？</b></summary>
+<br>
+不会。Ducktor 不出考题，也不对使用者打分。<code>/duck-idea</code> 评估的是课题方案的成熟度，<code>/duck-review</code> 审视的是论文手稿的质量——<b>我们评估的是研究客体，而非研究者本人。</b>
+</details>
 
-## 来源和致谢
+---
 
-- 名字来自小黄鸭调试法（[Rubber duck debugging](https://en.wikipedia.org/wiki/Rubber_duck_debugging)），出自《程序员修炼之道》（The Pragmatic Programmer）。
-- 方法论、手册和 10 个科研技能来自 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)。Copyright (c) 2026 Yuyu Luo (methodology) and contributors。本仓库的提交历史从上游 c243997（2026-07-01）分出来。上游到那时为止的提交和作者都保留着。`library/` 和 `handbook/` 的内容取自上游 aff5de9（2026-07-16）。
-- README 两张图里的论文数字，取自《Attention Is All You Need》（[arXiv 1706.03762](https://arxiv.org/abs/1706.03762)）的表 2 和表 3。
-- README 的结构和写法参考了 [ponytail](https://github.com/DietrichGebert/ponytail)（MIT）。支持多种 AI 工具的做法参考了 ponytail 和 [superpowers](https://github.com/obra/superpowers)。
+## 来源与致谢
 
-## 许可证
+* **命名灵感**：源自《程序员修炼之道》（*The Pragmatic Programmer*）提出的小黄鸭调试法（[Rubber Duck Debugging](https://en.wikipedia.org/wiki/Rubber_duck_debugging)）。
+* **核心方法论与技能库**：科研手册（`handbook/`）与 10 项底层科研技能（`library/`）源自香港科技大学（广州）数据智能与分析实验室开源的 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)（Copyright © 2026 Yuyu Luo and contributors）。本仓库提交历史自上游 `c243997`（2026-07-01）分支演进，完整保留了上游历史提交与作者署名；`library/` 与 `handbook/` 内容同步自上游 `aff5de9`（2026-07-16）。
+* **示例数据说明**：README 演示图表中引用的对比实验数据，取自经典论文 *Attention Is All You Need*（[arXiv:1706.03762](https://arxiv.org/abs/1706.03762)）的 Table 2 与 Table 3。
+* **工程致谢**：README 的文档叙事受 [ponytail](https://github.com/DietrichGebert/ponytail)（MIT）启发；多平台 Agent Harness 的兼容架构参考了 `ponytail` 与 [superpowers](https://github.com/obra/superpowers)。
 
-按目录分。我们写的文字（`skills/`、`rules/`、`cards/`）、`handbook/` 和 README 的图（`assets/`）用 CC BY-NC-SA 4.0，不可商用。代码（`bin/`、`hooks/`、`scripts/`、`tests/`）用 MIT。`library/` 里的科研技能保留各自原来的许可：6 个用 CC BY 4.0，4 个用 CC BY-NC-SA 4.0。详见 [LICENSE](LICENSE) 和 [LICENSES/README.md](LICENSES/README.md)。
+---
+
+## 许可证 (License)
+
+本项目采用分目录多重许可策略：
+* **方法论文档与视觉资产**：本项目原创的规则与卡片（`skills/`、`rules/`、`cards/`）、科研手册（`handbook/`）及配图资产（`assets/`）采用 **CC BY-NC-SA 4.0** 协议（非商业性使用-相同方式共享）。
+* **工程代码**：脚手架、Hook 与测试脚本（`bin/`、`hooks/`、`scripts/`、`tests/`）采用 **MIT** 协议。
+* **上游技能库**：`library/` 目录下的科研技能保留各自的上游许可证（其中 6 项采用 **CC BY 4.0**，4 项采用 **CC BY-NC-SA 4.0**）。
+
+完整许可条款请参阅 [LICENSE](LICENSE) 与 [LICENSES/README.md](LICENSES/README.md)。
