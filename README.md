@@ -130,19 +130,19 @@ Ducktor 不出题，也不给你这个人打分。
 
 ## 安装
 
-需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限：`gh repo view JoeyWu-tech/Ducktor` 能打开，就是有了。以前装过 Doctor Duck（Ducktor 的旧名字），先照 [INSTALL.md](INSTALL.md) 里「以前装的是 Doctor Duck」一节卸掉旧的，再往下装。
+需要 Node.js 18 或更高版本。仓库现在是私有的，你的 GitHub 账号要先拿到访问权限：`gh repo view yinwu01/Ducktor` 能打开，就是有了。以前装过 Doctor Duck（Ducktor 的旧名字），先照 [INSTALL.md](INSTALL.md) 里「以前装的是 Doctor Duck」一节卸掉旧的，再往下装。
 
 **Claude Code**，在终端里：
 
 ```bash
-claude plugin marketplace add JoeyWu-tech/Ducktor
+claude plugin marketplace add yinwu01/Ducktor
 claude plugin install duck@ducktor
 ```
 
 **Codex：**
 
 ```bash
-codex plugin marketplace add JoeyWu-tech/Ducktor
+codex plugin marketplace add yinwu01/Ducktor
 codex plugin add duck@ducktor
 ```
 
