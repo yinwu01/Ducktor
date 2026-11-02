@@ -8,7 +8,11 @@
 <h1 align="center">Ducktor</h1>
 
 <p align="center">
-  <em>AI 做研究。Ducktor 讲为什么。道理你带走。</em>
+  在 vibe research 下，我们这些新入学的研究生除了能看 agent 帮你做完一切、过程中刷刷手机以外，还能学到什么？如何实现一个在 vibe research 下的知识闭环？
+</p>
+
+<p align="center">
+  有没有可能，即使在 agent 能够全自动帮你把一堆零散数据整合并写成论文的过程中，它也能像导师一样，一步步告诉你这个过程中你可以学到哪些东西？
 </p>
 
 <p align="center">
@@ -25,21 +29,28 @@
 </p>
 
 <p align="center">
-  <strong>贡献怎么定、话说多满、跟谁比，AI 替你定了。</strong><br>
-  <strong>Ducktor 把这些判断拆开，一条一条讲给你。</strong><br>
-  <strong>讲到的原则，记进你的笔记本。</strong><br>
-  <sub>用在 Claude Code 和 Codex 里。道理标明出处，找不到出处，Ducktor 就直说是它自己的判断。</sub>
-</p>
-
-<p align="center">
   <sub>简体中文 &middot; <a href="i18n/README.en.md">English</a></sub>
 </p>
 
 ---
 
-你认识它：程序员桌上那只黄色的橡皮鸭。程序出了 bug，你把代码一行一行讲给它听，讲着讲着，自己就找到了 bug。
+## 为什么做 Ducktor
 
-现在 AI 替你做研究，轮不到你讲了。Ducktor 反过来：它把 AI 做过的判断讲给你听。
+**在 vibe research 浪潮之下，研究者（特别是新入学的研究生）在研究过程中究竟能获得什么样的知识？这是我们在 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 获得学术界和业界的认可之后，越来越关注的一个问题。**
+
+我们从社群中发现，许多 skill 使用者是正在学习科研流程或希望继续精进的研究人员及研究生。对他们而言，我们之前的 Supervisor 系列工作能够提供有深度且结构化的知识认知与引导，**但尚无法提供直接指导**。
+
+与此同时，agent 将过往的科研过程大大压缩，传统由导师指导或学生自行反复探索再进步的范式正逐渐失效。我们就在思考：在车轮之下，作为 human，我们的思维是否也能同步跟上 agent 步伐？我们的脑子能否在这个过程中真正学到东西并以此精进？
+
+目前许多这类 vibe research 工具只是一个开环系统：**data in**，然后 **paper out**，整个过程中没有形成人的知识闭环。
+
+因此，我们希望通过 Ducktor 这个项目来补上闭环的缺口：
+
+1. 你的输入不再仅仅是 data，而是将 data 与你想要参考的顶级学者思想共同作为 input。
+2. 在 agent 执行 research 的过程中，Ducktor 会拆解出用户真正应该学习掌握的内容，整理成册，并与你实时互动。
+3. 让你不仅能在这里学到足够扎实的内容，还能在此过程中将 paper 润色打磨，最终输出高质量的成果。
+
+我们希望避免人在这 vibe research 中彻底丧失掌控力与思考能力，这就是 Ducktor 这个项目真正想做的事。
 
 ## 之前 / 之后
 
@@ -186,7 +197,7 @@ codex plugin add duck@ducktor
 不给你打分。`/duck-idea` 给 idea 打分，`/duck-review` 给稿子打分，评的是东西，不是你。
 
 **为什么叫 Ducktor？**
-开头那只橡皮鸭，现在读完博士了。
+程序员桌上常有一只黄色的橡皮鸭。程序出了 bug，你把代码一行一行讲给它听，讲着讲着，自己就找到了 bug。这只橡皮鸭读完了博士，就成了 Ducktor。
 
 ## 来源和致谢
 
