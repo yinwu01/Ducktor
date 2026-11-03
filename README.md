@@ -37,7 +37,7 @@
 
 在 **Vibe Research** 浪潮下，编码与科研 Agent 极大地压缩了从实验到成文的周期。但这也是我们在开源 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)（![GitHub stars](https://img.shields.io/github/stars/HKUSTDial/Supervisor-Skills?style=flat-square&label=stars&color=111111)）并获得学界与业界广泛认可后，愈发担忧的一个问题：**当 AI 接管了执行细节，研究者（尤其是高年级本科生与低年级研究生）还能否从科研过程中习得真正的学术判断力？**
 
-在社区反馈中我们发现，许多研究者依赖 `Supervisor-Skills` 获取结构化的科研认知，但静态的技能库仍缺少**伴随式的实时指导**。与此同时，当前多数自动化科研工具本质上是一个开环系统——**Data In, Paper Out**。Agent 替你完成了所有隐性决策（如何界定核心贡献、结论下到什么分寸、消融实验如何归因），而人却被排除在思考回路之外。
+在社区反馈中我们发现，许多研究者依赖 `Supervisor-Skills` 获取结构化的科研认知，但静态的技能库仍缺少**伴随式的实时指导**。与此同时，当前多数自动化科研工具本质上是一个开环系统：**Data In, Paper Out**。Agent 替你完成了所有隐性决策（如何界定核心贡献、结论下到什么分寸、消融实验如何归因），而人却被排除在思考回路之外。
 
 **Ducktor 旨在打破这种「执行加速、认知空心化」的困境，构建属于研究者的知识闭环：**
 
@@ -48,7 +48,7 @@
 <details>
 <summary><b>💡 为什么取名为 Ducktor？</b></summary>
 <br>
-灵感源于软件工程中的<a href="https://zh.wikipedia.org/wiki/%E5%B0%8F%E9%BB%84%E9%B8%AD%E8%B0%83%E8%AF%95%E6%B3%95">小黄鸭调试法（Rubber Duck Debugging）</a>——工程师通过向桌上的小黄鸭逐行解释代码逻辑，在自我审视与复述中发现盲区、厘清思路。<b>Ducktor（Duck + Doctor/Mentor）</b> 扮演的正是终端里这只戴博士帽的“学术小黄鸭”：通过高频、轻量的方法论互动，帮你夺回对研究过程的掌控力与思考深度。
+灵感源于软件工程中的<a href="https://zh.wikipedia.org/wiki/%E5%B0%8F%E9%BB%84%E9%B8%AD%E8%B0%83%E8%AF%95%E6%B3%95">小黄鸭调试法（Rubber Duck Debugging）</a>：工程师通过向桌上的小黄鸭逐行解释代码逻辑，在自我审视与复述中发现盲区、厘清思路。<b>Ducktor（Duck + Doctor/Mentor）</b> 扮演的正是终端里这只戴博士帽的“学术小黄鸭”：通过高频、轻量的方法论互动，帮你夺回对研究过程的掌控力与思考深度。
 </details>
 
 ---
@@ -59,7 +59,7 @@
   <img src="assets/before-after.zh-CN.png" width="880" alt="示意图：同样面对「实验都做完了，结果在 results/ 里。帮我写成一篇 NeurIPS 论文。」。未装 Ducktor 时，AI 一口气生成全文，隐性取舍不透明。使用 Ducktor 时，通过 /duck-outline（关联卡 W08：贡献需具体到删去即改变核心主张）、/duck-write（关联卡 W13：杜绝凭记忆生成伪造引用，逐条核验）、/duck-review（关联卡 R02：大幅性能提升需解耦参数量与训练步数来源）分步推进，每步输出核心取舍、可迁移原则与下次行动建议，并沉淀至 .duck/notebook.md。">
 </p>
 
-当你把实验结果交给常规 AI 撰写论文时，AI 会一次性输出初稿。**核心贡献如何提炼、结论措辞的强弱边界、对比基线的合理性**，全部由模型在黑盒中自行决断——你可能拿到了一篇通顺的草稿，却错失了最重要的方法论训练，也为后续审稿埋下了隐患。
+当你把实验结果交给常规 AI 撰写论文时，AI 会一次性输出初稿。**核心贡献如何提炼、结论措辞的强弱边界、对比基线的合理性**，全部由模型在黑盒中自行决断。你可能拿到了一篇通顺的草稿，却错失了最重要的方法论训练，也为后续审稿埋下了隐患。
 
 引入 Ducktor 后，同样的任务被重构为透明的教研闭环：
 - 使用 `/duck-outline` 梳理主线逻辑，`/duck-write` 撰写正文，`/duck-review` 以审稿人视角严苛自查。
@@ -168,7 +168,7 @@ codex plugin add duck@ducktor
 | `/duck-idea` | **课题评估**：审视研究 Idea 的新颖性、可行性与潜在审稿风险。 |
 | `/duck-vibe` | **人机边界划分**：评估当前模块哪些工作可托管给 AI，哪些核心科学判断必须由研究者亲自把关。 |
 | `/duck-outline` | **逻辑架构**：梳理整篇论文的论证脉络（内置技术论文与 Benchmark 论文双模板）。 |
-| `/duck-intro` | **引言撰写**：构建“背景—挑战—方法映射—贡献”严密咬合的 Introduction。 |
+| `/duck-intro` | **引言撰写**：构建“背景→挑战→方法映射→贡献”严密咬合的 Introduction。 |
 | `/duck-write` | **正文撰写**：基于真实实验证据撰写方法与实验章节，严控引用真实性。 |
 | `/duck-figure` | **图表设计**：规划科研图表结构并核查可视化信息密度与规范。 |
 | `/duck-polish` | **学术润色**：提升学术表达的精准度、可读性与行文节奏。 |
@@ -218,7 +218,7 @@ codex plugin add duck@ducktor
 <details>
 <summary><b>6. Ducktor 会对研究者进行能力评分吗？</b></summary>
 <br>
-不会。Ducktor 不出考题，也不对使用者打分。<code>/duck-idea</code> 评估的是课题方案的成熟度，<code>/duck-review</code> 审视的是论文手稿的质量——<b>我们评估的是研究客体，而非研究者本人。</b>
+不会。Ducktor 不出考题，也不对使用者打分。<code>/duck-idea</code> 评估的是课题方案的成熟度，<code>/duck-review</code> 审视的是论文手稿的质量：<b>我们评估的是研究客体，而非研究者本人。</b>
 </details>
 
 ---
