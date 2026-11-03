@@ -123,6 +123,15 @@ Ducktor 将过程中的认知资产以纯文本 Markdown 存储在项目本地�
 
 ## 安装与快速开始
 
+让你的 agent 帮忙，把下面这段话发给它：
+
+```text
+帮我安装 Ducktor 插件：https://github.com/yinwu01/Ducktor
+照仓库里 INSTALL.md 的步骤装好，装完告诉我怎么开始用。
+```
+
+也可以照下面的步骤自己装。
+
 **环境要求**：Node.js 18 及以上版本。
 *(注：当前仓库处于私有测试期，请先确认你的 GitHub 账号已开通访问权限，可通过 `gh repo view yinwu01/Ducktor` 验证。若此前安装过旧版 `Doctor Duck`，请先参照 [INSTALL.md](INSTALL.md) 中的卸载指南清理旧版本。)*
 
@@ -229,6 +238,7 @@ codex plugin add duck@ducktor
 * **核心方法论与技能库**：科研手册（`handbook/`）与 10 项底层科研技能（`library/`）源自香港科技大学（广州）数据智能与分析实验室开源的 [Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills)（Copyright © 2026 Yuyu Luo and contributors）。本仓库提交历史自上游 `c243997`（2026-07-01）分支演进，完整保留了上游历史提交与作者署名；`library/` 与 `handbook/` 内容同步自上游 `aff5de9`（2026-07-16）。
 * **示例数据说明**：README 演示图表中引用的对比实验数据，取自经典论文 *Attention Is All You Need*（[arXiv:1706.03762](https://arxiv.org/abs/1706.03762)）的 Table 2 与 Table 3。
 * **工程致谢**：README 的文档叙事受 [ponytail](https://github.com/DietrichGebert/ponytail)（MIT）启发；多平台 Agent Harness 的兼容架构参考了 `ponytail` 与 [superpowers](https://github.com/obra/superpowers)。
+* **Supervisor 系列**：我们正式将 Supervisor 作为一个实验室系列：[Supervisor-Skills](https://github.com/HKUSTDial/Supervisor-Skills) 是系列的第一个，Ducktor 与 [DeepSeek-Ducktor](https://github.com/yinwu01/DeepSeek-Ducktor) 是第二和第三个。接下来我们还会继续开源，并与社区合作。
 
 ---
 
