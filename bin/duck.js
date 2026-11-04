@@ -15,7 +15,10 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const CONFIG_LIMIT = 1200; // characters of .duck/config.md passed through as-is
+// Characters of .duck/config.md passed through as-is. 1,000 holds the template and a few dozen
+// lines of settings; past that the AI is told to read the file. (1,200 until 0.2.1: the rules
+// grew, and the worst case must stay under the size test's 7,000.)
+const CONFIG_LIMIT = 1000;
 
 // Values the switch line may carry. The Chinese words are what students tend to type.
 const MODES = {
@@ -123,7 +126,7 @@ function buildContext(project) {
     const label = { unset: '没开启', off: 'off，和没开启一样' }[mode] || mode;
     parts.push(`项目的 .duck/config.md（开关：${label}）：\n${shown}`);
     if (note) parts.push(note);
-    if (SHORT_REPLIES.test(config)) parts.push('学生要过回复写短（config.md 里的「回复：短」）：这次会话的每条回复都写短；长的内容写进文件，回复里说在哪。');
+    if (SHORT_REPLIES.test(config)) parts.push('学生要过回复写短（config.md 里的「回复：短」）：这次会话的每条回复都写短，十行以内；长的内容写进文件，回复里说在哪。');
     if (config.includes('�')) parts.push('.duck/config.md 里有读不出的字节（可能不是 UTF-8 编码），开关可能没认对。');
   }
   return parts.join('\n\n');
