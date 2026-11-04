@@ -166,8 +166,15 @@ test("the student's copy of the rules wins over the plugin's", () => {
   for (const copy of ['# 改过的\r\n\r\n## 每次都照做\r\n- 我们自己的一条\r\n', '# 改过的\n\n## 每次都照做']) {
     const text = duck.buildContext(project({ '.duck/config.md': '开关：on\r\n', '.duck/skills/core.md': copy }));
     assert.equal(text.match(/## 每次都照做/g).length, 1, JSON.stringify(copy));
-    assert.doesNotMatch(text, /学生的副本里没有这一节/);
+    assert.doesNotMatch(text, /上面「每次都照做」一节来自插件原版/);
   }
+  // A 0.2.0 copy has 「每次都照做」 but no 「怎么讲」 (new in 0.2.1): it gets that section, once.
+  const old = duck.buildContext(project({ '.duck/config.md': '开关：on\n', '.duck/skills/core.md': '# 改过的\n\n## 每次都照做\n- 我们自己的一条\n' }));
+  assert.equal(old.match(/^## 怎么讲/gm).length, 1);
+  assert.match(old, /上面「怎么讲」一节来自插件原版/);
+  const both = duck.buildContext(project({ '.duck/config.md': '开关：on\n', '.duck/skills/core.md': '# 改过的\n\n## 每次都照做\n- 一条\n\n## 怎么讲\n- 我们的讲法\n' }));
+  assert.equal(both.match(/^## 怎么讲/gm).length, 1);
+  assert.doesNotMatch(both, /学生的副本里没有这一节/);
 });
 
 test('a long config is cut and a non-UTF-8 config is flagged', () => {
@@ -197,8 +204,8 @@ test('an English config gets an English reminder to reply in English', () => {
 test('the injected text stays well under host limits', () => {
   // Claude Code caps additionalContext at 10,000 characters; Codex moves long context to a file.
   // Worst cases: on, the short-reply line (adds a sentence), an English config (adds one more),
-  // and a config cut at its limit.
-  for (const head of ['开关：on\n回复：短\n', 'Switch: on\nReply: short\n']) {
+  // unreadable bytes (one more), and a config cut at its limit.
+  for (const head of ['开关：on\n回复：短\n', 'Switch: on\nReply: short\n', 'Switch: on\nReply: short\n\uFFFD']) {
     const text = duck.buildContext(project({ '.duck/config.md': `${head}${'x'.repeat(5000)}` }));
     assert.ok(text.length < 7000, `${text.length} characters`);
   }
