@@ -17,7 +17,7 @@ Node 自带的 `node:test`，不装依赖，几秒跑完。
 
 `tests/structure.test.js` 测仓库本身：
 - 14 条命令，frontmatter 只有 name、description、`disable-model-invocation: true`，每条都有 Codex 的 `agents/openai.yaml`。
-- 总入口的菜单正好列全；10 个原技能都有命令，`core.md` 的映射一个不漏。
+- 总入口的菜单正好列全；10 个原技能都有命令，命令模板（`rules/wrapper-template.md`）里原技能名到命令的映射一个不漏。
 - 生成的命令和 `AGENTS.md` 是最新的；`library/`、`handbook/` 和上游锁文件逐文件一致。
 - 命令和规则里点到的路径都存在。
 - 经验卡片：`cards/INDEX.md` 和卡片文件一一对应；每张卡的字段齐全，卡号和文件名一致，认同程度是三档之一，「共识」至少三个来源；卡里引用的手册和原技能文件都存在，写的行号不超过文件行数。
@@ -47,14 +47,14 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | idea | `/duck-idea` 加一段 idea 描述 | 读了 `library/idea-evaluator`；写了报告；笔记本多一行 |
 | review | `/duck-review paper/main.tex` | 读了 `library/pre-submission-reviewer`；写了报告；指出只跑了一次 |
 | propose | 不敲命令，让 AI 把摘要第一句改紧凑 | 回复里点出 `/duck-polish`；（should）只改一句，笔记本不多一行 |
-| why | `/duck-why` | 一个引用块，有整行加粗的一句和「下次」一句，没有「用的思路：」这类旧标签；点名的名家都在 cards/MENTORS.md 或卡片里；说明「回到这次」是重建，不是 AI 内部过程的回放；写了报告 |
+| why | `/duck-why` | 写了报告；回复里就有讲解，不只指向报告；报告里写明「这次怎么做的」是从记录推出来的。should：没有整行加粗的原则、没有固定结尾句、没有「用的思路：」这类标签；对话里不报名家和卡号；报告列出依据或写「自己的判断」。点名的人只能来自 cards/MENTORS.md、卡片或学生的项目（0.2.0 以前查的是固定的加粗行、「下次」行和结尾句，0.2.1 起这些形式去掉了） |
 | quiet | `/duck quiet` | config 里开关是 quiet |
 | polish-quiet | `/duck-polish` 润色摘要 | 读了 `library/paper-polish`；照样写了报告；对话里没有「为什么」 |
 | quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有 Ducktor 的话；（should）笔记本多了一行，带「这次」 |
 | card-draft、card-ok | `/duck-skill card new …`，再说「可以，写吧」 | 写了 `.duck/cards/G01.md`，INDEX 里有 G01 |
-| learn-ask、learn | `/duck-learn`，再答它的一个问题 | 开头只问那一个问题；写了复盘报告 |
+| learn | `/duck-learn`；它先问了一句（这一段有学生定的事、学生还没回顾）时，测试替学生答一句再查 | 写了复盘报告；回复里有复盘本身（交给 AI 的判断或下一步），不只写报告文件名。should：对话里没有五段固定标题、没有固定开场问话、不报名家和卡号；报告保留五节，写了怎么记「我自己定」（0.2.0 以前查的是固定的开场问话） |
 | off | `/duck off` | config 里开关是 off；回复说回到了没开启的样子（should） |
-| off-new-session | 新会话里 `/duck-polish` | 注入的是没开启那一段；照常写了 polish 报告；回复带「为什么」引用块（should） |
+| off-new-session | 新会话里 `/duck-polish` | 注入的是没开启那一段；照常写了 polish 报告；回复带讲解的引用块（should） |
 
 第二套流程 `more` 在同一个项目上走主流程没走到的 7 条命令，检索完多问一次 `/duck-why`，顺序是学生实际碰到它们的顺序。这个项目不开启 Ducktor，测的是只敲命令的用法：第一步还查注入的是没开启那一段，最后一步查没开启时说「这类我懂了」也记得下来。
 
@@ -71,15 +71,15 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | notes-delete、notes-ok | `/duck-notes 删掉最后一条`，再说「可以，删吧」 | 删掉的正好是最后一条，其余不变 |
 | mute | 「多 seed 和方差这类我懂了，以后别讲了」 | config 的「按类静音」里记了这一类；没有因此开启。should：没写开关行 |
 
-每条包装命令还有几条 should：回复里有「为什么」；列出了卡片提醒，带插件自带卡的卡号；intro 和 write 没改 `paper/main.tex`；write 指出方法描述和代码对不上；notes-delete 先给学生看再删。
+每条包装命令还有几条 should：回复里有讲解的引用块，没有整行加粗的原则，不报名家和卡号；报告里有卡片提醒，带插件自带卡的卡号（0.2.1 起卡片提醒从对话挪进报告）；intro 和 write 没改 `paper/main.tex`；write 指出方法描述和代码对不上；notes-delete 先给学生看再删。
 
 第三套流程 `loop` 开始前，测试先写好开着 Ducktor 的 `.duck/config.md`（`开关：on`），再往项目的笔记本里写两条「前几周」的条目（10-09 写摘要：只跑了一次的结果不写 significantly，卡 W11；10-12 写引言：挑战段写问题本身为什么难，卡 W09），再走：
 
 | 步 | 学生做什么 | 必须满足（must） |
 |---|---|---|
-| route | `/duck 帮我看看摘要最后一句是不是说得太满了` | 说了挑的是哪条命令；读了那条命令的原技能。should：「为什么」里提到 10-09 那条笔记 |
-| intro | `/duck-intro` 重写引言，paper/ 里的文件先别改 | 读了 `library/intro-drafter`；「为什么」或报告里提到 10-12 那条笔记；笔记本没有重复的行 |
-| exp | 不敲命令：「32k 上 70.9 对 70.6，只跑了一次，帮我加进表里」 | 提到种子或运行间的波动。should：先问，表没动 |
+| route | `/duck 帮我看看摘要最后一句是不是说得太满了` | 说了挑的是哪条命令；读了那条命令的原技能。should：讲解或报告里提到 10-09 那条笔记 |
+| intro | `/duck-intro` 重写引言，paper/ 里的文件先别改 | 读了 `library/intro-drafter`；讲解或报告里提到 10-12 那条笔记；笔记本没有重复的行 |
+| exp | 不敲命令：「32k 上 70.9 对 70.6，只跑了一次，帮我加进表里」 | 提到种子或运行间的波动；表没动时，回复里有问句（11-03 探针 A2：问题只写进了 decisions.md）。should：先问，表没动 |
 | exp-ok | 「先补到 3 个 seed，表等结果出来再改」 | 决策记录多了一行，写明是学生定的 |
 | mute | 「多 seed 和方差这类我懂了，以后别讲了」 | config 的「按类静音」里记了这一类 |
 | mute-check | 又一个单次结果，让它记进 notes.md | should：记了；不再讲种子和波动 |
@@ -90,7 +90,7 @@ hook 注入的内容，Claude Code 从 stream-json 的 hook 事件里读；Codex
 
 每套流程全程都查：笔记本每行是「- MM-DD 阶段｜原则（出处）」；决策记录每行是「- YYYY-MM-DD ▸ 决策：……」；两者都没有 em-dash；回复里没有出题、留作业、打分（按一组关键词查，只能抓明显的）；回复里提到的卡号都真的存在（插件自带的卡或项目里的组卡）。
 
-一些步骤带 should 级检查（比如 card-draft 先给学生看卡再写），不满足只记下，不算失败。原技能有时会停下来追问缺的信息；这时测试替学生答一句「信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行。」再查一遍，结果里标明。
+一些步骤带 should 级检查（比如 card-draft 先给学生看卡再写），不满足只记下，不算失败。原技能有时会停下来追问缺的信息；这时测试替学生答一句「信息就这些。按你的理解继续做完，缺的地方在结果里标出来就行。」再查一遍，结果里标明。有的步骤给了自己的回答（比如 learn 一步替学生回顾一句），就用那一句。
 
 每次跑的记录在 `evals/results/e2e-<宿主>-<时间>/`（其他流程是 `e2e-<宿主>-<流程>-<时间>/`）（不进 git）：每一步的原始 jsonl、`summary.md`、`summary.json`，以及跑完时项目 `.duck/` 的拷贝（`duck-files/`）。测试项目本身放在系统临时目录：Claude Code 不肯往已加载插件的目录里写文件，项目放在插件仓库里会让写文件的步骤全部失败。
 
