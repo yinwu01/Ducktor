@@ -214,7 +214,10 @@ const afterLastQuote = (s) => {
   while (i >= 0 && !/^[ \t]*>/.test(lines[i])) i -= 1;
   return i < 0 ? s : lines.slice(i + 1).join('\n');
 };
-const WHY_BLOCK = { test: (s) => quoteText(lastWhy(s)).length > 0 && afterLastQuote(s).replace(/\s/g, '').length <= 400 };
+// Claude Code's web search tool makes the model end with a 「Sources:」 list; it is not part of
+// what follows the explanation (rc4 more, stage survey).
+const withoutSources = (s) => s.replace(/\n+(Sources|来源)[:：][ \t]*\n(?:[ \t]*[-*][^\n]*(?:\n|$))+\s*$/, '\n');
+const WHY_BLOCK = { test: (s) => quoteText(lastWhy(s)).length > 0 && afterLastQuote(withoutSources(s)).replace(/\s/g, '').length <= 400 };
 // The old fixed principle line: a quote line bold from end to end.
 const BOLD_LINE = /^[ \t]*>\s*\*\*[^\n]+\*\*\s*$/m;
 // A step of the wrapped skill given as the reason, e.g. 这是原技能 Step 0 的要求. Broad on purpose:
