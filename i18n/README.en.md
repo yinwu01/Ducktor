@@ -84,7 +84,7 @@ After you install it, Ducktor is in **on-demand mode** by default. It steps in o
 
 * **Short notes on method, right away**: when the AI completes a research action that matters (it chooses a technical approach, changes the experiment design, or finishes a core paragraph), Ducktor adds one to three lines at the end of the reply about the research reasoning behind it.
 * **Ask before key decisions**: for a major trade-off that changes the direction of the research, the AI asks you before it acts (at most 3 core questions at a time, so that it does not interrupt too much). If you said you want to decide a kind of judgment yourself, it always asks about that kind.
-* **The "evidence guardrail" before results go into the paper**: in companion mode, when you ask the AI to put experimental data into a table or to draw a conclusion, Ducktor first checks three reviewer-level red lines (if it finds a problem, it stops before writing and asks you; in Claude Code it sometimes edits the table first and then warns you):
+* **The "evidence guardrail" before results go into the paper**: in companion mode, when you ask the AI to put experimental data into a table or to draw a conclusion, Ducktor first checks three reviewer-level red lines (if it finds a problem, it stops before writing and asks you; in Claude Code, more often than not it edits the table first and then warns you):
   1. **Statistical significance**: did the experiment run only once? Is the gap larger than the variation of the result itself (random seeds, sampling of the test set)? Outside computer science, the standard of your field takes its place (for example sample size and power, effect sizes and confidence intervals).
   2. **Separated attribution**: when there is a large gain, is its source (for example, more parameters or more training steps vs. the method itself) clearly separated?
   3. **Claims match evidence**: is the wording of the conclusion stronger than what the current experimental evidence supports?
@@ -108,7 +108,7 @@ All records are standard Markdown files. You can commit them to Git together wit
 
 ### 4. A traceable mentor knowledge base (no lectures from thin air)
 
-To avoid the empty "correct but useless" talk of large models, when Ducktor explains a method, it draws only on the four sources below. In the conversation it turns them into experience; the sources go into the report, and it gives them when you ask. If nothing fits, it says the point is the AI's own judgment:
+To avoid the empty "correct but useless" talk of large models, when Ducktor explains a method, it draws only on the four sources below. In the conversation it turns them into experience; the sources go into the report or into the notebook line, and it gives them when you ask. If nothing fits, it says the point is the AI's own judgment:
 
 * **[Experience cards](../cards/INDEX.md)**: 23 built-in cards on frequent research situations, each with when it applies, what to do, and where it comes from in the literature (for example, `W11`: the strength of the wording must match the strength of the experimental evidence).
 * **[Mentors index](../cards/MENTORS.md)**: structured key points from classic essays on research method by Richard Hamming, John Schulman, Andrej Karpathy, Jennifer Widom and others, with links to the originals.
@@ -216,7 +216,7 @@ Almost none. In a project without companion mode, the session hook adds only a v
 <summary><b>3. Will it interrupt my work often, or change my paper on its own?</b></summary>
 <br>
 <b>It does not interrupt often</b>: the AI asks first only for a major trade-off that changes the direction of the research or breaks the evidence guardrail (and asks at most 3 questions at a time); routine work such as fixing spelling or polishing one sentence goes ahead directly.<br>
-<b>It does not change your draft on its own</b>: the AI changes your paper and code only when you tell it to; with Ducktor on, it appends decisions, notes and reports to <code>.duck/</code> by itself, without touching your draft. When you insist on your own wording and it disagrees, it tells you what that costs and offers one fix, and you choose; it does not rewrite your draft its own way. If you are in a hurry and want to skip the questions, just say <i>"No need to ask this time, you decide"</i>, and the AI goes ahead and records the decision as "AI decided" in the log.
+<b>It does not change your draft on its own</b>: the AI changes your paper and code only when you tell it to; with Ducktor on, it appends decisions, notes and reports to <code>.duck/</code> by itself, without touching your draft. When you insist on your own wording and it disagrees, it tells you what that costs and offers one fix, and you choose; it does not rewrite your draft its own way. Integrity is the exception: it does not delete a disclosure such as "results are from a single run" for you, and it sometimes adds such a sentence to your draft itself and tells you; you can delete it yourself. If you are in a hurry and want to skip the questions, just say <i>"No need to ask this time, you decide"</i>, and the AI goes ahead and records the decision as "AI decided" in the log.
 </details>
 
 <details>
