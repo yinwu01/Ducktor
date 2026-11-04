@@ -350,7 +350,8 @@ const learnChecks = (answerWords) => [
   ...(answerWords ? [['must', "the student's answer went into the report's next steps", (t) => !t.reply.includes('[学生]')
     || answerWords.test(reportSection(newestReport('learn'), /下一步|Next steps/))]] : []),
   // The look-back comes first; one question on a concrete decision closes the last reply.
-  ['should', 'ends with one look-back question', (t) => /[？?][^？?]{0,40}$/.test(t.reply.trim())],
+  // Judged on the first reply: after the stage's answer the conversation goes on (rc3 paper run).
+  ['should', 'ends with one look-back question', (t) => /[？?][^？?]{0,40}$/.test(t.reply.split('\n\n[学生]')[0].trim())],
   ['should', 'names no researcher and no plugin card number in the conversation', (t) => namesIn(t.reply).length === 0 && !cardIds(t.reply).some((id) => PLUGIN_CARDS.has(id))],
   ['should', 'the report keeps the five sections', () => ['本来想干什么', '实际怎样', '会盯哪里', '交给 ?AI', '下一步'].every((k) => new RegExp(k).test(newestReport('learn')))],
   ['should', 'the report says how to record 我自己定', () => /我自己定/.test(newestReport('learn'))],
@@ -378,6 +379,9 @@ function mainStages() {
       ['must', 'says the duck is not on in this project', (t) => /(没|未)[^\n]{0,8}开启|还没开|没在这个项目/.test(t.reply.replace(/\*/g, ''))],
       ['must', 'the menu did not turn it on', () => !switchIs('on')],
       ['must', 'hook injected the plugin root', (t) => /插件根目录/.test(t.injected)],
+      // The student's notes are Chinese, the paper and README English: the menu follows the notes
+      // (rc3, 11-04: it followed the paper, so the config came out as 「Switch: on」).
+      ['must', 'menu in Chinese: the student\'s notes are Chinese', (t) => /摸方向|评估 idea|写论文/.test(t.reply)],
       ['should', 'no quack and no 鸭子: an advisor does not talk like that', (t) => !/quack|鸭子|嘎/i.test(t.reply)],
     ] },
     // Turning it on mid-session: the rules were not injected at session start, so the AI reads them now.
