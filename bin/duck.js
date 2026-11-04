@@ -97,6 +97,12 @@ const EVERY_TIME = /^##[ \t]*每次都照做[ \t]*$/m;
 // 「回复：短」 (English config: Reply: short) holds for every reply of every session. On the
 // second day of an 11-04 trial the first reply of a new session came back long although the line
 // was in the config passed through below, so the hook says it again in words.
+// An English config (its switch line reads 「Switch:」) means the student works in English. The rules
+// are in Chinese; on day 2 of an 11-04 re-test a new session answered an English question in
+// Chinese although the student, the config and the records were all English. The reminder is
+// itself in English.
+const ENGLISH_CONFIG = /^[ \t>*-]*switch[ \t]*[:：]/im;
+
 const SHORT_REPLIES = /^[ \t>*-]*(?:回复[ \t]*[:：][ \t]*短|reply[ \t]*:[ \t]*short)[ \t。.]*$/im;
 
 // One "## " section of a rules file, heading included; '' when it is not there.
@@ -126,6 +132,7 @@ function buildContext(project) {
     const label = { unset: '没开启', off: 'off，和没开启一样' }[mode] || mode;
     parts.push(`项目的 .duck/config.md（开关：${label}）：\n${shown}`);
     if (note) parts.push(note);
+    if (ENGLISH_CONFIG.test(config)) parts.push('The student works in English: reply in English, the first reply of this session included.');
     if (SHORT_REPLIES.test(config)) parts.push('学生要过回复写短（config.md 里的「回复：短」）：这次会话的每条回复都写短，十行以内；长的内容写进文件，回复里说在哪。');
     if (config.includes('�')) parts.push('.duck/config.md 里有读不出的字节（可能不是 UTF-8 编码），开关可能没认对。');
   }

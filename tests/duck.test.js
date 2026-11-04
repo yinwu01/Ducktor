@@ -187,11 +187,21 @@ test('「回复：短」 in the config is repeated in words, in every switch sta
   }
 });
 
+test('an English config gets an English reminder to reply in English', () => {
+  for (const sw of ['Switch: on\n', 'Switch: off\n', 'Switch: quiet\n']) {
+    assert.match(duck.buildContext(project({ '.duck/config.md': `# Ducktor settings\n\n${sw}` })), /reply in English, the first reply/);
+  }
+  assert.doesNotMatch(duck.buildContext(project({ '.duck/config.md': '开关：on\n' })), /reply in English, the first reply/);
+});
+
 test('the injected text stays well under host limits', () => {
   // Claude Code caps additionalContext at 10,000 characters; Codex moves long context to a file.
-  // Worst case: on, the short-reply line (adds a sentence), and a config cut at its limit.
-  const text = duck.buildContext(project({ '.duck/config.md': `开关：on\n回复：短\n${'x'.repeat(5000)}` }));
-  assert.ok(text.length < 7000, `${text.length} characters`);
+  // Worst cases: on, the short-reply line (adds a sentence), an English config (adds one more),
+  // and a config cut at its limit.
+  for (const head of ['开关：on\n回复：短\n', 'Switch: on\nReply: short\n']) {
+    const text = duck.buildContext(project({ '.duck/config.md': `${head}${'x'.repeat(5000)}` }));
+    assert.ok(text.length < 7000, `${text.length} characters`);
+  }
 });
 
 test('SessionStart hook: Claude Code environment', () => {
