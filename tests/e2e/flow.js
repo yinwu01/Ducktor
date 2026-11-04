@@ -322,7 +322,7 @@ const whyChecks = () => [
   ['must', 'wrote a why report', () => reports('why').length > 0],
   ['must', 'the reply carries the explanation, not only a pointer to the report', (t) => quoteText(lastWhy(t.reply)).replace(/\s/g, '').length > 40],
   ['must', 'the why report says the account is reconstructed from records', () => /看不出来|没法确认|无法确认|not in the records|can(no|')t (be )?(confirm|know)|no way to (know|confirm)/i.test(newestReport('why'))],
-  ['should', 'the why report lists its grounds or says it is its own judgment', () => /依据|自己的判断|Grounds|Sources|own judgment/i.test(newestReport('why'))],
+  ['should', 'the why report lists its grounds or says it is its own judgment', () => /依据|自己的判断|AI ?的判断|Grounds|Sources|own judgment|AI's judgment/i.test(newestReport('why'))],
   ['should', 'no all-bold principle line', (t) => !BOLD_LINE.test(t.reply)],
   ['should', 'no fixed closing line about what cannot be confirmed', (t) => !/没法确认|AI 当时是不是这么想的/.test(t.reply)],
   ['should', 'no section labels like 用的思路： or 名家怎么看：', (t) => !OLD_OR_NEW_LABELS.test(t.reply)],

@@ -108,7 +108,7 @@ All records are standard Markdown files. You can commit them to Git together wit
 
 ### 4. A traceable mentor knowledge base (no lectures from thin air)
 
-To avoid the empty "correct but useless" talk of large models, when Ducktor explains a method, it draws only on the four sources below. In the conversation it turns them into experience; the sources go into the report, and it gives them when you ask. If nothing fits, it says the point is its own judgment:
+To avoid the empty "correct but useless" talk of large models, when Ducktor explains a method, it draws only on the four sources below. In the conversation it turns them into experience; the sources go into the report, and it gives them when you ask. If nothing fits, it says the point is the AI's own judgment:
 
 * **[Experience cards](../cards/INDEX.md)**: 23 built-in cards on frequent research situations, each with when it applies, what to do, and where it comes from in the literature (for example, `W11`: the strength of the wording must match the strength of the experimental evidence).
 * **[Mentors index](../cards/MENTORS.md)**: structured key points from classic essays on research method by Richard Hamming, John Schulman, Andrej Karpathy, Jennifer Widom and others, with links to the originals.
