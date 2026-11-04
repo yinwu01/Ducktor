@@ -43,7 +43,7 @@ Cursor、Gemini CLI、Qwen Code 有适配文件，但还没在本机实测过；
 
 ## 装好了，怎么确认
 
-1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。它先说一句最省事的用法，再列出 13 条命令（加上 `/duck` 本身一共 14 条），说 Ducktor 在这个项目里还没开启。
+1. 开新会话，敲 `/duck`（Codex 里 `$duck:duck`）。它先说一句最省事的用法，再列出 13 条命令（加上 `/duck` 本身一共 14 条），说 Ducktor 在这个项目里还没开启。只敲了命令、还没写过话时，它看你自己的笔记和 `.duck/` 的语言：是英文才用英文，看不出来就用中文；论文和 README 不算，因为很多同学用英文写论文。你写一句英文，它就改用英文。
 2. 在一个项目里敲 `/duck on`，项目里会出现 `.duck/config.md`，开关那一行是 on。从这一轮起它平时也跟着。敲 `/duck off`，或者删掉那一行，就回到默认：平时不出声，敲命令时照常讲。
 
 ## 以前装的是 Doctor Duck
@@ -65,5 +65,5 @@ Codex 里是 `codex plugin remove duck@doctor-duck` 和 `codex plugin marketplac
 - **Codex 里 AI 写不了 `.duck/` 下的文件，或者每条 shell 命令都失败**：看报错里有没有 `bwrap: Unexpected capabilities`。有的话是机器环境的问题，和插件无关：Codex 进程带着 ambient capabilities，有些版本的 bubblewrap（比如 0.6.1）因此不肯启动。用 `setpriv --inh-caps=-all --ambient-caps=-all codex` 启动 Codex。
 - **`/duck-review` 叫不出来，或者叫到了别的东西**：用插件命令的全名 `/duck:duck-review`。
 - **第一次跑 `/duck-survey` 弹了好几次授权**：Claude Code 第一次用 WebSearch、WebFetch 上网查文献时会问你。点允许；选了不再询问，以后就不问了。
-- **Claude Code 里改开关时问能不能改 `.duck/config.md`**：正常。`.duck/` 建好以后，往笔记本、决策记录里追加和写报告由插件放行，不弹窗；默认权限模式下，改已有的行、改开关和规则文件要你点头。AI 用 Write 整份写笔记本或决策记录、又没留下原来的条目时，插件直接拒绝，让 AI 先读、再在末尾追加。
+- **Claude Code 里改开关时问能不能改 `.duck/config.md`**：正常。`.duck/` 建好以后，往笔记本、决策记录里追加和写报告由插件放行，不弹窗；默认权限模式下，改已有的行、改开关和规则文件要你点头。AI 用 Write 整份写笔记本或决策记录、又没留下原来的条目时，插件直接拒绝，让 AI 先读、再在末尾追加；AI 用 shell 命令（echo 加 >> 这类）写这两个文件时，插件也拒绝，让它改用编辑工具，这样不弹框。
 - **Windows**：还没在 Windows 上实测过。hook 跑不起来时，命令照样能用，只是开启了的项目也没有常驻规则，Claude Code 里读插件文件会多弹几次询问。
