@@ -66,6 +66,8 @@ AGENTS.md               给不跑 hook 的 agent 用的常驻规则（生成的�
 
 Claude Code 默认不让读工作目录以外的文件：交互时每次弹窗问，`-p` 模式下直接拒绝。插件也没办法通过清单给自己加可读目录。所以插件带了第二个 hook：PreToolUse，匹配 Read、Glob、Grep、Write、Edit、MultiEdit，调 `bin/duck.js allow`。读：目标路径（解开符号链接以后）在插件根目录下才回答 allow。写：只放行项目 `.duck/` 下 Ducktor 自己记的几样，`notebook.md`、`decisions.md` 和 `reports/` 下的 `.md`。项目按 `CLAUDE_PROJECT_DIR` 认（没有才用 hook 输入里的 cwd），AI `cd paper` 以后照样放行；路径都解开符号链接再比。笔记本和决策记录是学生拿去组会用的日志，只放行追加：新建或空文件；Write 或 Edit 照宿主的做法套到原文件上以后，原文件一字节不差地留在开头。改旧行、删行、往旧行中间插字、replace_all 照常问。`.duck/`、`reports/` 或文件本身是符号链接或硬链接的不放行；`config.md`、`skills/`、`cards/` 下一次会话会当设定和规则读进来，照常问学生。2026-10-27 的学生旅程测试里，AI 用 shell 往笔记本追加被权限拦下，记录就丢了，所以加了写这一半。别的路径一律不回答，照宿主原来的规矩走。shell 命令（cat、ls、find）不在放行范围里，照宿主原来的规矩走（交互时弹窗问，`-p` 模式下拒绝），所以常驻规则让 AI 用 Read 读插件文件。Glob 的 pattern 和 Grep 的 glob 过滤也会指到文件，所以带 `..`、`~` 的不放行，绝对路径的要落在插件根目录下。Linux 上的 Claude Code 默认没有 Glob、Grep 这两个工具（找文件走 Bash 的 find），常驻规则让 AI 改读 `library/upstream.lock.json`，那里列着 `library/` 下每个文件的路径。
 
+11-04 用 Claude Code 2.1.318 看到，它给模型的工具里已经没有 Glob、Grep（会话开头的 init 事件里列着工具）。所以常驻规则让 AI 只用 Read 读插件的文件，列 library/ 的文件改读 library/upstream.lock.json；hook 对 Glob、Grep 的放行留给还有这两个工具的版本。
+
 这条 hook 只跳过「要不要允许」的询问；据 Claude Code 的权限文档，用户自己设的 deny、ask 规则照样生效。用户开了 `blockReadsOutsideWorkingDirectories` 时它还管不管用，文档没写，我们也没测。
 
 Codex 的沙箱默认能读整个文件系统，不需要这条；它的工具名也不叫 Read，这条 hook 在 Codex 里匹配不到任何东西。

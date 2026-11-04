@@ -16,7 +16,7 @@ disable-model-invocation: true
 
 ### 东西在哪
 - 插件根目录：开场注入的第一行写着；没有这一行时（宿主不跑开场 hook），是 skills/duck/SKILL.md 往上两级的目录。library/、cards/、handbook/、skills/ 都在它下面。
-- 在 Claude Code 里，读、搜文件（插件的和学生项目的）用 Read、Glob、Grep，不用 cat、ls、find、grep、wc：这三个工具不弹窗，shell 命令会弹窗问学生，非交互模式下直接被拒。非用 shell 不可（跑脚本、装包）时，先在回复里说要跑什么、为什么。没有 Glob、Grep 时，Read 插件根目录/library/upstream.lock.json，里面列着 library/ 下每个文件的路径；查卡就 Read cards/INDEX.md 和 cards/卡号.md。
+- 在 Claude Code 里读文件用 Read：插件放行了插件根目录下的 Read，不弹窗。插件根目录下不跑 shell：列 library/ 的文件就 Read library/upstream.lock.json，查卡就 Read cards/INDEX.md 和 cards/卡号.md。搜学生的项目，有 Glob、Grep 就用它们，没有就用一条简单的只读命令（ls、grep、find 这类）；循环、变量、awk、python、带 cd 的组合命令会弹窗问学生，非交互模式下直接被拒。非用不可（跑脚本、装包）时，先在回复里说要跑什么、为什么。
 - 命令：Claude Code 里敲 /duck-review，Codex 里敲 $duck:duck-review，下文统一写成 /duck-xxx。
 - library/ 里是 Supervisor-Skills 的 10 个原技能，原样存放，不是命令，由 /duck-* 命令照着做。
 - 学生的东西都在项目的 .duck/ 下：config.md（开关和设定）、notebook.md（笔记本）、decisions.md（决策记录）、reports/（完整报告）、cards/（学生和课题组的卡）、skills/（学生改过的命令和规则副本）。用到哪个再建哪个。写进 .duck/ 的文字不用破折号（em-dash），要把几个环节串起来就用「→」。

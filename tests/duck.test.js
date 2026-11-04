@@ -109,7 +109,7 @@ test('not turned on and off: the hook gives no rules, the commands carry the bas
     assert.ok(text.includes(section('东西在哪')), `${name}: 东西在哪`);
     assert.ok(text.includes(section('每次都照做')), `${name}: 每次都照做`);
     assert.ok(text.includes(section('怎么讲')), `${name}: 怎么讲`);
-    assert.match(text, /用 Read、Glob、Grep，不用 cat/, name);
+    assert.match(text, /读文件用 Read：插件放行了插件根目录下的 Read/, name);
     assert.match(text, /用学生的语言/, name);
     // The commands that run an original skill map the skill names it mentions to commands.
     if (!['duck-why', 'duck-learn', 'duck-notes', 'duck-skill'].includes(name)) assert.match(text, /deep-research → \/duck-survey/, name);

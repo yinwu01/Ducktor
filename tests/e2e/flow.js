@@ -76,7 +76,7 @@ function runCodex(prompt, session, opts = {}) {
 
 // Normalizes one host transcript into { session, reply, reads, tools, injected, cost }.
 function parse(stdout) {
-  const t = { session: null, reply: '', reads: [], tools: [], injected: '', cost: 0, errors: [] };
+  const t = { session: null, reply: '', reads: [], tools: [], denials: [], injected: '', cost: 0, errors: [] };
   const texts = [];
   for (const line of stdout.split('\n')) {
     let ev;
@@ -93,7 +93,7 @@ function parse(stdout) {
         }
       }
       // The student sees every message of the turn, not only the last one in `result`.
-      if (ev.type === 'result') { t.reply = texts.length ? texts.join('\n\n') : (ev.result || ''); t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; }
+      if (ev.type === 'result') { t.reply = texts.length ? texts.join('\n\n') : (ev.result || ''); t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; t.denials = (ev.permission_denials || []).map((d) => `${d.tool_name} ${JSON.stringify(d.tool_input || {}).slice(0, 120)}`); }
     } else {
       if (ev.type === 'thread.started') t.session = ev.thread_id;
       const it = ev.item || {};
@@ -595,10 +595,12 @@ function globalChecks(transcripts) {
       const log = norm(text('decisions.md'));
       return transcripts.every((t) => [...t.reply.matchAll(/▸ ?决策[:：]\s*([^\n]{6,})/g)].every((m) => log.includes(norm(m[1]).slice(0, 12))));
     }],
-    // Reading or searching project files through the shell asks the student each time (11-04
-    // trials: 11 prompts in 14 turns for one student); Read, Glob and Grep do not.
-    ['should', 'Claude Code read project files without the shell', () => HOST !== 'claude'
-      || transcripts.every((t) => !t.tools.some((x) => /^Bash (?:cd [^;&|]+(?:&&|;)\s*)?(cat|ls|find|grep|head|tail|wc)\b/.test(x)))],
+    // A tool call the host refuses here (headless, acceptEdits) is one a student would have to
+    // approve (11-04 trials: 11 prompts in 14 turns for one student, most of them compound shell
+    // commands). Claude Code 2.1.318 has no Glob or Grep tool, so simple read-only commands are
+    // fine; loops, awk, python and cd in a compound command are not.
+    ['should', 'no tool call needed the student\'s approval', () => HOST !== 'claude'
+      || transcripts.every((t) => !(t.denials || []).length)],
     // The short why names cards by title; a bare card number is jargon the student cannot read.
     ['should', 'no card number on its own in a short why', () => transcripts.map((t) => lastWhy(t.reply)).every((w) => !bareCardId(w))],
     // Most notebook lines are written by the AI; quoting one as the student's own is wrong.
@@ -682,7 +684,7 @@ function main() {
       const again = HOST === 'claude' ? runClaude(answer, session, opts) : runCodex(answer, session, opts);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
       const t2 = parse(again.stdout || '');
-      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], reply: `${t.reply}\n\n[学生] ${answer}\n\n${t2.reply}`, cost: t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
+      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], denials: [...(t.denials || []), ...(t2.denials || [])], reply: `${t.reply}\n\n[学生] ${answer}\n\n${t2.reply}`, cost: t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
       if (HOST === 'codex') t.injected = codexInjected(session);
       checks = evaluate(t);
     }
