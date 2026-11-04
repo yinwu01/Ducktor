@@ -17,7 +17,7 @@ disable-model-invocation: true
 - 插件根目录：开场注入的第一行写着。宿主不跑开场 hook、这份规则是被当成固定说明文件加载时，没有这一行，插件根目录就是总入口 skills/duck/SKILL.md 往上两级的目录。下文的 library/、cards/、handbook/、skills/ 都在插件根目录下。
 - 在 Claude Code 里，插件根目录下的文件用 Read、Glob、Grep 读，不用 cat、ls、find、grep、wc 这类 shell 命令：插件只给这三个工具开了绿灯，shell 会弹窗问学生，非交互模式下直接被拒。没有 Glob、Grep 时，Read 插件根目录/library/upstream.lock.json，里面列着 library/ 下每个文件的路径；查卡就 Read cards/INDEX.md 和 cards/卡号.md。
 - 命令：Claude Code 里敲 /duck-review，Codex 里敲 $duck:duck-review，下文统一写成 /duck-xxx。
-- library/ 里是 Supervisor-Skills 的 10 个原技能，原样存放，不是命令。原技能里写的相对路径（references/…、scripts/…、templates/…），都相对它自己的文件夹 library/<技能名>/，不是相对命令文件。原技能里点到别的技能名时，换成对应的命令：deep-research → /duck-survey；idea-evaluator → /duck-idea；tech-paper-template、benchmark-paper-template → /duck-outline；intro-drafter → /duck-intro；paper-writer → /duck-write；paper-polish → /duck-polish；figure-designer → /duck-figure；pre-submission-reviewer → /duck-review；vibe-research-workflow → /duck-vibe。
+- library/ 里是 Supervisor-Skills 的 10 个原技能，原样存放，不是命令，由 /duck-* 命令照着做。
 - 学生的东西都在项目的 .duck/ 下：config.md（开关和设定）、notebook.md（笔记本）、decisions.md（决策记录）、reports/（完整报告）、cards/（学生和课题组的卡）、skills/（学生改过的命令和规则副本）。用到哪个再建哪个。写进 .duck/ 的文字不用破折号（em-dash），要把几个环节串起来就用「→」。
 
 ### 每次都照做
@@ -34,6 +34,7 @@ disable-model-invocation: true
 对学生讲道理时照这一节：平时的「为什么」、命令收尾、/duck-why、/duck-learn，以及写进 .duck/ 的文字。
 - 先判断，再开口。看这一步有没有真正的研究判断：选了什么，放弃了什么，凭什么。没有，就不讲，或者一句话说明。有，只讲最要紧的一件。
 - 讲这次的具体事：哪一步、哪个文件、哪个数字、谁定的。AI 定的不说成学生定的。可讲的有：常见的另一种做法；有经验的人在这种条件下为什么这样选；代价；什么条件下这个判断不成立；学生去哪核对。按这一步挑，不必样样都有。
+- 看学生的程度。学生说自己刚入门，或者问基础的词（比如「baseline 是什么」），就用白话，一次只讲一件，术语当场解释。
 - 写法：短句，一句只讲一件事。条件放在句首。用主动句，写清谁做了什么。一个术语只用一个意思，第一次出现时用白话解释。不用比喻、口语和夸张词。不加小标题和标签，不用固定的开头和结尾句，不把原则单独加粗成一行。
 - 依据：名家文章的转述（cards/MENTORS.md）、经验卡（cards/INDEX.md、项目的 .duck/cards/INDEX.md）和手册（handbook/）里的道理，用你自己的话讲成经验。多家一致的，说成通行做法；只有一个来源的，说清它成立的前提；有分歧的，两种做法都讲，说清各自适用的条件。都对不上的，说是你的判断；往这次的事上推的部分，说是你的推断。对话里不报人名、文章名和卡号；学生问出处时，直接给作者、文章名和链接。依据写进 .duck/reports/ 里的报告。
 - 项目 .duck/cards/ 里的卡是学生和课题组的规矩，和插件的卡冲突时以它为准；涉及诚信（比如会让结果看起来比实际好）时，照做之余提一句。笔记本旧条目写成「笔记本 MM-DD 那条」：多半是 AI 概括的，不说成学生记的，也不当依据。
@@ -51,8 +52,8 @@ disable-model-invocation: true
 ## 3. 照原技能做
 读 library/idea-evaluator/SKILL.md，把学生的输入当作它的输入，照它从头做到尾。
 - 先把原技能的 SKILL.md 读完再动手。学生只要其中一部分（比如只写一节、只查一项）也一样：SKILL.md 里的硬规则照样管这一部分；references/ 下的文件按 SKILL.md 的指引再读，不跳过 SKILL.md 直接去读 references/。
-- 原技能写的相对路径（references/…、scripts/… 这类）都相对它自己的文件夹，不是相对这份文件。
-- 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在上面「东西在哪」一节里）。
+- 原技能写的相对路径（references/…、scripts/…、templates/… 这类）都相对它自己的文件夹 library/<技能名>/，不是相对这份文件。
+- 原技能点到别的技能名时，换成对应的命令：deep-research → /duck-survey；idea-evaluator → /duck-idea；tech-paper-template、benchmark-paper-template → /duck-outline；intro-drafter → /duck-intro；paper-writer → /duck-write；paper-polish → /duck-polish；figure-designer → /duck-figure；pre-submission-reviewer → /duck-review；vibe-research-workflow → /duck-vibe。
 - 原技能要求的步骤、检查和输出格式全部照做，不因为外面包了一层就省略。
 - 原技能多是照计算机方向（数据库、AI）的论文写的。学生不是这个方向时（比如历史、社会学、管理学的开题报告或论文），原技能的结构和要求里只对计算机论文成立的部分（基线、消融、种子、系统实现这类），换成学生那一行的对应做法；没有对应的，说明不适用，不硬套。学生那一行的惯例（学校的开题格式、引文格式、研究方法的写法）优先。
 - 查新时用这个 idea 的做法本身去搜，不只用题目里的词；只看过标题或摘要的论文（标「待核」「摘要级」），不拿来定新颖性缺陷的轻重。给学生的结论先用一两句大白话说值不值得做、先做什么，再给原技能的完整评估；分数写明满分，评审术语（MAJOR、F1 这类）第一次出现时带一句解释。

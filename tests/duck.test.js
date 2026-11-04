@@ -105,12 +105,14 @@ test('not turned on and off: the hook gives no rules, the commands carry the bas
       continue;
     }
     // Copied whole from core.md, so a command in a project that has not turned Ducktor on
-    // still reads plugin files with Read, maps skill names, and follows the every-time rules.
+    // still reads plugin files with Read, follows the every-time rules and explains the same way.
     assert.ok(text.includes(section('东西在哪')), `${name}: 东西在哪`);
     assert.ok(text.includes(section('每次都照做')), `${name}: 每次都照做`);
+    assert.ok(text.includes(section('怎么讲')), `${name}: 怎么讲`);
     assert.match(text, /用 Read、Glob、Grep 读，不用 cat/, name);
-    assert.match(text, /deep-research → \/duck-survey/, name);
     assert.match(text, /用学生的语言/, name);
+    // The commands that run an original skill map the skill names it mentions to commands.
+    if (!['duck-why', 'duck-learn', 'duck-notes', 'duck-skill'].includes(name)) assert.match(text, /deep-research → \/duck-survey/, name);
   }
 });
 

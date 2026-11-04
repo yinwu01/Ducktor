@@ -24,8 +24,8 @@ disable-model-invocation: true
 ## 3. 照原技能做
 {{skill_block}}
 - 先把原技能的 SKILL.md 读完再动手。学生只要其中一部分（比如只写一节、只查一项）也一样：SKILL.md 里的硬规则照样管这一部分；references/ 下的文件按 SKILL.md 的指引再读，不跳过 SKILL.md 直接去读 references/。
-- 原技能写的相对路径（references/…、scripts/… 这类）都相对它自己的文件夹，不是相对这份文件。
-- 原技能点到别的技能名时，换成对应的 /duck-* 命令（对照表在上面「东西在哪」一节里）。
+- 原技能写的相对路径（references/…、scripts/…、templates/… 这类）都相对它自己的文件夹 library/<技能名>/，不是相对这份文件。
+- 原技能点到别的技能名时，换成对应的命令：deep-research → /duck-survey；idea-evaluator → /duck-idea；tech-paper-template、benchmark-paper-template → /duck-outline；intro-drafter → /duck-intro；paper-writer → /duck-write；paper-polish → /duck-polish；figure-designer → /duck-figure；pre-submission-reviewer → /duck-review；vibe-research-workflow → /duck-vibe。
 - 原技能要求的步骤、检查和输出格式全部照做，不因为外面包了一层就省略。
 - 原技能多是照计算机方向（数据库、AI）的论文写的。学生不是这个方向时（比如历史、社会学、管理学的开题报告或论文），原技能的结构和要求里只对计算机论文成立的部分（基线、消融、种子、系统实现这类），换成学生那一行的对应做法；没有对应的，说明不适用，不硬套。学生那一行的惯例（学校的开题格式、引文格式、研究方法的写法）优先。{{extra}}
 
