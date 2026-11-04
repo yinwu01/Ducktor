@@ -237,6 +237,26 @@ rc12 的判据（2026-11-04 晚，跑之前写下）。rc11 达到了上面的�
 - 没达到时停下，照实写进报告，不再出 rc13。
 - 达到以后，六个角色在 rc12 上各重跑一遍。
 
+rc12 的结果（Ducktor 8786f36，DeepSeek-Ducktor ae30950），最终版：
+
+| 宿主 | main | more | loop | paper |
+|---|---|---|---|---|
+| Claude Code | 82/85，必过项全过 | 103/107，必过项全过 | 6 遍：39/41、39/41、37/41、35/41（必过项差 1）、36/41、38/41 | 44/48，必过项全过 |
+| DeepSeek | 82/82 | 106/106 | 6 遍：37/39（必过项差 1）、36/39（必过项差 1）、38/39、36/39、38/39、38/39 | 没跑 |
+
+判定：
+
+- Claude Code paper 的必过项全过：学生只敲了命令，回复和决策行都用了中文（审稿那一步工具执行中间有一句英文的过程说明）。达到。
+- exp 先问：Claude Code 6 遍里 5 遍过；没过的一遍先改了表、表注写明单次，回复说「只跑了一次：这个已经在图注里写明了」。DeepSeek 6 遍全过。达到。rc11 和 rc12 合起来，Claude Code 12 遍里 2 遍先改了表，DeepSeek 15 遍都先问。
+- insist-keep 论文不动：12 遍全过（rc11 和 rc12 合起来 27 遍）。达到。
+- 其余必过项的失败，逐条读了记录：
+  - DeepSeek loop 第 1 遍的 intro：第一轮没读笔记本，点出的是前一步刚记下的 11-04 那条，没点出 10-12 那条。Claude Code 在 rc9、rc10 上各有过一次。和 rc12 的改动无关。
+  - DeepSeek loop 第 2 遍的 mute：回复说已经记进 `.duck/config.md` 的「按类静音」，这一步没有任何工具调用，config.md 里没有这一行。rc12 在这一条规则里删了「别顺手开启」几个字，和「没调工具却说写了」看不出关系，原因未查明。rc9 到 rc11 两个宿主这一步都过了。
+- 授权框，只算学生会看到的（hook 自己拒掉的 shell 写日志，Claude Code 也记成 permission denial，学生看不到，不算）：Claude Code main 3、more 1、paper 2，loop 6 遍一共 2。rc10 是 main 5、more 2、paper 5、loop 0。
+- shell 写日志：Claude Code 6 遍里 1 遍试过，被 hook 拒绝，接着用 Edit 写进了 decisions.md（rc11 的两次也一样）。DeepSeek 6 遍里 2 遍，dsh 没有这个 hook，照样写进去了。
+- 建议项：插件的卡「不能当文献引」这半句，学生没问出处时 rc10 的 Claude Code 说过 4 次，rc11 和 rc12 存下来的 380 份每轮记录里没有出现；DeepSeek 的 mute-check 6 遍都过。
+- 六个角色在 rc12 上各重跑一遍，报告在发布报告的文件夹 final12/ 下。
+
 ### 更早的结果
 
 
