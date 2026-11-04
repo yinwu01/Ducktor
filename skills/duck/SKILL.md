@@ -56,7 +56,7 @@ disable-model-invocation: true
    - off：回到刚装好的样子：平时不再先问、不讲也不记；敲 /duck-xxx 时照常讲为什么、照常记。config.md 里关掉的命令和静音的设定照样算数。
    学生只说「安静点」「别啰嗦」、没说哪一档时：现在是 on，就切到 quiet，说清 quiet 照样记；项目还没开启，就别切到 quiet（quiet 比没开启管得多），告诉学生没开启时平时本来就不出声，再问要不要回复短一点（在 config.md 记「回复：短」，英文 config 写 Reply: short；config.md 还没有时照下面的格式新建，但不写开关行，别顺手开启）。
    切开关不是研究决定：不往 .duck/decisions.md 记，也不往笔记本里记。
-3. 从这一轮起，你就按新开关做。切到 on 或 quiet 时，如果这次会话的开场注入里没有常驻规则（写的是没在这个项目开启），现在就读常驻规则：项目里有 .duck/skills/core.md 读它，没有就读插件根目录/rules/core.md，从这一轮起照做。切到 off，就从这一轮起照插件根目录/rules/idle.md 做，和没开启一样。下次开会话时，开场注入会按新开关来。
+3. 从这一轮起，你就按新开关做。切到 on 或 quiet 时，如果这次会话的开场注入里没有常驻规则（写的是没在这个项目开启），现在就读常驻规则：项目里有 .duck/skills/core.md 读它，没有就读插件根目录/rules/core.md（路径是确定的，直接用 Read 读，不用先列目录），从这一轮起照做。切到 off，就从这一轮起照插件根目录/rules/idle.md 做，和没开启一样。下次开会话时，开场注入会按新开关来。
 
 新建 config.md 用这个格式：
 
@@ -101,4 +101,5 @@ When you say "I've got this kind", Ducktor adds a line here and stops explaining
 3. 然后读那条命令的说明文件「插件根目录/skills/duck-xxx/SKILL.md」，把学生这句话当作敲在命令后面的内容，照说明从头做到尾，开头和收尾的步骤一步都不跳。
 4. 学生自己加的命令（.claude/skills/duck-xxx/ 或 .agents/skills/duck-xxx/）也在挑选范围里，挑中了就读那一份。
 5. 说明文件不存在，就告诉学生这条命令还没装好，照常帮学生做这件事。
-6. 表里没有合适的命令，就直说没有，照常帮学生做；Ducktor 在这个项目开着时，按常驻规则附「为什么」。
+6. 学生要写或改开题报告、研究方案、基金申请：没有专门的命令，先直说。再按这一轮要做的事挑：整份方案要改，挑 /duck-review，按方案的要求看，不按投稿的标准打分；只定选题和研究问题，挑 /duck-idea；只补文献综述，挑 /duck-survey。
+7. 表里没有合适的命令，就直说没有，照常帮学生做；Ducktor 在这个项目开着时，按常驻规则讲为什么。
