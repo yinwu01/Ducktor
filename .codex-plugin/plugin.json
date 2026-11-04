@@ -1,9 +1,9 @@
 {
   "name": "duck",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Ducktor: a research mentor built on Supervisor-Skills. Runs the research skills as $duck:duck-* commands and opens up the why behind each AI step, so you can still learn while the AI does the work. Trust me, I'm a Ducktor.",
   "author": {
-    "name": "JoeyWu-tech"
+    "name": "yinwu01"
   },
   "license": "CC-BY-NC-SA-4.0 AND CC-BY-4.0 AND MIT",
   "keywords": [
@@ -18,7 +18,7 @@
     "displayName": "Ducktor",
     "shortDescription": "Research mentor that explains the why",
     "longDescription": "Runs the Supervisor-Skills research skills (survey, idea evaluation, outlining, writing, polishing, figures, review) and explains the reasoning behind each step so the student learns.",
-    "developerName": "JoeyWu-tech",
+    "developerName": "yinwu01",
     "category": "Productivity",
     "capabilities": [
       "Instructions",
