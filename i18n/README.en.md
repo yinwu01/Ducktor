@@ -70,7 +70,7 @@ When you give your experimental results to a regular AI to write the paper, the 
 
 With Ducktor, the same task becomes a transparent loop of teaching and research:
 - Use `/duck-outline` to set the main line of the argument, `/duck-write` to write the body, and `/duck-review` to check the draft strictly, as a reviewer would.
-- After each key stage, Ducktor gives you three things: **the core trade-off of this step (Why)**, **a research principle that carries over to other work (Principle)**, and **an action you can take earlier next time (Next Time)**.
+- After each key stage, Ducktor explains **the core trade-off of this step (Why)**: the common alternative, why this choice, and when it does not hold. When there is **a research principle that carries over (Principle)** or **an action you can take earlier next time (Next Time)**, it says that too and saves it to the notebook.
 
 ---
 
@@ -80,35 +80,35 @@ Ducktor does not replace your underlying model. It is a light layer of rules, ho
 
 ### 1. Two modes and the "evidence guardrail"
 
-After you install it, Ducktor is in **on-demand mode** by default. It steps in only when you call a `/duck-*` command. Run `/duck on` in the root folder of a project to turn on **companion mode** for that project (or use `/duck quiet` for a quiet mode that records but does not show):
+After you install it, Ducktor is in **on-demand mode** by default. It steps in only when you call a `/duck-*` command. Run `/duck on` in the root folder of a project to turn on **companion mode** for that project (or use `/duck quiet` for a quiet mode: it still asks first and still records, but does not explain in the conversation):
 
 * **Short notes on method, right away**: when the AI completes a research action that matters (it chooses a technical approach, changes the experiment design, or finishes a core paragraph), Ducktor adds one or two sentences at the end of the reply about the research reasoning behind it.
-* **Ask before key decisions**: for a major trade-off that changes the direction of the research, the AI asks you before it acts (at most 3 core questions at a time, so that it does not interrupt too much).
+* **Ask before key decisions**: for a major trade-off that changes the direction of the research, the AI asks you before it acts (at most 3 core questions at a time, so that it does not interrupt too much). If you said you want to decide a kind of judgment yourself, it always asks about that kind.
 * **The "evidence guardrail" before results go into the paper**: in companion mode, when you ask the AI to put experimental data into a table or to draw a conclusion, Ducktor first checks three reviewer-level red lines (if it finds a problem, it stops before writing and asks you):
   1. **Statistical significance**: did the experiment run only once? Is the gap larger than the variation between random seeds?
   2. **Separated attribution**: when there is a large gain, is its source (for example, more parameters or more training steps vs. the method itself) clearly separated?
   3. **Claims match evidence**: is the wording of the conclusion stronger than what the current experimental evidence supports?
 
-> 📌 *Note: when you run a `/duck-*` command, the workflow follows the steps of that command, and the three checks above come at the end of the command as "experience card" reminders. For real conversations before and after Ducktor is on, see the evaluation set [evals/before-after/](../evals/before-after/).*
+> 📌 *Note: when you run a `/duck-*` command, the workflow follows the steps of that command; the experience cards behind the three checks above go into the "Card reminders" section of the command's report, and the most important one is explained when the command ends. For real conversations before and after Ducktor is on, see the evaluation set [evals/before-after/](../evals/before-after/).*
 
 ### 2. Ask afterwards (`/duck-why`) and look back on a stage (`/duck-learn`)
 
-* **Ask right away (`/duck` & `/duck-why`)**: even after the AI has finished, you can type `/duck <your question>` at any time (for example, `/duck What research norms should I pay attention to in this step?`), and Ducktor sends it to the command that fits best. When you call `/duck-why`, Ducktor looks at the last action (or a file, Git commit, or paragraph that you name) and explains **the one detail most worth learning**: it compares the common beginner mistake with the thinking of experienced researchers, gives the source in the literature, points to the data to check, and ends with a **bold principle** and a **guide for next time**.
-* **Look back on a stage (`/duck-learn`)**: call it when a research stage comes to an end. It first asks you *"Which step did you decide yourself? Which step would you most like to redo?"* (you can skip). Then it uses the decision log, reports and notes in the project, compares the "original goal" with the "actual result", points out the weak spots that a top mentor would examine, and lists the judgments that you left entirely to the AI, so that you take back academic ownership step by step.
+* **Ask right away (`/duck` & `/duck-why`)**: even after the AI has finished, you can type `/duck <your question>` at any time (for example, `/duck What research norms should I pay attention to in this step?`), and Ducktor sends it to the command that fits best. When you call `/duck-why`, Ducktor looks at the last action (or a file, Git commit, or paragraph that you name) and explains **the one judgment most worth learning**: the common way versus why experienced researchers choose otherwise, when that does not hold, and where to check the data. If you made this call and never said why, it first asks what you were thinking, then builds on your answer. Ideas from well-known researchers and from the cards are turned into experience in the explanation; the sources go into the report, and it gives author, title and link when you ask.
+* **Look back on a stage (`/duck-learn`)**: call it when a research stage comes to an end. It first reads the decision log, reports, notes and Git commits of this stretch. If you made calls in it and have not looked back on them yet, it asks you for one sentence on what you would change (you can skip). Then it compares the "original goal" with the "actual result", points out the weak spots an experienced advisor would examine, lists the judgments left to the AI, and gives one or two next steps; it also says whether the next steps of the last look-back were done. If you say you want to decide a kind of judgment yourself next time, it shows you the line for `.duck/config.md` and adds it once you agree, so that you take back academic ownership step by step.
 
 ### 3. Personal knowledge and decision history (`.duck/`)
 
 Ducktor stores what you learn as plain-text Markdown in the `.duck/` folder of the project:
 
-* **Research principle notebook (`.duck/notebook.md`)**: the principles, one per line. The next time you do a similar task, Ducktor finds the related principles and brings them back. If you say "I already know this kind of principle", it then only records and stops repeating the lesson.
-* **Decision log (`.duck/decisions.md`)**: the key trade-offs of the research, one per line, each marked with who decided (`Human` or `AI`).
-* **Look-back and explanation reports (`.duck/reports/`)**: the full analyses of `/duck-learn` and `/duck-why`.
+* **Research principle notebook (`.duck/notebook.md`)**: the principles, one per line. With Ducktor on, before similar work and whenever you run a `/duck-*` command, Ducktor finds the related principles and follows them. If you say "I already know this kind of principle", it then only records and stops repeating the lesson.
+* **Decision log (`.duck/decisions.md`)**: the key trade-offs of the research, one per line, each marked with who decided ("you decided" or "AI decided").
+* **Look-back and explanation reports (`.duck/reports/`)**: the full result, the grounds of the explanation and the card reminders of every command, plus the full analyses of `/duck-learn` and `/duck-why`.
 
 All records are standard Markdown files. You can commit them to Git together with your paper and code (when your advisor asks in a group meeting "why did you design the experiment this way", you can trace it back at any time). If you do not want them in the repository, add `.duck/` to `.git/info/exclude`.
 
 ### 4. A traceable mentor knowledge base (no lectures from thin air)
 
-To avoid the empty "correct but useless" talk of large models, when Ducktor explains a method, it cites only the four sources below (if there is no clear source, Ducktor says openly that this is only the current model's inference):
+To avoid the empty "correct but useless" talk of large models, when Ducktor explains a method, it draws only on the four sources below. In the conversation it turns them into experience; the sources go into the report, and it gives them when you ask. If nothing fits, it says the point is its own judgment:
 
 * **[Experience cards](../cards/INDEX.md)**: 23 built-in cards on frequent research situations, each with when it applies, what to do, and where it comes from in the literature (for example, `W11`: the strength of the wording must match the strength of the experimental evidence).
 * **[Mentors index](../cards/MENTORS.md)**: structured key points from classic essays on research method by Richard Hamming, John Schulman, Andrej Karpathy, Jennifer Widom and others, with links to the originals.
@@ -203,7 +203,7 @@ Clone this repository to your computer, copy [`AGENTS.md`](../AGENTS.md) into th
 <details>
 <summary><b>1. Do I have to write a configuration file by hand?</b></summary>
 <br>
-No. <code>/duck on</code> creates <code>.duck/config.md</code> in the project. Later you can turn single commands on or off or add your own experience cards with <code>/duck-skill</code>, or just say in the conversation "make the replies shorter" or "no need to explain this kind of point again", and the preference goes into the configuration.
+No. <code>/duck on</code> creates <code>.duck/config.md</code> in the project. Later you can turn single commands on or off or add your own experience cards with <code>/duck-skill</code>, or just say in the conversation "make the replies shorter" or "no need to explain this kind of point again", and the preference goes into the configuration. When you say "I want to decide this kind of thing myself", it shows you the line first and adds it once you agree; when you say "just explain, don't ask me first" in <code>/duck-why</code> or <code>/duck-learn</code>, those two commands just explain from then on.
 </details>
 
 <details>
@@ -216,7 +216,7 @@ Almost none. In a project without companion mode, the session hook adds only a v
 <summary><b>3. Will it interrupt my work often, or change my paper on its own?</b></summary>
 <br>
 <b>It does not interrupt often</b>: the AI asks first only for a major trade-off that changes the direction of the research or breaks the evidence guardrail (and asks at most 3 questions at a time); routine work such as fixing spelling or polishing one sentence goes ahead directly.<br>
-<b>It does not change your draft on its own</b>: the AI changes files only when you tell it to. If you are in a hurry and want to skip the questions, just say <i>"No need to ask this time, you decide"</i>, and the AI goes ahead and records the decision as <code>AI</code> in the log.
+<b>It does not change your draft on its own</b>: the AI changes your paper and code only when you tell it to; with Ducktor on, it appends decisions, notes and reports to <code>.duck/</code> by itself, without touching your draft. When you insist on your own wording and it disagrees, it tells you what that costs and offers one fix, and you choose; it does not rewrite your draft its own way. If you are in a hurry and want to skip the questions, just say <i>"No need to ask this time, you decide"</i>, and the AI goes ahead and records the decision as "AI decided" in the log.
 </details>
 
 <details>
@@ -228,7 +228,7 @@ Almost none. In a project without companion mode, the session hook adds only a v
 <details>
 <summary><b>5. What are the permission limits of the plugin, and how is data privacy kept?</b></summary>
 <br>
-The local hook scripts of the plugin only read local files. <b>They never go online, and they do not change your code on their own.</b> In Claude Code, the hooks let only two kinds of safe actions through without a prompt: (1) reading files in the plugin's own folder; (2) after <code>.duck/</code> exists, appending entries to the notebook and the decision log and writing look-back reports. Changing existing notes, changing the configuration (<code>config.md</code>), or changing skills and cards (<code>skills/</code>, <code>cards/</code>) still asks for permission in the terminal as usual. Also, commands such as <code>/duck-survey</code>, <code>/duck-idea</code> and <code>/duck-review</code> let the AI use search tools to find public literature online when needed.
+The local hook scripts of the plugin only read local files. <b>They never go online, and they do not change your code on their own.</b> In Claude Code, the hooks let only two kinds of safe actions through without a prompt: (1) reading files in the plugin's own folder; (2) after <code>.duck/</code> exists, appending entries to the notebook and the decision log and writing look-back reports. Changing existing notes, changing the configuration (<code>config.md</code>), or changing skills and cards (<code>skills/</code>, <code>cards/</code>) still asks for permission in the terminal as usual. Also, commands such as <code>/duck-survey</code>, <code>/duck-idea</code> and <code>/duck-review</code> let the AI use search tools to find public literature online when needed. What the AI reads in your project goes to your model provider as usual, the same as without the plugin.
 </details>
 
 <details>
