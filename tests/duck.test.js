@@ -357,7 +357,9 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   const dir = project({ '.duck/notebook.md': '- 10-26 旧的一条\n', '.duck/decisions.md': '- 2026-10-26 ▸ 决策：A（你定）\n', '.duck/reports/r.md': '# 旧报告\n' });
   const allow = (tool, rel, extra) => allowWrite(tool, path.join(dir, '.duck', rel), dir, extra);
   assert.equal(allow('Write', 'decisions.md', { content: '- 2026-10-26 ▸ 决策：A（你定）\n- 2026-10-27 ▸ 决策：B（AI 定）\n' }), 'allow');
-  assert.equal(allow('Write', 'decisions.md', { content: '- 2026-10-26 ▸ 决策：A（AI 定）\n' }), null);
+  // A Write that drops the old text replaces every entry: refused, so the model reads and adds.
+  assert.equal(allow('Write', 'decisions.md', { content: '- 2026-10-26 ▸ 决策：A（AI 定）\n' }), 'deny');
+  assert.equal(allow('Write', 'notebook.md', { content: '- 11-05 写方案｜新的一条\n' }), 'deny');
   assert.equal(allow('Edit', 'decisions.md', { old_string: '（你定）', new_string: '（AI 定）' }), null);
   assert.equal(allow('Edit', 'notebook.md', { old_string: '- 10-26 旧的一条\n', new_string: '' }), null);
   assert.equal(allow('MultiEdit', 'notebook.md', { edits: [ADD, { old_string: '旧', new_string: '新' }] }), null);
@@ -369,7 +371,7 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   // A file with bytes that are not UTF-8 cannot be rewritten through a lossy string.
   const bad = project({ '.duck/notebook.md': '' });
   fs.writeFileSync(path.join(bad, '.duck', 'notebook.md'), Buffer.from([0x2d, 0x20, 0xff, 0x0a]));
-  assert.equal(allowWrite('Write', path.join(bad, '.duck', 'notebook.md'), bad, { content: '- \ufffd\n- 新的\n' }), null);
+  assert.equal(allowWrite('Write', path.join(bad, '.duck', 'notebook.md'), bad, { content: '- \ufffd\n- 新的\n' }), 'deny');
   // Reports may be corrected after a conclusion is overturned.
   assert.equal(allow('Edit', 'reports/r.md', { old_string: '# 旧报告', new_string: '# 改过的报告' }), 'allow');
   // An empty log may be written whole.
@@ -379,7 +381,7 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   const open = project({ '.duck/decisions.md': '- 2026-10-26 ▸ 决策：A（你定）' });
   const openAllow = (tool, extra) => allowWrite(tool, path.join(open, '.duck', 'decisions.md'), open, extra);
   assert.equal(openAllow('Edit', { old_string: 'A（你定）', new_string: 'A（你定）作废，实际是 AI 定的' }), null);
-  assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）作废\n' }), null);
+  assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）作废\n' }), 'deny');
   assert.equal(openAllow('Edit', { old_string: 'A（你定）', new_string: 'A（你定）\n- 2026-10-27 ▸ 决策：B（AI 定）' }), 'allow');
   assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）\r\n- 2026-10-27 ▸ 决策：B（AI 定）\r\n' }), 'allow');
 });
