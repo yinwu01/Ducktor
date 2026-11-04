@@ -386,6 +386,42 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）\r\n- 2026-10-27 ▸ 决策：B（AI 定）\r\n' }), 'allow');
 });
 
+// Runs the PreToolUse hook for a shell command.
+function shellDecision(command) {
+  const run = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: ROOT }, JSON.stringify({ tool_name: 'Bash', tool_input: { command }, cwd: os.tmpdir() }));
+  return run.stdout ? JSON.parse(run.stdout).hookSpecificOutput.permissionDecision : null;
+}
+
+test('PreToolUse hook: a shell command that writes a log is refused, reading one is not', () => {
+  assert.match(HOOKS.PreToolUse[0].matcher, /(^|\|)Bash(\||$)/);
+  // The first two are the commands rc10 ran on 11-04 (main and loop, Claude Code).
+  for (const c of [
+    "printf '%s\\n' '- 2026-11-04 ▸ 决策：A（你定）' >> .duck/decisions.md && printf '%s\\n' '- 11-04 润色｜B（AI 的判断）' >> .duck/notebook.md; tail -2 .duck/decisions.md",
+    'echo "- 2026-11-04 ▸ 决策：A（AI 定）" >> .duck/decisions.md; tail -2 .duck/decisions.md',
+    "cat >> /home/s/thesis/.duck/notebook.md <<'EOF'\n- 11-04 写方案｜A｜这次：B\nEOF",
+    'cat > .duck/notebook.md <<EOF\n- 11-05 新的一条\nEOF',
+    'echo x > "/Users/s/My Thesis/.duck/notebook.md"',
+    'echo x >> /Users/s/My\\ Thesis/.duck/decisions.md',
+    'echo x >>.duck/notebook.md',
+    "printf 'x\\n' | tee -a .duck/notebook.md >/dev/null",
+    "sed -i 's/AI 定/你定/' .duck/decisions.md",
+    "sed -i.bak -e 's/a/b/' ./.duck/notebook.md",
+    "perl -pi -e 's/a/b/' .duck/notebook.md",
+  ]) assert.equal(shellDecision(c), 'deny', c);
+  for (const c of [
+    'cat .duck/notebook.md',
+    'tail -2 .duck/decisions.md',
+    "grep -n '10-09' .duck/notebook.md > /tmp/hits.txt",
+    "sed -n '1,5p' .duck/notebook.md",
+    'echo "- 64k: 69.8" >> notes.md',
+    'cp .duck/notebook.md /tmp/notebook-backup.md',
+    'echo x > .duck/notebook.md.bak',
+    'ls .duck && wc -l .duck/decisions.md',
+    'python3 -I tools/count.py > results/summary.md',
+    "printf 'x\\n' | tee /tmp/log.txt; cat .duck/notebook.md",
+  ]) assert.equal(shellDecision(c), null, c);
+});
+
 test('PreToolUse hook: the project is the session root, not the shell folder', () => {
   const dir = project({ '.duck/notebook.md': '- 10-26 旧的一条\n', 'paper/main.tex': 'x' });
   const nb = path.join(dir, '.duck', 'notebook.md');
