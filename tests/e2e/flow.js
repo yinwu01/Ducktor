@@ -322,7 +322,8 @@ const learnChecks = () => [
   ['must', 'wrote a learn report', () => reports('learn').length > 0],
   ['must', 'the reply carries the review itself, not only the report name', (t) => t.reply.replace(/\s/g, '').length > 200 && /AI ?定|交给 ?AI|下一步|接下来/.test(t.reply)],
   ['should', 'lists what was left to the AI', (t) => /交给 ?AI|AI ?定/.test(t.reply)],
-  ['should', 'no fixed bold headings in the conversation', (t) => !/^\s*\*\*(本来想干什么|实际怎样|顶级导师会盯哪里|这次交给 ?AI 的判断|下一步)\*\*/m.test(t.reply)],
+  // Also inside the quote and with a full stop or colon inside the bold: 「> **本来想干什么。**」.
+  ['should', 'no fixed bold headings in the conversation', (t) => !/^[\s>]*\*\*(本来想干什么|实际怎样|(顶级|有经验的)导师会盯哪里|(这次)?交给 ?AI 的判断|下一步|最要紧)/m.test(t.reply)],
   ['should', 'no fixed opening question', (t) => !/哪一步最想重来/.test(t.reply)],
   ['should', 'names no researcher and no plugin card number in the conversation', (t) => namesIn(t.reply).length === 0 && !cardIds(t.reply).some((id) => PLUGIN_CARDS.has(id))],
   ['should', 'the report keeps the five sections', () => ['本来想干什么', '实际怎样', '会盯哪里', '交给 ?AI', '下一步'].every((k) => new RegExp(k).test(newestReport('learn')))],
