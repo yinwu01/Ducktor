@@ -227,7 +227,7 @@ codex plugin add duck@ducktor
 <details>
 <summary><b>5. 插件的权限边界与数据隐私如何保障？</b></summary>
 <br>
-插件自带的本地 Hook 脚本仅做本地文件读取，<b>绝不联网，也不主动修改业务代码</b>。在 Claude Code 中，Hook 仅对两类安全操作配置了免弹窗放行：（1）读取插件自身目录文件；（2）<code>.duck/</code> 目录初始化后，向笔记本、决策日志追加条目及生成复盘报告。若涉及修改已有笔记、变更配置（<code>config.md</code>）或改动技能卡片（<code>skills/</code>、<code>cards/</code>），依然会正常触发终端授权确认。此外，执行 <code>/duck-survey</code>、<code>/duck-idea</code>、<code>/duck-review</code> 等命令时，AI 会按需调用搜索工具联网检索公开文献。AI 读到的项目内容照常发给你所用的模型服务商，和不装插件时一样。
+插件自带的本地 Hook 脚本仅做本地文件读取，<b>绝不联网，也不主动修改业务代码</b>。在 Claude Code 中，Hook 仅对两类安全操作配置了免弹窗放行：（1）读取插件自身目录文件；（2）<code>.duck/</code> 目录初始化后，向笔记本、决策日志追加条目及生成复盘报告。若涉及修改已有笔记、变更配置（<code>config.md</code>）或改动技能卡片（<code>skills/</code>、<code>cards/</code>），依然会正常触发终端授权确认。AI 若要整份覆盖笔记本或决策日志、不保留原有条目，Hook 会直接拒绝，避免旧条目丢失。此外，执行 <code>/duck-survey</code>、<code>/duck-idea</code>、<code>/duck-review</code> 等命令时，AI 会按需调用搜索工具联网检索公开文献。AI 读到的项目内容照常发给你所用的模型服务商，和不装插件时一样。
 </details>
 
 <details>

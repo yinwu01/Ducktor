@@ -65,5 +65,5 @@ Codex 里是 `codex plugin remove duck@doctor-duck` 和 `codex plugin marketplac
 - **Codex 里 AI 写不了 `.duck/` 下的文件，或者每条 shell 命令都失败**：看报错里有没有 `bwrap: Unexpected capabilities`。有的话是机器环境的问题，和插件无关：Codex 进程带着 ambient capabilities，有些版本的 bubblewrap（比如 0.6.1）因此不肯启动。用 `setpriv --inh-caps=-all --ambient-caps=-all codex` 启动 Codex。
 - **`/duck-review` 叫不出来，或者叫到了别的东西**：用插件命令的全名 `/duck:duck-review`。
 - **第一次跑 `/duck-survey` 弹了好几次授权**：Claude Code 第一次用 WebSearch、WebFetch 上网查文献时会问你。点允许；选了不再询问，以后就不问了。
-- **Claude Code 里改开关时问能不能改 `.duck/config.md`**：正常。`.duck/` 建好以后，往笔记本、决策记录里追加和写报告由插件放行，不弹窗；改已有的行、改开关和规则文件要你点头。
+- **Claude Code 里改开关时问能不能改 `.duck/config.md`**：正常。`.duck/` 建好以后，往笔记本、决策记录里追加和写报告由插件放行，不弹窗；改已有的行、改开关和规则文件要你点头。AI 用 Write 整份写笔记本或决策记录、又没留下原来的条目时，插件直接拒绝，让 AI 先读、再在末尾追加。
 - **Windows**：还没在 Windows 上实测过。hook 跑不起来时，命令照样能用，只是开启了的项目也没有常驻规则，Claude Code 里读插件文件会多弹几次询问。
