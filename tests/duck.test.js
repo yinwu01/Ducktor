@@ -179,9 +179,18 @@ test('a long config is cut and a non-UTF-8 config is flagged', () => {
   assert.match(duck.buildContext(dir), /读不出的字节/);
 });
 
+test('「回复：短」 in the config is repeated in words, in every switch state', () => {
+  for (const sw of ['', '开关：on\n', '开关：off\n']) {
+    assert.match(duck.buildContext(project({ '.duck/config.md': `${sw}回复：短\n` })), /学生要过回复写短/);
+    assert.match(duck.buildContext(project({ '.duck/config.md': `${sw}Reply: short\n` })), /学生要过回复写短/);
+    assert.doesNotMatch(duck.buildContext(project({ '.duck/config.md': sw || '# Ducktor 设定\n' })), /学生要过回复写短/);
+  }
+});
+
 test('the injected text stays well under host limits', () => {
   // Claude Code caps additionalContext at 10,000 characters; Codex moves long context to a file.
-  const text = duck.buildContext(project({ '.duck/config.md': `开关：on\n${'x'.repeat(5000)}` }));
+  // Worst case: on, the short-reply line (adds a sentence), and a config cut at its limit.
+  const text = duck.buildContext(project({ '.duck/config.md': `开关：on\n回复：短\n${'x'.repeat(5000)}` }));
   assert.ok(text.length < 7000, `${text.length} characters`);
 });
 
