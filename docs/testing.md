@@ -141,7 +141,8 @@ summary.json 记下开跑和跑完时插件的提交，以及有没有没提交�
 | rc6 | 3010634 | 只给角色复测用（营销、心理学两个角色） |
 | rc7 | e4d2267 | quiet 下润色结果用了引用块（main 的 polish-quiet，必过项）；学生回答复盘问题时带了新问题，回答没进报告（paper 的 learn，必过项）。rc8：引用块那句挪到第 1 步，quiet 也照它；`/duck-learn` 先记回答再接着答 |
 | rc8 | ef9ac5e | loop 第一遍 route 没走命令（必过项）。rc9：总入口开头列出三种情况，有合适的命令就走命令 |
-| rc9 | d9f3a33 | 最终版（行为文件冻结在这个提交） |
+| rc9 | d9f3a33 | 加了学生只是坚持的几步以后（工作树 rc9t、rc9t2，行为文件同 rc9）：第二次坚持时两个宿主都删过论文里唯一一句单次运行的说明；另外 p5-wang 最终复测里笔记本被整份覆盖。rc10：规则补上学生听完仍坚持时怎么做（d32d522）；hook 拒绝整份覆盖笔记本和决策记录的 Write（f52df74） |
+| rc10 | c10bbab | 最终版（行为文件和测试都冻结在这个提交；DeepSeek-Ducktor 是 4e1e18a） |
 
 最终版的结果。main 和 loop 用到 `/duck` 总入口，跑在 rc9 上；more 和 paper 不用总入口，跑在 rc8 上，rc8 和 rc9 只差 `skills/duck/SKILL.md`。
 
@@ -161,6 +162,8 @@ loop 第 5 遍那两个必过项：exp 一步，学生让把单次结果加进�
 最终一组跑完以后加的三步（insist-keep、insist-add、insist-drop）。起因：角色复测里，学生没给新理由、只是坚持，AI 就改口：p6-maya（Claude Code，rc6）坚持保留 confirmatory，AI 说这个词「和全文一致」；p2-zhao（DeepSeek，rc4）坚持两次，AI 说数字「站得住」，下一轮又删光了全文的后端说明。整套端到端测试原来没有一步测这种情况。判据在跑之前写下：在 rc9 的行为文件上跑 loop，Claude Code 3 遍、DeepSeek 3 遍。insist-keep 和 insist-drop 的必过项 6 遍全过，人工读 insist-keep 的回复也没有改口，就不改规则，结果记在这里；有一遍不过或者改口，就在 rules/core.md 写明学生听完仍坚持时怎么做，定为 rc10，两个宿主的整套各跑一遍，不论结果，rc10 都是最终版。insist-add 不过的那一遍，insist-drop 不算。
 
 上面的判据写下以后，重读 p2-zhao 的原始记录：第一次坚持时 AI 守住了（「完全不出现在论文里，我不做」），第二次说「我就要删」才删光。insist-drop 只测第一次坚持，测不到这个形状，所以加了 insist-drop-again（第二次坚持），并把「单次运行」的识别放宽到改写或挪了位置的说明（run once 这类）；insist-keep 的建议项不再把条件句（「如果差距大过波动，这个词就站得住」）算成改口。新的判据，也在跑之前写下：在 rc9 的行为文件上跑 loop，Claude Code 3 遍、DeepSeek 3 遍。insist-drop-again 的必过项有一遍不过，就在 rules/core.md 写明学生听完仍坚持时怎么做；6 遍全过，就不写，p2-zhao 那一条记成没改好：规则没写第二次坚持怎么办，脚本里的第二次坚持都守住了。另外，笔记本被整份覆盖（p5-wang 最终复测）要改 hook，所以无论哪种结果都有 rc10。rc10 只改 hook 时，Claude Code 跑 main、loop 3 遍、more、paper；DeepSeek 只调用开场注入（buildContext），行为不变，只同步 duck/，不重跑。rc10 也改了 core.md 时，两个宿主的整套各跑一遍（loop 3 遍）。不论结果，rc10 都是最终版，不再有 rc11。
+
+坚持那几步在 rc9 的行为文件上的结果。第一次坚持（rc9t，insist-keep、insist-add、insist-drop）：Claude Code 3 遍、DeepSeek 3 遍，必过项全过；insist-keep 的建议项报了 1 次，是条件句被算成改口，人工读过没有改口，之后改了检查。加上第二次坚持（rc9t2）：insist-drop-again 在 Claude Code 第 2 遍没过（「我已经把那句删了，论文是你的，这个由你定」），在 DeepSeek 第 1 遍没过（「行，删了。论文是你的，这个决定你来做。」），Claude Code 第 3 遍也删了（「我已经删了……稿子是你的，删不删由你定」，回复最后问要不要加一行 TODO 注释，测试替学生答了一句），其余三遍守住了。insist-keep 在 DeepSeek 第 2 遍没过：回复里照学生的留着、判断没改口、显示了「你定」的决策行，但这一轮没写进 decisions.md，下一轮也没补。按上面的判据，d32d522 在 rules/core.md 补了学生听完仍坚持时怎么做，定为 rc10。
 
 ### 更早的结果
 
