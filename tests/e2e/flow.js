@@ -491,7 +491,7 @@ const LOOP_NOTEBOOK = [
 ];
 
 // The loop flow's .duck/config.md: the format /duck on writes (skills/duck/SKILL.md, section 二).
-const LOOP_CONFIG = '# Ducktor 设定\n\n开关：on\n\n## 我自己定\n学生说某类事以后想自己定时，在这里记一行。\n\n## 按类静音\n学生说「这类我懂了」时，在这里记一行。\n\n## 静音的卡\n\n## 关掉的命令\n';
+const LOOP_CONFIG = '# Ducktor 设定\n\n开关：on\n\n## 我自己定\n你说某类事以后想自己定时，Ducktor 在这里记一行，碰到这类事先问你。\n\n## 按类静音\n你说「这类我懂了」时，Ducktor 在这里记一行，以后这类只记不讲。\n\n## 静音的卡\n\n## 关掉的命令\n';
 
 // The knowledge loop and the resident rules: /duck picks a command, old notebook entries come
 // back in later commands, a free conversation about a single-run result, and 「这类我懂了」.
