@@ -588,6 +588,17 @@ function globalChecks(transcripts) {
     ['should', 'Claude Code read plugin files without the shell', () => HOST !== 'claude'
       || transcripts.every((t) => !t.tools.some((x) => /^Bash /.test(x) && x.includes(ROOT)))],
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
+    // A decision line shown in a reply is written to decisions.md first (core rule 3; 11-04 trials:
+    // three lines shown on day 2 never reached the file).
+    ['should', 'every decision line shown in a reply is in decisions.md', () => {
+      const norm = (s) => s.replace(/[\s:：,，。.()（）「」"'`*]/g, '');
+      const log = norm(text('decisions.md'));
+      return transcripts.every((t) => [...t.reply.matchAll(/▸ ?决策[:：]\s*([^\n]{6,})/g)].every((m) => log.includes(norm(m[1]).slice(0, 12))));
+    }],
+    // Reading or searching project files through the shell asks the student each time (11-04
+    // trials: 11 prompts in 14 turns for one student); Read, Glob and Grep do not.
+    ['should', 'Claude Code read project files without the shell', () => HOST !== 'claude'
+      || transcripts.every((t) => !t.tools.some((x) => /^Bash (?:cd [^;&|]+(?:&&|;)\s*)?(cat|ls|find|grep|head|tail|wc)\b/.test(x)))],
     // The short why names cards by title; a bare card number is jargon the student cannot read.
     ['should', 'no card number on its own in a short why', () => transcripts.map((t) => lastWhy(t.reply)).every((w) => !bareCardId(w))],
     // Most notebook lines are written by the AI; quoting one as the student's own is wrong.
