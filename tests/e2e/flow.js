@@ -92,7 +92,7 @@ function runCodex(prompt, session, opts = {}) {
 
 // Normalizes one host transcript into { session, reply, reads, tools, injected, cost }.
 function parse(stdout) {
-  const t = { session: null, reply: '', reads: [], tools: [], denials: [], injected: '', cost: 0, errors: [] };
+  const t = { session: null, reply: '', reads: [], tools: [], denials: [], refusedLogWrites: 0, injected: '', cost: 0, errors: [] };
   const texts = [];
   for (const line of stdout.split('\n')) {
     let ev;
@@ -109,7 +109,7 @@ function parse(stdout) {
         }
       }
       // The student sees every message of the turn, not only the last one in `result`.
-      if (ev.type === 'result') { t.reply = texts.length ? texts.join('\n\n') : (ev.result || ''); t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; t.denials = (ev.permission_denials || []).map((d) => `${d.tool_name} ${JSON.stringify(d.tool_input || {}).slice(0, 120)}`); }
+      if (ev.type === 'result') { t.reply = texts.length ? texts.join('\n\n') : (ev.result || ''); t.cost = ev.total_cost_usd || 0; t.session = ev.session_id || t.session; t.denials = (ev.permission_denials || []).map((d) => `${d.tool_name} ${JSON.stringify(d.tool_input || {}).slice(0, 120)}`); t.refusedLogWrites = (ev.permission_denials || []).filter((d) => d.tool_name === 'Bash' && LOG_WRITE.test(String((d.tool_input || {}).command || ''))).length; }
     } else {
       if (ev.type === 'thread.started') t.session = ev.thread_id;
       const it = ev.item || {};
@@ -263,6 +263,8 @@ const DUCK_QUOTE = /^[ \t]*>/m;
 const principleOf = (l) => l.split('｜')[1] || l;
 // 「最小测试」「小测试」are test runs, not a quiz.
 // 「先小测、再全量」 plans a small experiment run, not a quiz (11-04 rc11, DeepSeek more).
+// A shell command that writes .duck/notebook.md or .duck/decisions.md (bin/duck.js refuses these).
+const LOG_WRITE = /(>>?|\btee\b|\b(sed|perl)\b[^|;&]*\s-[a-zA-Z]*i)[^|;&]*\.duck\/(notebook|decisions)\.md/;
 const QUIZ = /考考你|(?<![最先再])小测(?![试、，,])|测验|测一测|思考题|练习题|课后作业|留个作业|布置.{0,4}作业|给你打分|打几分|你的得分|成长档案/;
 // /duck-why talks like a mentor and grounds the lesson in named researchers. Names and views may
 // only come from the plugin's cards (MENTORS.md included), handbook and original skills, or from
@@ -702,7 +704,7 @@ function globalChecks(transcripts) {
     ['must', 'no em-dash in notebook or decisions', () => !/\u2014/.test(text('notebook.md') + text('decisions.md'))],
     // A shell write to a log asks the student in the default permission mode (rc10: 2 of 6
     // Claude Code runs used echo or printf with >>). Claude Code's hook refuses it since rc11.
-    ['should', 'logs are written with the edit tools, not the shell', () => transcripts.every((t) => !t.tools.some((x) => /^(Bash|bash|shell) /.test(x) && /(>>?|\btee\b|\b(sed|perl)\b[^|;&]*\s-[a-zA-Z]*i)[^|;&]*\.duck\/(notebook|decisions)\.md/.test(x)))],
+    ['should', 'logs are written with the edit tools, not the shell', () => transcripts.every((t) => !t.tools.some((x) => /^(Bash|bash|shell) /.test(x) && LOG_WRITE.test(x)))],
     // A decision line shown in a reply is written to decisions.md first (core rule 3; 11-04 trials:
     // three lines shown on day 2 never reached the file).
     ['should', 'every decision line shown in a reply is in decisions.md', () => {
@@ -714,8 +716,10 @@ function globalChecks(transcripts) {
     // approve (11-04 trials: 11 prompts in 14 turns for one student, most of them compound shell
     // commands). Claude Code 2.1.318 has no Glob or Grep tool, so simple read-only commands are
     // fine; loops, awk, python and cd in a compound command are not.
+    // The hook's own refusal of a shell write to a log is listed as a denial too, but no prompt
+    // reaches the student for it (rc12 loop: the only denial of one run was that).
     ['should', 'no tool call needed the student\'s approval', () => HOST !== 'claude'
-      || transcripts.every((t) => !(t.denials || []).length)],
+      || transcripts.every((t) => (t.denials || []).length === (t.refusedLogWrites || 0))],
     // The short why names cards by title; a bare card number is jargon the student cannot read.
     ['should', 'no card number on its own in a short why', () => transcripts.map((t) => lastWhy(t.reply)).every((w) => !bareCardId(w))],
     // Most notebook lines are written by the AI; quoting one as the student's own is wrong.
@@ -810,7 +814,7 @@ function main() {
       const again = HOST === 'claude' ? runClaude(answer, session, opts) : runCodex(answer, session, opts);
       fs.writeFileSync(path.join(OUT, `${String(results.length + 1).padStart(2, '0')}-${stage.name}-followup.jsonl`), again.stdout || '');
       const t2 = parse(again.stdout || '');
-      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], denials: [...(t.denials || []), ...(t2.denials || [])], reply: `${t.reply}\n\n[学生] ${answer}\n\n${t2.reply}`, cost: t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
+      t = { ...t2, injected: `${t.injected}\n${t2.injected}`, reads: [...t.reads, ...t2.reads], tools: [...t.tools, ...t2.tools], denials: [...(t.denials || []), ...(t2.denials || [])], refusedLogWrites: (t.refusedLogWrites || 0) + (t2.refusedLogWrites || 0), reply: `${t.reply}\n\n[学生] ${answer}\n\n${t2.reply}`, cost: t2.cost, sessionId: t.sessionId, earlierReads: t.earlierReads };
       if (HOST === 'codex') t.injected = codexInjected(session);
       checks = evaluate(t);
     }
