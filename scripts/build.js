@@ -5,7 +5,7 @@
 //   skills/<name>/SKILL.md, skills/<name>/agents/openai.yaml
 //       the nine /duck-* wrappers, from rules/wrapper-template.md + rules/commands.json
 //   the 「先记住的规矩」 block in every command except the hub (skills/duck)
-//       the 「东西在哪」 and 「每次都照做」 sections of rules/core.md, so a command has them
+//       the 「东西在哪」, 「每次都照做」 and 「怎么讲」 sections of rules/core.md, so a command has them
 //       in a project that has not turned Ducktor on (the hook then injects only a short
 //       note); in the hand-written commands it sits between basics:start and basics:end
 //   AGENTS.md
@@ -40,14 +40,14 @@ function sectionOf(text, title) {
 // What every command needs even when the resident rules are not loaded.
 function basics() {
   const core = read('rules/core.md');
-  const sections = ['东西在哪', '每次都照做'].map((title) => {
+  const sections = ['东西在哪', '每次都照做', '怎么讲'].map((title) => {
     const s = sectionOf(core, title);
     if (!s) throw new Error(`rules/core.md has no "## ${title}" section`);
     return s.replace(/^## /, '### ');
   });
   return [
     '## 先记住的规矩',
-    '下面两节和常驻规则里的同名两节一样：Ducktor 没在这个项目开启时，这条命令也照它们做；开场注入里有常驻规则时，以注入的为准。',
+    '下面三节和常驻规则里的同名三节一样：Ducktor 没在这个项目开启时，这条命令也照它们做；开场注入里有常驻规则时，以注入的为准。',
     '',
     sections.join('\n\n'),
   ].join('\n');

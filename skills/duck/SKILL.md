@@ -51,7 +51,7 @@ disable-model-invocation: true
 
 1. 改项目 .duck/config.md 里「开关：」那一行（英文 config 里是「Switch:」）：有这一行就改这一行，不另加一行。文件在、没有这一行（之前只记过静音、「回复：短」或关掉的命令），就在第一个标题下面加这一行，别的不动。没有这个文件，就照下面的格式新建。这是学生明确要的，不用再问。改 config.md、写 decisions.md 都用文件编辑工具（Claude Code 里是 Write、Edit），不用 echo、sed 这类 shell 命令，没写成就照实说；写进 .duck/ 的文字不用破折号。第一次建 .duck/ 时顺带说一句（不用问）：提交进 git 就和论文一起留档，不想提交就写进 .git/info/exclude。
 2. 告诉学生改了哪一行、改成了什么，以及这一档的意思：
-   - on：平时干活也按常驻规则来（讲为什么、记决策、结果进论文前对标准），每次命令跑完出「为什么」报告，对话里放短版，完整版存进 .duck/reports/；
+   - on：平时干活也按常驻规则来（讲为什么、记决策、结果进论文前对标准），每次命令跑完讲这一步的道理，完整报告存进 .duck/reports/；
    - quiet：照样先问，照记照存，对话里不放；平时干活用到的原则也照样记进笔记本；
    - off：回到刚装好的样子：平时不再先问、不讲也不记；敲 /duck-xxx 时照常讲为什么、照常记。config.md 里关掉的命令和静音的设定照样算数。
    学生只说「安静点」「别啰嗦」、没说哪一档时：现在是 on，就切到 quiet，说清 quiet 照样记；项目还没开启，就别切到 quiet（quiet 比没开启管得多），告诉学生没开启时平时本来就不出声，再问要不要回复短一点（在 config.md 记「回复：短」，英文 config 写 Reply: short；config.md 还没有时照下面的格式新建，但不写开关行，别顺手开启）。
@@ -64,6 +64,9 @@ disable-model-invocation: true
 # Ducktor 设定
 
 开关：on
+
+## 我自己定
+学生说某类事以后想自己定时，在这里记一行。
 
 ## 按类静音
 学生说「这类我懂了」时，在这里记一行。
@@ -79,6 +82,9 @@ disable-model-invocation: true
 # Ducktor settings
 
 Switch: on
+
+## I decide
+When the student says they want to decide a kind of judgment themselves, add a line here.
 
 ## Muted topics
 When the student says "I've got this kind", add a line here.
