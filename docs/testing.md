@@ -52,7 +52,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | polish-quiet | `/duck-polish` 润色摘要 | 读了 `library/paper-polish`；照样写了报告；对话里没有「为什么」 |
 | quiet-free | 不敲命令，让 AI 把代码里的跳过阈值改成按层取分位数 | 对话里没有 Ducktor 的话；（should）笔记本多了一行，带「这次」 |
 | card-draft、card-ok | `/duck-skill card new …`，再说「可以，写吧」 | 写了 `.duck/cards/G01.md`，INDEX 里有 G01 |
-| learn | `/duck-learn`；它先问了一句（这一段有学生定的事、学生还没回顾）时，测试替学生答一句再查 | 写了复盘报告；回复里有复盘本身（交给 AI 的判断或下一步），不只写报告文件名。should：对话里没有五段固定标题、没有固定开场问话、不报名家和卡号；报告保留五节，写了怎么记「我自己定」（0.2.0 以前查的是固定的开场问话） |
+| learn | `/duck-learn`；复盘末尾问了学生一句时，测试替学生答一句再查 | 写了复盘报告；回复里有复盘本身（交给 AI 的判断或下一步），不只写报告文件名。should：对话里没有五段固定标题（加粗的段首标签也算，引用块里的也算）、没有固定开场问话、不报名家和卡号；报告保留五节，写了怎么记「我自己定」（0.2.0 以前查的是固定的开场问话） |
 | off | `/duck off` | config 里开关是 off；回复说回到了没开启的样子（should） |
 | off-new-session | 新会话里 `/duck-polish` | 注入的是没开启那一段；照常写了 polish 报告；回复带讲解的引用块（should） |
 
@@ -81,6 +81,7 @@ DUCK_E2E_ONLY=menu,review node tests/e2e/flow.js claude   # 只跑几步
 | intro | `/duck-intro` 重写引言，paper/ 里的文件先别改 | 读了 `library/intro-drafter`；讲解或报告里提到 10-12 那条笔记；笔记本没有重复的行 |
 | exp | 不敲命令：「32k 上 70.9 对 70.6，只跑了一次，帮我加进表里」 | 提到种子或运行间的波动；表没动时，回复里有问句（11-03 探针 A2：问题只写进了 decisions.md）。should：先问，表没动 |
 | exp-ok | 「先补到 3 个 seed，表等结果出来再改」 | 决策记录多了一行，写明是学生定的 |
+| free-notebook | 不敲命令：「帮我给导师写一段这周的进展，就写 32k 上那个结果」 | should：提到笔记本 10-09 那条；不把单次结果写成显著更好（查常驻规则第 6 条：开始一段工作前翻笔记本） |
 | mute | 「多 seed 和方差这类我懂了，以后别讲了」 | config 的「按类静音」里记了这一类 |
 | mute-check | 又一个单次结果，让它记进 notes.md | should：记了；不再讲种子和波动 |
 
