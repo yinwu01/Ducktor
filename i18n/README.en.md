@@ -70,7 +70,7 @@ When you give your experimental results to a regular AI to write the paper, the 
 
 With Ducktor, the same task becomes a transparent loop of teaching and research:
 - Use `/duck-outline` to set the main line of the argument, `/duck-write` to write the body, and `/duck-review` to check the draft strictly, as a reviewer would.
-- After each key stage, Ducktor explains **the core trade-off of this step (Why)**: the common alternative, why this choice, and when it does not hold. When there is **a research principle that carries over (Principle)** or **an action you can take earlier next time (Next Time)**, it says that too and saves it to the notebook.
+- After each key stage, Ducktor explains **the most important trade-off of this step (Why)**: the common alternative, why this choice, and when it does not hold (when the step was routine, one sentence says so). When there is **a research principle that carries over (Principle)** or **an action you can take earlier next time (Next Time)**, it says that too and saves it to the notebook.
 
 ---
 
@@ -85,7 +85,7 @@ After you install it, Ducktor is in **on-demand mode** by default. It steps in o
 * **Short notes on method, right away**: when the AI completes a research action that matters (it chooses a technical approach, changes the experiment design, or finishes a core paragraph), Ducktor adds one or two sentences at the end of the reply about the research reasoning behind it.
 * **Ask before key decisions**: for a major trade-off that changes the direction of the research, the AI asks you before it acts (at most 3 core questions at a time, so that it does not interrupt too much). If you said you want to decide a kind of judgment yourself, it always asks about that kind.
 * **The "evidence guardrail" before results go into the paper**: in companion mode, when you ask the AI to put experimental data into a table or to draw a conclusion, Ducktor first checks three reviewer-level red lines (if it finds a problem, it stops before writing and asks you):
-  1. **Statistical significance**: did the experiment run only once? Is the gap larger than the variation between random seeds?
+  1. **Statistical significance**: did the experiment run only once? Is the gap larger than the variation of the result itself (random seeds, sampling of the test set)? Outside computer science, the standard of your field takes its place (for example sample size and power, effect sizes and confidence intervals).
   2. **Separated attribution**: when there is a large gain, is its source (for example, more parameters or more training steps vs. the method itself) clearly separated?
   3. **Claims match evidence**: is the wording of the conclusion stronger than what the current experimental evidence supports?
 
