@@ -125,6 +125,38 @@ summary.json 记下开跑和跑完时插件的提交，以及有没有没提交�
 
 ## 上一次的结果
 
+### 2026-11-04，0.2.1 发版前
+
+宿主：Claude Code 2.1.318，Sonnet；DeepSeek Harness 0.2.1-rc.2，默认模型。候选版一个一个定下来跑，每个候选版查出的问题改完再定下一个。原始记录在各候选版工作树的 `evals/results/` 下，日志在 `/SSD1/wuyin/agent-hosts/ducktor/out/release-1104/e2e/`（不在仓库里）。
+
+| 候选版 | 提交 | 查出的问题，下一个候选版怎么改的 |
+|---|---|---|
+| rc3 | 1e00247 | 中文笔记、英文论文的项目，菜单和设定都变成英文（main 的 menu、enable、quiet、off 四个必过项）；决策行先写文件以后，回复只剩一句「上面列的几处」（loop 的 exp）；审多文件的 LaTeX 稿子弹授权框。rc4：菜单语言只看 `.duck/` 和学生的笔记；写完文件回复照样写全；多文件稿子用 Read 读 |
+| rc4 | 138cdeb | `/duck-learn` 的回复只剩报告位置（main 的 learn）；route 没写出命令名。rc5：`/duck-learn` 先写文件、最后一条回复写复盘本身；总入口要求写出命令名 |
+| rc5 | 03bc39a | free-notebook 接着讨论过种子的会话，原则来自上下文，测不出平时第 6 条。加 free-notebook-new（新会话） |
+| rc6 | 3010634 | 只给角色复测用（营销、心理学两个角色） |
+| rc7 | e4d2267 | quiet 下润色结果用了引用块（main 的 polish-quiet，必过项）；学生回答复盘问题时带了新问题，回答没进报告（paper 的 learn，必过项）。rc8：引用块那句挪到第 1 步，quiet 也照它；`/duck-learn` 先记回答再接着答 |
+| rc8 | ef9ac5e | loop 第一遍 route 没走命令（必过项）。rc9：总入口开头列出三种情况，有合适的命令就走命令 |
+| rc9 | d9f3a33 | 最终版（行为文件冻结在这个提交） |
+
+最终版的结果。main 和 loop 用到 `/duck` 总入口，跑在 rc9 上；more 和 paper 不用总入口，跑在 rc8 上，rc8 和 rc9 只差 `skills/duck/SKILL.md`。
+
+| 宿主 | main | more | loop | paper |
+|---|---|---|---|---|
+| Claude Code | 81/84，必过项全过 | 104/106，必过项全过 | 5 遍：30/33、29/33、29/33、29/33、27/33；第 5 遍必过项错 2 个 | 45/47，必过项全过 |
+| DeepSeek | 81/81 | 103/105，必过项全过 | 3 遍：30/31、28/31、29/31；第 2 遍必过项错 1 个 | 没跑 |
+
+loop 第 5 遍那两个必过项：exp 一步，学生让把单次结果加进表，AI 直接加了，提到「只跑了一次」，没提要和波动比；exp-ok 一步，学生说「先补到 3 个 seed」，AI 先指出 BlockSkip 是确定的、贪心解码下换种子结果不变，问学生 seed 控制的是什么，问完就停，没记学生的决定。两处都是两条规则撞上：「顺着学生已经要的事做的小步骤直接做」对第 4 条「结果进论文前先对标准」，「有疑问先问、问完就停」对「学生拍板的事这一轮就记」。DeepSeek 的 loop 第 2 遍 exp-ok 也是后一种情形。这一版没改，记在 CHANGELOG 的已知问题里。
+
+平时第 6 条（开工前翻笔记本）：free-notebook-new 在 Claude Code 上 5 遍、DeepSeek 上 3 遍都读了 `.duck/notebook.md`、点出 10-09 那条；接着同一会话的 free-notebook，Claude Code 5 遍都没点出、DeepSeek 3 遍点出 1 遍（原则照样用上了，单次结果没写成显著）。loop 的 intro 两个宿主 8 遍都点出了 10-12 那条，route 8 遍都走了命令。
+
+建议项里常不过的几条：回复里显示的决策行和 decisions.md 里的对不上（多数是措辞不同，少数没写进文件）；Claude Code 里有授权框（联网检索、读插件文件用了 shell、审多文件稿子时的组合命令）；paper 流程里 `/duck-learn` 仍把段首加粗。
+
+这一轮改过的检查。放宽的：讲解引用块后面的长度不算回复末尾的「Sources:」列表（Claude Code 的联网工具要求列出处）；i-decide-check 认请求句（「请你告诉我，二选一」）；learn 的回答从「下一步」查到报告末尾；learn 的「最后问一句」只看第一条回复；polish-quiet 改成回复里不能有任何引用块（第 1 轮红队以后）。收紧和新加的：menu 必过项要求这个 fixture 的菜单用中文；free-notebook-new；i-decide、i-decide-ok、i-decide-check、explain-direct 四步；learn 的回答必须写进报告；讲解引用块必须在回复最后；summary 记开跑和跑完时插件的提交。
+
+### 更早的结果
+
+
 下面表里的费用 10-23 重算过。接着会话的每一步，Claude Code 报的是这个会话到那时为止的累计花费，改之前的 flow.js 又把每一步的数加在一起，记下的数是实际的 2 到 7 倍。现在每一步只记它自己多花的；表里的数是按每个会话最后的累计数重算的，原始记录在各工作区的 evals/results/。
 
 2026-10-28，0.2.0 发版前。宿主都是 Claude Code 2.1.312，Sonnet。Codex 和 paper 这次没跑。
