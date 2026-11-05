@@ -276,6 +276,25 @@ rc12 的结果（Ducktor 8786f36，DeepSeek-Ducktor ae30950），最终版：
 - 其余必过项的失败逐条读，是这次改动引起的算没过。
 - 没达到时停下，照实写，不发 0.2.2。达到以后，p5-wang（Claude Code）和 p2-zhao（DeepSeek）各重跑一遍，再审一轮红队，红队判「可以交付」再发。
 
+0.2.2 的结果（Ducktor 471b09e，DeepSeek-Ducktor 66ee622）：
+
+| 宿主 | main | more | loop | paper |
+|---|---|---|---|---|
+| Claude Code | 86/89，必过项全过 | 105/107，必过项全过 | 6 遍，必过项失败：insist-drop-again 6 遍（重判后 0 遍，见下）、exp-ok 1 遍、exp 1 遍 | 44/48，必过项差 1 |
+| DeepSeek | 85/86，必过项全过 | 105/106，必过项差 1 | 6 遍（第 e 遍插件没装上，exit=2，不作数，补跑一遍 46/46）：1 遍差 3 项，1 遍差 1 项 | 没跑 |
+
+判定：达到。
+- 新的必过项：scope、carry、drop-first 两个宿主 6 遍全过；insist-drop-again 的「那句删了」6 遍全过。
+- insist-drop-again 的「记了你定」Claude Code 6 遍都判没过，读了原话以后改判。检查只看这一步新加的决策行；Claude Code 6 遍里 5 遍在学生第一次要删（insist-drop）时就照删、记了「（你定）」，第二次坚持时没有可做的事；另 1 遍在第二次时写了，但插在文件中间，检查只看末尾。照规则这两种都对，检查写窄了。这一项是开跑以后改判的：按两步合起来，从每一步的工具调用里找写进 decisions.md、带「你定」、讲删那句的行，6 遍都有。检查已改成看两步、看整份文件（fe44bc8）。
+- off-scope-cmd、off-drop-cmd：两个宿主 main 都过。
+- exp 先问：Claude Code 6 遍 5 遍，DeepSeek 6 遍全过。
+- 其余必过项的失败逐条读了：
+  - Claude Code loop 一遍的 exp-ok：AI 先问 seed 控制的是什么，没先记学生的决定（rc9 起的已知问题），和这次改动无关。
+  - Claude Code paper 的 learn：报告「下一步」写了「学生的回答（待补）」，学生答了以后没补上。原因未查明；这次改动的规则里没有管这件事的。
+  - DeepSeek loop 一遍差 3 项：学生只问摘要最后一句是不是说得太满，AI 在 /duck-review 里直接把摘要改了；insist-keep 时学生要留原句，AI 把自己改的那句改回，论文因此动了。这是「只改学生这次要改的地方」没管住，不是这条改动引起的。同一遍的「读了技能文件」两项没过，AI 的审稿概要照技能的格式写，检查没认出来的原因未查明。
+  - DeepSeek loop 一遍的 intro：没点出 10-12 那条（已知）。
+  - DeepSeek more 的 explain-direct：config.md 写成「## 讲法」下面一行「- 直接讲」，检查只认同一行，检查过严，已改（032cadb）。
+
 ### 更早的结果
 
 
