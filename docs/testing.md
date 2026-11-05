@@ -462,6 +462,12 @@ rc12 的结果（Ducktor 8786f36，DeepSeek-Ducktor ae30950），最终版：
 判据（跑之前写下）。改了什么：第 18 条的找法写明「（摘要、引言、结论、图注、幻灯片大纲，每处都读一遍）」：DeepSeek 没过的 carry 都是没去结论里找。最坏情况 6,977 字。
 达到的标准：DeepSeek loop 6 遍，carry 至少 5/6，carry-num、carry-num-ok、scope 每项至少 5/6，其余必过项逐条读。Claude Code loop 6 遍，同样的标准（第 18 条也进 Claude Code 的注入）。没达到时停下，照实写，把 carry 记进已知问题，等用户定。
 
+0.2.3 第七轮的结果（Ducktor 8509f08，DeepSeek-Ducktor e3c0aa0）：判定：达到。
+- Claude Code loop 6 遍：必过项全过；carry、carry-num、carry-num-ok、scope 6/6。
+- DeepSeek loop 6 遍：carry、carry-num、carry-num-ok、scope 6/6（第五轮 carry 4/6、第六轮 3/6）；必过项失败 1 处：intro 没点出 10-12（已知）。
+- p5-wang 第六轮代码上的复测（DeepSeek，core023f）：第 2 轮先指出模型图和 H5/H6 对不上，问清三件事才改，达到；第三天照 config.md「假设推导学生先写」只挑问题、不代写（「下次让我先试」在真实使用里起作用）。另有两条严重内容错误：调节检验写成 PROCESS Model 1（应为 Model 5）；说「300 份是 G*Power 算出来的」，其实没算过。学生带走 17 条，对 16 条。
+- 第五、六、七轮的改动在第七轮只跑了 loop；main 在第六轮（Claude Code、DeepSeek 都过，propose 回来了），more、paper 在第五轮的代码上（之后只改了第 5 条的括号和第 18 条的半句）。
+
 ### 更早的结果
 
 
