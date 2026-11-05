@@ -452,6 +452,16 @@ rc12 的结果（Ducktor 8786f36，DeepSeek-Ducktor ae30950），最终版：
 - p5-wang 在 DeepSeek 上再复测一遍，第 2 轮用同一句原话：研究决定学生定之前稿子里没被改，编号列给了学生。
 - 没达到时停下，照实写。达到以后审一轮红队，再等用户点头合并发布。
 
+0.2.3 第六轮的结果（Ducktor 31f7a2a，DeepSeek-Ducktor 9b8604c，15:27 起跑）：
+- propose：Claude Code main 过，DeepSeek main 87/87 全过。删掉括号以后这一步回来了，和推断一致（各一遍，没有对照）。
+- DeepSeek loop 6 遍：carry 3/6（第五轮 4/6），没过的 3 遍都是 AI 删了那句、列了引言里别的空话，没去结论里找；carry-num、carry-num-ok、scope 6/6。另 1 遍 mute：AI 回复说「已记进 config.md 里『按类静音』下的这一行」，检查在 config.md 里没找到（原因未查明，项目文件跑完已删）。
+- 判定：没达到（DeepSeek carry）。
+
+### 2026-11-05，0.2.3 第七轮
+
+判据（跑之前写下）。改了什么：第 18 条的找法写明「（摘要、引言、结论、图注、幻灯片大纲，每处都读一遍）」：DeepSeek 没过的 carry 都是没去结论里找。最坏情况 6,977 字。
+达到的标准：DeepSeek loop 6 遍，carry 至少 5/6，carry-num、carry-num-ok、scope 每项至少 5/6，其余必过项逐条读。Claude Code loop 6 遍，同样的标准（第 18 条也进 Claude Code 的注入）。没达到时停下，照实写，把 carry 记进已知问题，等用户定。
+
 ### 更早的结果
 
 
