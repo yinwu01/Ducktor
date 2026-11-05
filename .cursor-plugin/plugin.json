@@ -2,7 +2,7 @@
   "name": "duck",
   "displayName": "Ducktor",
   "description": "Ducktor: a research mentor built on Supervisor-Skills. Runs the research skills as /duck-* commands and opens up the why behind each AI step, so you can still learn while the AI does the work. Trust me, I'm a Ducktor.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "name": "yinwu01"
   },
