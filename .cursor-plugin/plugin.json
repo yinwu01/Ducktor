@@ -2,12 +2,12 @@
   "name": "duck",
   "displayName": "Ducktor",
   "description": "Ducktor: a research mentor built on Supervisor-Skills. Runs the research skills as /duck-* commands and opens up the why behind each AI step, so you can still learn while the AI does the work. Trust me, I'm a Ducktor.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
-    "name": "JoeyWu-tech"
+    "name": "yinwu01"
   },
-  "homepage": "https://github.com/JoeyWu-tech/Ducktor",
-  "repository": "https://github.com/JoeyWu-tech/Ducktor",
+  "homepage": "https://github.com/yinwu01/Ducktor",
+  "repository": "https://github.com/yinwu01/Ducktor",
   "license": "CC-BY-NC-SA-4.0 AND CC-BY-4.0 AND MIT",
   "keywords": [
     "research",

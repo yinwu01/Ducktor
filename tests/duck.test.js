@@ -105,12 +105,14 @@ test('not turned on and off: the hook gives no rules, the commands carry the bas
       continue;
     }
     // Copied whole from core.md, so a command in a project that has not turned Ducktor on
-    // still reads plugin files with Read, maps skill names, and follows the every-time rules.
+    // still reads plugin files with Read, follows the every-time rules and explains the same way.
     assert.ok(text.includes(section('东西在哪')), `${name}: 东西在哪`);
     assert.ok(text.includes(section('每次都照做')), `${name}: 每次都照做`);
-    assert.match(text, /用 Read、Glob、Grep 读，不用 cat/, name);
-    assert.match(text, /deep-research → \/duck-survey/, name);
+    assert.ok(text.includes(section('怎么讲')), `${name}: 怎么讲`);
+    assert.match(text, /读文件用 Read：插件放行了插件根目录下的 Read/, name);
     assert.match(text, /用学生的语言/, name);
+    // The commands that run an original skill map the skill names it mentions to commands.
+    if (!['duck-why', 'duck-learn', 'duck-notes', 'duck-skill'].includes(name)) assert.match(text, /deep-research → \/duck-survey/, name);
   }
 });
 
@@ -164,8 +166,15 @@ test("the student's copy of the rules wins over the plugin's", () => {
   for (const copy of ['# 改过的\r\n\r\n## 每次都照做\r\n- 我们自己的一条\r\n', '# 改过的\n\n## 每次都照做']) {
     const text = duck.buildContext(project({ '.duck/config.md': '开关：on\r\n', '.duck/skills/core.md': copy }));
     assert.equal(text.match(/## 每次都照做/g).length, 1, JSON.stringify(copy));
-    assert.doesNotMatch(text, /学生的副本里没有这一节/);
+    assert.doesNotMatch(text, /上面「每次都照做」一节来自插件原版/);
   }
+  // A 0.2.0 copy has 「每次都照做」 but no 「怎么讲」 (new in 0.2.1): it gets that section, once.
+  const old = duck.buildContext(project({ '.duck/config.md': '开关：on\n', '.duck/skills/core.md': '# 改过的\n\n## 每次都照做\n- 我们自己的一条\n' }));
+  assert.equal(old.match(/^## 怎么讲/gm).length, 1);
+  assert.match(old, /上面「怎么讲」一节来自插件原版/);
+  const both = duck.buildContext(project({ '.duck/config.md': '开关：on\n', '.duck/skills/core.md': '# 改过的\n\n## 每次都照做\n- 一条\n\n## 怎么讲\n- 我们的讲法\n' }));
+  assert.equal(both.match(/^## 怎么讲/gm).length, 1);
+  assert.doesNotMatch(both, /学生的副本里没有这一节/);
 });
 
 test('a long config is cut and a non-UTF-8 config is flagged', () => {
@@ -177,10 +186,29 @@ test('a long config is cut and a non-UTF-8 config is flagged', () => {
   assert.match(duck.buildContext(dir), /读不出的字节/);
 });
 
+test('「回复：短」 in the config is repeated in words, in every switch state', () => {
+  for (const sw of ['', '开关：on\n', '开关：off\n']) {
+    assert.match(duck.buildContext(project({ '.duck/config.md': `${sw}回复：短\n` })), /学生要过回复写短/);
+    assert.match(duck.buildContext(project({ '.duck/config.md': `${sw}Reply: short\n` })), /学生要过回复写短/);
+    assert.doesNotMatch(duck.buildContext(project({ '.duck/config.md': sw || '# Ducktor 设定\n' })), /学生要过回复写短/);
+  }
+});
+
+test('an English config gets an English reminder to reply in English', () => {
+  for (const sw of ['Switch: on\n', 'Switch: off\n', 'Switch: quiet\n']) {
+    assert.match(duck.buildContext(project({ '.duck/config.md': `# Ducktor settings\n\n${sw}` })), /reply in English, the first reply/);
+  }
+  assert.doesNotMatch(duck.buildContext(project({ '.duck/config.md': '开关：on\n' })), /reply in English, the first reply/);
+});
+
 test('the injected text stays well under host limits', () => {
   // Claude Code caps additionalContext at 10,000 characters; Codex moves long context to a file.
-  const text = duck.buildContext(project({ '.duck/config.md': `开关：on\n${'x'.repeat(5000)}` }));
-  assert.ok(text.length < 7000, `${text.length} characters`);
+  // Worst cases: on, the short-reply line (adds a sentence), an English config (adds one more),
+  // unreadable bytes (one more), and a config cut at its limit.
+  for (const head of ['开关：on\n回复：短\n', 'Switch: on\nReply: short\n', 'Switch: on\nReply: short\n\uFFFD']) {
+    const text = duck.buildContext(project({ '.duck/config.md': `${head}${'x'.repeat(5000)}` }));
+    assert.ok(text.length < 7000, `${text.length} characters`);
+  }
 });
 
 test('SessionStart hook: Claude Code environment', () => {
@@ -329,7 +357,9 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   const dir = project({ '.duck/notebook.md': '- 10-26 旧的一条\n', '.duck/decisions.md': '- 2026-10-26 ▸ 决策：A（你定）\n', '.duck/reports/r.md': '# 旧报告\n' });
   const allow = (tool, rel, extra) => allowWrite(tool, path.join(dir, '.duck', rel), dir, extra);
   assert.equal(allow('Write', 'decisions.md', { content: '- 2026-10-26 ▸ 决策：A（你定）\n- 2026-10-27 ▸ 决策：B（AI 定）\n' }), 'allow');
-  assert.equal(allow('Write', 'decisions.md', { content: '- 2026-10-26 ▸ 决策：A（AI 定）\n' }), null);
+  // A Write that drops the old text replaces every entry: refused, so the model reads and adds.
+  assert.equal(allow('Write', 'decisions.md', { content: '- 2026-10-26 ▸ 决策：A（AI 定）\n' }), 'deny');
+  assert.equal(allow('Write', 'notebook.md', { content: '- 11-05 写方案｜新的一条\n' }), 'deny');
   assert.equal(allow('Edit', 'decisions.md', { old_string: '（你定）', new_string: '（AI 定）' }), null);
   assert.equal(allow('Edit', 'notebook.md', { old_string: '- 10-26 旧的一条\n', new_string: '' }), null);
   assert.equal(allow('MultiEdit', 'notebook.md', { edits: [ADD, { old_string: '旧', new_string: '新' }] }), null);
@@ -341,7 +371,7 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   // A file with bytes that are not UTF-8 cannot be rewritten through a lossy string.
   const bad = project({ '.duck/notebook.md': '' });
   fs.writeFileSync(path.join(bad, '.duck', 'notebook.md'), Buffer.from([0x2d, 0x20, 0xff, 0x0a]));
-  assert.equal(allowWrite('Write', path.join(bad, '.duck', 'notebook.md'), bad, { content: '- \ufffd\n- 新的\n' }), null);
+  assert.equal(allowWrite('Write', path.join(bad, '.duck', 'notebook.md'), bad, { content: '- \ufffd\n- 新的\n' }), 'deny');
   // Reports may be corrected after a conclusion is overturned.
   assert.equal(allow('Edit', 'reports/r.md', { old_string: '# 旧报告', new_string: '# 改过的报告' }), 'allow');
   // An empty log may be written whole.
@@ -351,9 +381,45 @@ test('PreToolUse hook: notebook and decisions only grow without a prompt', () =>
   const open = project({ '.duck/decisions.md': '- 2026-10-26 ▸ 决策：A（你定）' });
   const openAllow = (tool, extra) => allowWrite(tool, path.join(open, '.duck', 'decisions.md'), open, extra);
   assert.equal(openAllow('Edit', { old_string: 'A（你定）', new_string: 'A（你定）作废，实际是 AI 定的' }), null);
-  assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）作废\n' }), null);
+  assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）作废\n' }), 'deny');
   assert.equal(openAllow('Edit', { old_string: 'A（你定）', new_string: 'A（你定）\n- 2026-10-27 ▸ 决策：B（AI 定）' }), 'allow');
   assert.equal(openAllow('Write', { content: '- 2026-10-26 ▸ 决策：A（你定）\r\n- 2026-10-27 ▸ 决策：B（AI 定）\r\n' }), 'allow');
+});
+
+// Runs the PreToolUse hook for a shell command.
+function shellDecision(command) {
+  const run = runHook('PreToolUse', { CLAUDE_PLUGIN_ROOT: ROOT }, JSON.stringify({ tool_name: 'Bash', tool_input: { command }, cwd: os.tmpdir() }));
+  return run.stdout ? JSON.parse(run.stdout).hookSpecificOutput.permissionDecision : null;
+}
+
+test('PreToolUse hook: a shell command that writes a log is refused, reading one is not', () => {
+  assert.match(HOOKS.PreToolUse[0].matcher, /(^|\|)Bash(\||$)/);
+  // The first two are the commands rc10 ran on 11-04 (main and loop, Claude Code).
+  for (const c of [
+    "printf '%s\\n' '- 2026-11-04 ▸ 决策：A（你定）' >> .duck/decisions.md && printf '%s\\n' '- 11-04 润色｜B（AI 的判断）' >> .duck/notebook.md; tail -2 .duck/decisions.md",
+    'echo "- 2026-11-04 ▸ 决策：A（AI 定）" >> .duck/decisions.md; tail -2 .duck/decisions.md',
+    "cat >> /home/s/thesis/.duck/notebook.md <<'EOF'\n- 11-04 写方案｜A｜这次：B\nEOF",
+    'cat > .duck/notebook.md <<EOF\n- 11-05 新的一条\nEOF',
+    'echo x > "/Users/s/My Thesis/.duck/notebook.md"',
+    'echo x >> /Users/s/My\\ Thesis/.duck/decisions.md',
+    'echo x >>.duck/notebook.md',
+    "printf 'x\\n' | tee -a .duck/notebook.md >/dev/null",
+    "sed -i 's/AI 定/你定/' .duck/decisions.md",
+    "sed -i.bak -e 's/a/b/' ./.duck/notebook.md",
+    "perl -pi -e 's/a/b/' .duck/notebook.md",
+  ]) assert.equal(shellDecision(c), 'deny', c);
+  for (const c of [
+    'cat .duck/notebook.md',
+    'tail -2 .duck/decisions.md',
+    "grep -n '10-09' .duck/notebook.md > /tmp/hits.txt",
+    "sed -n '1,5p' .duck/notebook.md",
+    'echo "- 64k: 69.8" >> notes.md',
+    'cp .duck/notebook.md /tmp/notebook-backup.md',
+    'echo x > .duck/notebook.md.bak',
+    'ls .duck && wc -l .duck/decisions.md',
+    'python3 -I tools/count.py > results/summary.md',
+    "printf 'x\\n' | tee /tmp/log.txt; cat .duck/notebook.md",
+  ]) assert.equal(shellDecision(c), null, c);
 });
 
 test('PreToolUse hook: the project is the session root, not the shell folder', () => {

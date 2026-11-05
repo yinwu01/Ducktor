@@ -50,12 +50,12 @@ test('the hub menu lists every command, and nothing else', () => {
   assert.deepEqual(listed, COMMANDS.filter((c) => c !== 'duck'));
 });
 
-test('every original skill has a command, and core.md maps every skill name', () => {
+test('every original skill has a command, and the command template maps every skill name', () => {
   const { commands } = json('rules/commands.json');
   const wrapped = commands.flatMap((c) => c.skills).sort();
   assert.deepEqual(wrapped, LIBRARY);
-  const core = read('rules/core.md');
-  for (const skill of LIBRARY) assert.match(core, new RegExp(`${skill}[^；。]*→ /duck-`), skill);
+  const template = read('rules/wrapper-template.md');
+  for (const skill of LIBRARY) assert.match(template, new RegExp(`${skill}[^；。]*→ /duck-`), skill);
 });
 
 test('generated files are up to date', () => {
