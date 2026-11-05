@@ -406,6 +406,17 @@ rc12 的结果（Ducktor 8786f36，DeepSeek-Ducktor ae30950），最终版：
 - p5-wang 在这一轮的代码上复测（DeepSeek）：改研究假设和研究设计时，研究决定先问再动手。没做到就照实写，不发 0.2.3。
 - 第 18 条的新做法要用户确认后才发。达到以后等用户点头再合并发布。
 
+0.2.3 第四轮的结果（Ducktor 225652a，DeepSeek-Ducktor 86eae0b，13:30 起跑）：
+
+| 宿主 | main | more | loop | paper |
+|---|---|---|---|---|
+| Claude Code | 86/90，必过项全过 | 110/112，必过项全过 | 6 遍 51 到 53/57，必过项失败 1 处 | 46/48，必过项全过 |
+| DeepSeek | 84/87，必过项差 2 | 109/111，必过项全过 | 6 遍 51 到 53/55，必过项失败 4 处 | 没跑 |
+
+- carry、carry-num、scope：Claude Code 6/6，DeepSeek 各 5/6；carry-num-ok 两个宿主 6/6；try-first、try-first-ok、try-first-check 两个宿主的 more 都过。e2e 这部分达到。
+- 其余必过项失败逐条读了：intro 没点出 10-12 两遍（Claude Code 1、DeepSeek 1，已知）；DeepSeek main 的 propose 没点出 /duck-polish（只改一句，规则第 5 条要求末尾点出命令，例句「整段润色可以用 /duck-polish」还在；0.2.2 第二轮和 0.2.3 第一轮这一步都过，这次只跑了一遍，原因未查明）；DeepSeek main 的「引的卡号都存在」：AI 引的 G01 是这一流程里学生建的组卡，同一行里的 P90 是分位数，检查把它当成卡号（检查误判）。
+- p5-wang 复测（86eae0b）：【跑完填】
+
 ### 更早的结果
 
 
