@@ -142,7 +142,7 @@ Ducktor 将过程中的认知资产以纯文本 Markdown 存储在项目本地�
 也可以照下面的步骤自己装。
 
 **环境要求**：Node.js 18 及以上版本。
-*(注：当前仓库处于私有测试期，请先确认你的 GitHub 账号已开通访问权限，可通过 `gh repo view yinwu01/Ducktor` 验证。若此前安装过旧版 `Doctor Duck`，请先参照 [INSTALL.md](INSTALL.md) 中的卸载指南清理旧版本。)*
+*(注：若此前安装过旧版 `Doctor Duck`，请先参照 [INSTALL.md](INSTALL.md) 中的卸载指南清理旧版本。)*
 
 ### Claude Code
 

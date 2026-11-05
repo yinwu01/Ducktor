@@ -2,8 +2,6 @@
 
 You must have Claude Code or Codex, and [Node.js](https://nodejs.org/) 18 or a later version. Both hooks use Node.js. It installs no packages.
 
-> At this time, the repository is private. Before you install, your GitHub account must have access to the repository, and git must be able to use that account (for example, with `gh` installed and logged in). If `gh repo view yinwu01/Ducktor` opens the repository, you have access. If it does not open, `marketplace add` also fails. Ask the owner of the repository for access first.
-
 ## Claude Code
 
 ```

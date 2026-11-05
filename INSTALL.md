@@ -2,8 +2,6 @@
 
 要求：装了 Claude Code 或 Codex，外加 [Node.js](https://nodejs.org/) 18 以上（两条 hook 都用，不装任何依赖）。
 
-> 仓库现在是私有的。装之前，你的 GitHub 账号要有这个仓库的访问权限，git 也要能用这个账号拉代码（比如装过 `gh` 并登录）。`gh repo view yinwu01/Ducktor` 能打开，就是有了；打不开，`marketplace add` 也会拉取失败，先找仓库管理员要权限。
-
 ## Claude Code
 
 ```

@@ -143,7 +143,7 @@ Follow the steps in i18n/INSTALL.en.md in that repository, then tell me how to s
 You can also install it yourself with the steps below.
 
 **Requirement**: Node.js 18 or a later version.
-*(Note: the repository is private during this test period. First make sure that your GitHub account has access to it. You can check with `gh repo view yinwu01/Ducktor`. If you installed the old `Doctor Duck` before, first remove it with the steps in [INSTALL.en.md](INSTALL.en.md).)*
+*(Note: if you installed the old `Doctor Duck` before, first remove it with the steps in [INSTALL.en.md](INSTALL.en.md).)*
 
 ### Claude Code
 
