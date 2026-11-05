@@ -58,7 +58,7 @@
 - 开工前翻笔记本：新会话里多数会点出用的是笔记本哪天那条（最后两轮 27 遍里 25 遍），测试只测了「给导师写进展」这一种工作；同一个会话里刚讨论过的原则，AI 照着做，但多半不点出是哪条；命令里也偶尔漏（引言命令最后两轮 27 遍里 1 遍没点出）。
 - 在 Claude Code 里，AI 联网查文献、用 python 算数或跑代码、用组合命令查稿子、用 shell 读插件文件（规则要它用 Read）时会弹允许框：最后一轮 main 3 次、more 1 次、paper 2 次，loop 6 遍一共 2 次（测试开着自动接受编辑，改文件不弹框，这些数不含改文件的框）。
 - AI 有时仍先用 shell 命令写笔记本或决策记录：Claude Code 上命令里写明 `.duck/` 路径的被插件拒绝，AI 随后改用编辑工具，测试里这几行都写进去了；最终版试用里有一次先 cd 进 `.duck/` 再写，没被拦住；DeepSeek-Ducktor 上没有这层拦截（最后两轮 15 遍里 3 遍用 shell 写了）。
-- 防止整份覆盖和拒绝 shell 写日志只在 Claude Code 里有，而且 Edit 整段替换、cp、mv、链接过来的文件、先 cd 进 `.duck/` 再写、用 python 写还拦不住；DeepSeek-Ducktor 的写文件审批由 dsh 自己管，Codex 的改文件工具这个 hook 看不到。
+- 防止整份覆盖和拒绝 shell 写日志只在 Claude Code 上测过（Codex 上会不会触发没测），而且 Edit 整段替换、cp、mv、链接过来的文件、先 cd 进 `.duck/` 再写、用 python 写还拦不住；DeepSeek-Ducktor 的写文件审批由 dsh 自己管，Codex 的改文件工具这个 hook 看不到。
 - Codex 上这一版还没有跑端到端测试。
 
 ## 0.2.0（2026-10-28）
