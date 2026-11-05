@@ -381,6 +381,11 @@ rc12 的结果（Ducktor 8786f36，DeepSeek-Ducktor ae30950），最终版：
 - 第 1 条在 DeepSeek 上没守住（p5）和「写 Discussion 时照抄错数」这一轮不改，写进已知问题；角色这一轮不重跑。
 - 没达到时停下，照实写。达到以后等用户点头再合并发布。
 
+0.2.3 第三轮的结果（Ducktor e4603e4，DeepSeek-Ducktor 8c4d093）：判定：达到。
+- 两个宿主 loop 各 6 遍：carry-num（第一次回复列出摘要的 31%）12/12，carry-num-ok 12/12，carry 12/12。
+- 其余必过项失败：DeepSeek 一遍 scope（把实验节一句移到别的节，6 遍 1 遍，第二轮也有 1 遍，记进已知问题）；DeepSeek 一遍 insist-drop：表注那句删了，exp 那步按学生要求加进表的行名里写着「from one run」，检查按全文搜（检查改成只查学生要删的那句，Claude Code 第一轮的同类失败也是这个原因）。
+- 没改、记进已知问题的：第 1 条在 DeepSeek 上没守住（p5：改研究设计时两件研究决定先改后问）；写正文时照抄稿子里算错的数，到复盘才查出（p6）；DeepSeek 上一轮回复偶尔等 5 到 10 分钟。
+
 ### 更早的结果
 
 
